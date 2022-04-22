@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>uaBrowser - 浏览器检测</title>
+  <meta name="description" content="通过Useragent和浏览器环境变量等方式判断浏览器、系统及设备类型，是页面判断检测的常用工具。">
+	<meta name="keywords" content="Useragent,用户代理,浏览器判断,浏览器类型,浏览器信息">
+  <script type="text/javascript" src="../dist/browser.min.js"></script>
+  <style>
+    a{
+      text-decoration: none;
+        color: #757575;
+    }
+    a:hover{
+      text-decoration: underline;
+    }
+    .wrapper{
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .container{
+      margin-bottom: 20px;
+    }
+    .footer{
+      line-height: 40px;
+      text-align: right;
+    }
+    .module .code{
+      padding: 10px;
+      margin-bottom: 5px;
+      background: #f8f8f8;
+      line-height: 24px;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+    .module table{
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+        border-spacing: 0;
+      text-align: center;
+    }
+    .module thead{
+      background: #eee;
+    }
+    .module th,.module td{
+      padding: 8px 5px;
+      line-height: 24px;
+      border: 1px solid #eee;
+    }
+
+    .mod-foot .btn{
+        position: relative;
+        display: inline-block;
+        min-width: 56px;
+        height: 34px;
+        background: #fff;
+        padding: 0 12px;
+        border: 1px solid #ececec;
+        border-radius: 6px;
+        line-height: 34px;
+        text-decoration: none;
+        text-align: center;
+        font-size: 14px;
+        color: #333;
+        overflow: hidden;
+        transition: color .2s,opacity .2s;
+        font-family: Tahoma,Arial, Helvetica,"Microsoft YaHei";
+        outline: none;
+        -webkit-appearance: none;
+    }
+    .mod-foot .btn:after {
+        content: " ";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        transition: opacity .2s;
+        border-radius: 6px;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .mod-foot .btn span,.mod-foot .btn svg{
+        vertical-align: middle;
+    }
+    .mod-foot .btn svg,.mod-foot .btn svg+span{
+        position: relative;
+        top: -1px;
+    }
+    .mod-foot .btn:hover {
+        color: #000;
+        opacity: 1;
+    }
+    .mod-foot .btn:hover:after {
+        opacity: .02;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="module">
+        <script>
+          var info = new uaBrowser()
+
+          console.log(info)
+
+          if (info.device!='Mobile') {
+            document.writeln('<table>\
+              <caption><div class="code">'+navigator.userAgent+'</div></caption>\
+              <thead>\
+                <tr>\
+                  <th>浏览器</th>\
+                  <th>版本</th>\
+                  <th>内核</th>\
+                  <th>操作系统</th>\
+                  <th>设备</th>\
+                  <th>语言</th>\
+                </tr>\
+              </thead>\
+              <tbody>\
+                <tr>\
+                  <td>'+info.browser+'</td>\
+                  <td>'+info.version+'</td>\
+                  <td>'+info.engine+'</td>\
+                  <td>'+info.os+' '+info.osVersion+'</td>\
+                  <td>'+info.device+'</td>\
+                  <td>'+info.language+'</td>\
+                </tr>\
+              </tbody>\
+            </table>');
+          } else {
+            document.writeln('<table>\
+              <caption><p>'+navigator.userAgent+'</p></caption>\
+              <thead>\
+                <tr>\
+                  <th>浏览器</th>\
+                  <th>版本</th>\
+                  <th>内核</th>\
+                </tr>\
+              </thead>\
+              <tbody>\
+                <tr>\
+                  <td>'+info.browser+'</td>\
+                  <td>'+info.version+'</td>\
+                  <td>'+info.engine+'</td>\
+                </tr>\
+              </tbody>\
+            </table>');
+            document.writeln('<table>\
+              <thead>\
+                <tr>\
+                  <th>操作系统</th>\
+                  <th>设备</th>\
+                  <th>语言</th>\
+                </tr>\
+              </thead>\
+              <tbody>\
+                <tr>\
+                  <td>'+info.os+' '+info.osVersion+'</td>\
+                  <td>'+info.device+'</td>\
+                  <td>'+info.language+'</td>\
+                </tr>\
+              </tbody>\
+            </table>')
+          }
+        </script>
+      </div>
+    </div>
+</body>
+</html>
