@@ -11,7 +11,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 })(this, function () {
   'use strict';
 
-  var version = "1.0.0";
+  var version = "0.1.0";
   var UA = navigator.userAgent;
   var mimeTypes = navigator.mimeTypes;
   var platfrom = navigator.platform;
