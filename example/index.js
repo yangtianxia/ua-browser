@@ -1,3 +1,3 @@
-import { uaBrowser } from '../dist'
+import uaBrowser from '../dist'
 
 console.log(uaBrowser())

@@ -100,9 +100,9 @@ export type EnvOption = EnvPart & EnvWebview & {
     | 'Pc'
 }
 
-export function uaBrowser(ua?: string): EnvOption
+declare function uaBrowser(ua?: string): EnvOption
 
-export namespace uaBrowser {
+declare namespace uaBrowser {
   /** 检查 `webview` 浏览环境，仅支持 `android` */
   function isWebview(ua: string): boolean
   /** 检查微信小程序 */
@@ -112,6 +112,8 @@ export namespace uaBrowser {
   /** 当前版本 */
   const VERSION: string
 }
+
+export default uaBrowser
 
 declare global {
   // Window
