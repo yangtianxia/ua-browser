@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin typescript && shx cp src/types.d.ts dist/index.d.ts && shx cp index.js dist/index.js",
+    "build": "shx rm -rf dist && rollup --config rollup.config.ts --configPlugin typescript && shx cp src/types.d.ts dist/index.d.ts && shx cp index.js dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
