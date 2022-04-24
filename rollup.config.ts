@@ -32,7 +32,7 @@ const common = (type?: string) => {
   return {
     input: './src/index.ts',
     output: {
-      file: `dist/browser.${type || ''}.js`,
+      file: `dist/browser${type ? `.min` : ''}.js`,
       format: 'umd',
       name: 'uaBrowser'
     },
