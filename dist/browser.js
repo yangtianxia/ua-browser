@@ -11,10 +11,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 })(this, function () {
   'use strict';
 
-  var version = "0.1.1";
-  var UA = navigator.userAgent;
-  var mimeTypes = navigator.mimeTypes;
-  var platfrom = navigator.platform;
+  var version = "0.1.2";
+  var NAVIGATOR = {};
+
+  if (typeof navigator !== 'undefined') {
+    NAVIGATOR = navigator;
+  }
+
+  var UA = NAVIGATOR.userAgent;
+  var mimeTypes = NAVIGATOR.mimeTypes;
+  var platfrom = NAVIGATOR.platform;
   /** 内核 */
 
   var engineRegExp = {
@@ -133,13 +139,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
   };
 
   var getLanguage = function getLanguage() {
-    return (navigator.browserLanguage || navigator.language).replace(/-\w+/g, function (word) {
+    var _a;
+
+    return (_a = NAVIGATOR.browserLanguage || NAVIGATOR.language) === null || _a === void 0 ? void 0 : _a.replace(/-\w+/g, function (word) {
       return word.toUpperCase();
     });
   };
 
   var isWechatMiniapp = function isWechatMiniapp() {
-    return '__wxjs_environment' in window && window.__wxjs_environment === 'miniprogram';
+    return typeof __wxjs_environment !== 'undefined' && __wxjs_environment === 'miniprogram';
   };
 
   var isWebview = function isWebview(ua) {
@@ -412,7 +420,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     }, {
       key: "getDevice",
       value: function getDevice() {
-        if (platfrom === 'MacIntel' && navigator.maxTouchPoints > 1) {
+        if (platfrom === 'MacIntel' && NAVIGATOR.maxTouchPoints > 1) {
           return 'Tablet';
         }
 
@@ -443,13 +451,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         };
         var is360 = false;
 
-        if ('chrome' in window) {
-          var chrome = window.chrome;
+        if (typeof chrome !== 'undefined') {
           var vers = this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
 
           if (chrome.adblock2345 || chrome.common2345) {
             env.browser = '2345Explorer';
-          } else if (getMimeType('application/360softmgrplugin') || getMimeType('application/mozilla-npqihooquicklogin') || vers > '36' && window.showModalDialog) {
+          } else if (getMimeType('application/360softmgrplugin') || getMimeType('application/mozilla-npqihooquicklogin') || vers > '36' && typeof showModalDialog !== 'undefined') {
             is360 = true;
           } else if (vers > '45') {
             is360 = getMimeType('application/vnd.chromium.remoting-viewer');
@@ -463,7 +470,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         if (env.device === 'Mobile' && /iPad/.test(this.ua)) {
           env.device = 'Tablet';
         } else if (is360) {
-          if (getMimeType('application/gameplugin') || !((_b = navigator === null || navigator === void 0 ? void 0 : navigator.connection) === null || _b === void 0 ? void 0 : _b.saveData)) {
+          if (getMimeType('application/gameplugin') || !((_b = NAVIGATOR === null || NAVIGATOR === void 0 ? void 0 : NAVIGATOR.connection) === null || _b === void 0 ? void 0 : _b.saveData)) {
             env.browser = '360SE';
           } else {
             env.browser = '360EE';
@@ -493,7 +500,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         if (env.browser === 'Chrome' && this.ua.match(/\S+Browser/)) {
           env.browser = this.ua.match(/\S+Browser/)[0];
           env.version = this.ua.replace(/^.*Browser\/([\d.]+).*$/, '$1');
-        } else if (env.browser === 'Firefox' && ('clientInformation' in window || !('u2f' in window))) {
+        } else if (env.browser === 'Firefox' && (typeof clientInformation !== 'undefined' || !(typeof u2f !== 'undefined'))) {
           env.browser = "".concat(env.browser, " Nightly");
         } else if (env.browser === 'Wechat' && isWechatMiniapp()) {
           env.browser = 'Wechat Miniapp';
