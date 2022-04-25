@@ -116,15 +116,16 @@ declare namespace uaBrowser {
 export default uaBrowser
 
 declare global {
-  // Window
-  interface Window {
-    __wxjs_environment: string
-    showModalDialog: any
-    chrome: {
-      adblock2345: any
-      common2345: any
-    }
+  const __wxjs_environment: string
+
+  const chrome: {
+    adblock2345: any
+    common2345: any
   }
+
+  const showModalDialog: any
+
+  const u2f: any
 
   // Navigator
   interface Navigator {
