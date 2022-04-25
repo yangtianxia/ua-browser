@@ -1,5 +1,5 @@
 import { version } from '../package.json'
-import UaBrowser, { isWebview, isWechatMiniapp, getLanguage } from './uaBrowser'
+import UaBrowser, { isWebview, isWechatMiniapp, getLanguage } from './browser'
 
 const instance = new UaBrowser() 
 
