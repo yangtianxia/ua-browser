@@ -1,6 +1,6 @@
 {
   "name": "ua-browser",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "uaBrowser - 通过 useragent和浏览器环境变量检测浏览器、系统及设备类型工具",
   "main": "index.js",
   "types": "./dist/index.d.ts",
