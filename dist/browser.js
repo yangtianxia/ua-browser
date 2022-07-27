@@ -11,7 +11,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 })(this, function () {
   'use strict';
 
-  var version = "0.1.2";
+  var version = "0.1.4";
   var NAVIGATOR = {};
 
   if (typeof navigator !== 'undefined') {
@@ -61,7 +61,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     QQ: /QQ\//,
     Baidu: /(Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD)/,
     Maxthon: /Maxthon/,
-    Sogou: /(Metasr|Sogou)/,
+    Sogou: /(MetaSr|Sogou)/,
     Liebao: /(LBBROWSER|LieBaoFast)/,
     '2345Explorer': /2345Explorer/,
     '115Browser': /115Browser/,
@@ -449,6 +449,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           language: (_a = getLanguage()) !== null && _a !== void 0 ? _a : 'unknown',
           platfrom: platfrom !== null && platfrom !== void 0 ? platfrom : 'unknown'
         };
+        var browser = env.browser;
         var is360 = false;
 
         if (typeof chrome !== 'undefined') {
@@ -471,10 +472,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           env.device = 'Tablet';
         } else if (is360) {
           if (getMimeType('application/gameplugin') || !((_b = NAVIGATOR === null || NAVIGATOR === void 0 ? void 0 : NAVIGATOR.connection) === null || _b === void 0 ? void 0 : _b.saveData)) {
-            env.browser = '360SE';
+            browser = '360SE';
           } else {
-            env.browser = '360EE';
+            browser = '360EE';
           }
+        }
+
+        if (hash.browser.indexOf(browser) >= hash.browser.indexOf(env.browser)) {
+          env.browser = browser;
         }
 
         if (env.browser === 'Baidu' && browserRegExp.Opera.test(this.ua)) {
