@@ -11,14 +11,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 })(this, function () {
   'use strict';
 
-  var version = "0.1.4";
+  var version = "0.1.5";
   var NAVIGATOR = {};
 
   if (typeof navigator !== 'undefined') {
     NAVIGATOR = navigator;
   }
 
-  var UA = NAVIGATOR.userAgent;
+  var UA = NAVIGATOR.userAgent || '';
   var mimeTypes = NAVIGATOR.mimeTypes;
   var platfrom = NAVIGATOR.platform;
   /** 内核 */
@@ -67,6 +67,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     '115Browser': /115Browser/,
     TheWorld: /TheWorld/,
     XiaoMi: /MiuiBrowser/,
+    Vivo: /VivoBrowser/,
+    Huawei: /HuaweiBrowser/,
+    OPPO: /HeyTapBrowser/,
     Quark: /Quark/,
     Qiyu: /Qiyu/,
     Wechat: /MicroMessenger/,
@@ -76,10 +79,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     Weibo: /Weibo/,
     Douban: /com\.douban\.frodo/,
     Suning: /SNEBUY-APP/,
-    iQiYi: /IqiyiAp/,
+    iQiYi: /IqiyiApp/,
     DingTalk: /DingTalk/,
-    Huawei: /(HuaweiBrowser|HUAWEI\/|HONOR)/,
-    Vivo: /VivoBrowser/
+    Douyin: /aweme/
   };
   /** 系统或平台 */
 
@@ -112,10 +114,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     isWebview: /; wv/
   };
   var hash = {
-    device: ['Mobile', 'Tablet'],
-    os: ['Windows', 'Linux', 'MacOS', 'Android', 'HarmonyOS', 'Ubuntu', 'FreeBSD', 'Debian', 'Windows Phone', 'BlackBerry', 'MeeGo', 'Symbian', 'iOS', 'Chrome OS', 'WebOS'],
-    engine: ['Trident', 'Presto', 'WebKit', 'Gecko', 'KHTML'],
-    browser: ['Safari', 'Chrome', 'IE', 'Edge', 'Firefox', 'Firefox Focus', 'Chromium', 'Opera', 'Vivaldi', 'Yandex', 'Arora', 'Lunascape', 'QupZilla', 'Coc Coc', 'Kindle', 'Iceweasel', 'Konqueror', 'Iceape', 'SeaMonkey', 'Epiphany', '360', '360EE', '360SE', 'UC', 'QQBrowser', 'QQ', 'Baidu', 'Maxthon', 'Sogou', 'Liebao', '2345Explorer', '115Browser', 'TheWorld', 'XiaoMi', 'Quark', 'Qiyu', 'Wechat', 'WechatWork', 'Taobao', 'Alipay', 'Weibo', 'Douban', 'Suning', 'iQiYi', 'DingTalk', 'Huawei', 'Vivo']
+    os: Object.keys(osRegExp),
+    device: Object.keys(deviceRegExp),
+    engine: Object.keys(engineRegExp),
+    browser: Object.keys(browserRegExp)
   };
 
   var getMimeType = function getMimeType(value) {
@@ -137,6 +139,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
     return 'unknown';
   };
+
+  var _windowVersion;
+
+  if (NAVIGATOR === null || NAVIGATOR === void 0 ? void 0 : NAVIGATOR.userAgentData) {
+    NAVIGATOR.userAgentData.getHighEntropyValues(['platformVersion']).then(function (ua) {
+      if (NAVIGATOR.userAgentData.platform === 'Windows') {
+        var majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
+
+        if (majorPlatformVersion >= 13) {
+          _windowVersion = '11';
+        } else {
+          _windowVersion = '10';
+        }
+      }
+    });
+  }
 
   var getLanguage = function getLanguage() {
     var _a;
@@ -249,6 +267,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         Vivo: function Vivo() {
           return _this.ua.replace(/^.*VivoBrowser\/([\d.]+).*$/, '$1');
         },
+        OPPO: function OPPO() {
+          return _this.ua.replace(/^.*HeyTapBrowser\/([\d.]+).*$/, '$1');
+        },
         Quark: function Quark() {
           return _this.ua.replace(/^.*Quark\/([\d.]+).*$/, '$1');
         },
@@ -285,6 +306,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         Huawei: function Huawei() {
           return _this.ua.replace(/^.*Version\/([\d.]+).*$/, '$1').replace(/^.*HuaweiBrowser\/([\d.]+).*$/, '$1');
         },
+        Douyin: function Douyin() {
+          return _this.ua.replace(/^.*app_version\/([\d.]+).*$/, '$1');
+        },
         '115Browser': function Browser() {
           return _this.ua.replace(/^.*115Browser\/([\d.]+).*$/, '$1');
         },
@@ -292,9 +316,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return _this.ua.replace(/^.*QihooBrowser\/([\d.]+).*$/, '$1');
         },
         '360SE': function SE() {
-          var vers = _this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+          var vers = _this.getChromeVars();
 
           var hash = {
+            '108': '14.0',
             '86': '13.0',
             '78': '12.0',
             '69': '11.0',
@@ -308,7 +333,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return hash[vers] || '';
         },
         '360EE': function EE() {
-          var vers = _this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+          var vers = _this.getChromeVars();
 
           var hash = {
             '86': '13.0',
@@ -322,7 +347,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return hash[vers] || '';
         },
         '2345Explorer': function Explorer() {
-          var vers = _this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+          var vers = _this.getChromeVars();
 
           var hash = {
             '69': '10.0',
@@ -337,7 +362,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             _version = _this.ua.replace(/^.*LieBaoFast\/([\d.]+).*$/, '$1');
           }
 
-          var vers = _this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+          var vers = _this.getChromeVars();
 
           var hash = {
             '57': '6.5',
@@ -366,7 +391,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return _this.ua.replace(/^.*Windows Phone( OS)? ([\d.]+);.*$/, '$2');
         },
         MacOS: function MacOS() {
-          return _this.ua.replace(/^.*Mac OS X ([\d_]+).*$/, '$1').replace(/_/g, '.');
+          return _this.ua.replace(/^.*Mac OS X -?([\d_]+).*$/, '$1').replace(/_/g, '.');
         },
         WebOS: function WebOS() {
           return _this.ua.replace(/^.*hpwOS\/([\d.]+);.*$/, '$1');
@@ -393,13 +418,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             '5.1': 'XP',
             '5.0': '2000'
           };
-          return hash[vers] || vers;
+          return hash[vers] || parseInt(vers).toString();
         }
       };
 
-      if (ua) {
-        this.ua = ua;
-      }
+      this.getChromeVars = function () {
+        return _this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+      };
+
+      this.setUA(ua);
     }
 
     _createClass(UaBrowser, [{
@@ -428,16 +455,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         return device === 'unknown' ? 'PC' : device;
       }
     }, {
+      key: "setUA",
+      value: function setUA(ua) {
+        if (typeof ua !== 'string') {
+          console.warn('Parameter must be of type string.');
+          this.ua = UA;
+        } else {
+          this.ua = ua;
+        }
+      }
+    }, {
       key: "getEnv",
       value: function getEnv(ua) {
         var _a, _b;
 
-        if (ua) {
-          this.ua = ua;
-        } else {
-          this.ua = UA;
-        }
-
+        this.setUA(ua);
         var env = {
           version: 'unknown',
           osVersion: 'unknown',
@@ -453,7 +485,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         var is360 = false;
 
         if (typeof chrome !== 'undefined') {
-          var vers = this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1');
+          var vers = this.getChromeVars();
 
           if (chrome.adblock2345 || chrome.common2345) {
             env.browser = '2345Explorer';
@@ -492,6 +524,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (env.osVersion === this.ua) {
             env.osVersion = 'unknown';
           }
+        }
+
+        if (env.os === 'Windows' && _windowVersion) {
+          env.osVersion = _windowVersion;
         }
 
         if (env.browser in this.version) {

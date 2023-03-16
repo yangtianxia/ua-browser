@@ -1,6 +1,6 @@
 export type HashOptions = Record<string, string>
 
-export type OsVersionType = 
+export type OsVersionType =
   | 'Android'
   | 'iOS'
   | 'Debian'
@@ -60,6 +60,7 @@ export type EnvOption = EnvPart & EnvWebview & {
     | '2345Explorer'
     | '115Browser'
     | 'TheWorld'
+		| 'OPPO'
     | 'XiaoMi'
     | 'Quark'
     | 'Qiyu'
@@ -76,6 +77,7 @@ export type EnvOption = EnvPart & EnvWebview & {
     | 'Vivo'
     | 'Firefox Nightly'
     | 'Wechat Miniapp'
+		| 'Douyin'
     | 'unknown'
   os:
     | 'Windows'
@@ -130,9 +132,8 @@ declare global {
   // Navigator
   interface Navigator {
     browserLanguage: string
-    connection: {
-      saveData: any
-    }
+		userAgentData: Record<string, any>
+    connection: Record<string, any>
   }
 }
 
