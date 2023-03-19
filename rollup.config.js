@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import { terser } from 'rollup-plugin-terser'
 
-const common = (type?: string) => {
+const common = () => {
   const plugins = [
     resolve(),
     json(),
@@ -23,21 +23,36 @@ const common = (type?: string) => {
         }]
       ]
     }),
+    terser(),
+    typescript()
   ]
 
-  if (type === 'min') {
-    plugins.push(terser())
-  }
-
-  return {
-    input: './src/index.ts',
-    output: {
-      file: `dist/browser${type ? `.min` : ''}.js`,
-      format: 'umd',
-      name: 'uaBrowser'
+  return [
+    {
+      input: './src/index.ts',
+      plugins: plugins.filter((plugin) => plugin.name !== 'terser'),
+      output: [
+        {
+          file: 'dist/index.esm.mjs',
+          format: 'es'
+        },
+        {
+          file: 'dist/index.cjs.js',
+          format: 'cjs',
+          exports: 'default'
+        }
+      ]
     },
-    plugins: plugins.concat(typescript()),
-  }
+    {
+      plugins,
+      input: './src/index.ts',
+      output: {
+        file: 'dist/index.min.js',
+        format: 'umd',
+        name: 'uaBrowser'
+      }
+    }
+  ]
 }
 
-export default [common(), common('min')]
+export default common()
