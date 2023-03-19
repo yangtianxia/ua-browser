@@ -16,7 +16,6 @@
 		"useDefineForClassFields": false
 	},
 	"include": [
-    "typings/**/*.d.ts",
     "src",
     "rollup.config.ts"
   ],
