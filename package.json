@@ -1,6 +1,6 @@
 {
   "name": "ua-browser",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "uaBrowser - 通过useragent和浏览器环境变量检测浏览器、系统及设备类型工具，支持node环境使用",
   "main": "index.js",
   "module": "./dist/index.esm.mjs",
