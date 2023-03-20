@@ -314,11 +314,13 @@ export default class UaBrowser {
 	private getChromeVars = () => this.ua.replace(/^.*Chrome\/([\d]+).*$/, '$1')
 
 	private setUA(ua?: string) {
-		if (typeof ua !== 'string') {
-			console.warn('Parameter must be of type string.')
-			this.ua = UA
-		} else {
+		if (typeof ua === 'string') {
 			this.ua = ua
+		} else {
+			if (typeof ua !== 'undefined') {
+				console.warn('`ua` must be of type string.')
+			}
+			this.ua = UA
 		}
 	}
 
