@@ -2,24 +2,27 @@
 
 通过userAgent和浏览器环境变量检测浏览器、系统及设备类型的常用工具
 
-## npm安装
+## 安装
 
-```javascript
+### npm
+
+```sh
 npm i ua-browser
 ```
 
-## browser安装
+### pnpm
 
-```javascript
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ua-browser/dist/browser.min.js"></script>
-<script type="text/javascript">
-  window.load = function() {
-    var ua = uaBrowser()
-  }
-</script>
+```sh
+pnpm add ua-browser
 ```
 
-## method
+### yarn
+
+```sh
+yarn add ua-browser
+```
+
+## 支持方法
 
 ```typescript
 import { uaBrowser } from 'ua-browser'
@@ -51,6 +54,7 @@ uaBrowser.VERSION: string
 ```
 
 ## 浏览器
+
 ```typescript
 type browser =
   | 'Safari'
@@ -200,5 +204,3 @@ type device =
 | Vivo浏览器 | `Vivo` |
 | Firefox 下一代网络浏览器Nightly | `Firefox Nightly` |
 | 微信小程序 | `Wechat Miniapp` |
-
-
