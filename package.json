@@ -1,6 +1,6 @@
 {
   "name": "ua-browser",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "uaBrowser - 通过useragent和浏览器环境变量检测浏览器、系统及设备类型工具，支持node环境使用",
   "main": "index.js",
   "module": "./dist/index.esm.mjs",
@@ -40,6 +40,7 @@
     "@babel/core": "^7.14.6",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.14.7",
+    "@changesets/cli": "^2.29.4",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
