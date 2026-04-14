@@ -1,26 +1,18 @@
 {
-	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-		"isolatedModules": true,
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"noEmitOnError": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"pretty": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"target": "ES2018",
-		"useDefineForClassFields": false
-	},
-	"include": [
-    "src",
-    "rollup.config.ts"
-  ],
-	"exclude": [
-    "dist",
-    "node_modules"
-  ]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "test"]
 }
