@@ -3,6 +3,9 @@ import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
 import { detectDevice } from './detectors/device.js'
+import { detectBot } from './detectors/bot.js'
+import { detectArch } from './detectors/arch.js'
+import { detectHeadless } from './detectors/headless.js'
 import { getMimeType, getLanguage, type NavContext } from './utils/navigator.js'
 
 export interface ParseOptions {
@@ -24,6 +27,9 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
   const { os, osVersion } = detectOs(ua, windowsVersion)
   const device = detectDevice(ua, nav)
+  const arch = detectArch(ua)
+  const { isBot, botName } = detectBot(ua)
+  const isHeadless = detectHeadless(ua)
   const language = nav ? getLanguage(nav) : 'unknown'
   const platform = nav?.platform ?? 'unknown'
 
@@ -124,7 +130,11 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     os,
     osVersion,
     device,
+    arch,
     isWebview: /; wv/.test(ua),
+    isHeadless,
+    isBot,
+    botName,
     language,
     platform
   }

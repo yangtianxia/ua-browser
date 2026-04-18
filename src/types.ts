@@ -82,6 +82,29 @@ export type OsName =
 
 export type DeviceName = 'Mobile' | 'Tablet' | 'PC'
 
+export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
+
+export type BotName =
+  | 'Googlebot'
+  | 'Bingbot'
+  | 'Baiduspider'
+  | 'Bytespider'
+  | 'YandexBot'
+  | 'DuckDuckBot'
+  | 'Slurp'
+  | 'Sogou'
+  | '360Spider'
+  | 'Applebot'
+  | 'Facebookbot'
+  | 'Twitterbot'
+  | 'LinkedInBot'
+  | 'SemrushBot'
+  | 'AhrefsBot'
+  | 'MJ12bot'
+  | 'PetalBot'
+  | 'GenericBot'
+  | 'unknown'
+
 export interface EnvOption {
   browser: BrowserName
   version: string
@@ -89,7 +112,11 @@ export interface EnvOption {
   os: OsName
   osVersion: string
   device: DeviceName
+  arch: ArchName
   isWebview: boolean
+  isHeadless: boolean
+  isBot: boolean
+  botName: BotName
   language: string
   platform: string
 }

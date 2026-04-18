@@ -5,6 +5,9 @@ import uaBrowser, {
   isWechatMiniapp,
   getLanguage,
   getWindowsVersion,
+  detectBot,
+  detectArch,
+  detectHeadless,
   VERSION
 } from '../src/index.js'
 
@@ -52,6 +55,18 @@ describe('API surface', () => {
 
   it('named export VERSION is a string', () => {
     expect(typeof VERSION).toBe('string')
+  })
+
+  it('named export detectBot is a function', () => {
+    expect(typeof detectBot).toBe('function')
+  })
+
+  it('named export detectArch is a function', () => {
+    expect(typeof detectArch).toBe('function')
+  })
+
+  it('named export detectHeadless is a function', () => {
+    expect(typeof detectHeadless).toBe('function')
   })
 
   it('isWebview correctly identifies webview UA', () => {

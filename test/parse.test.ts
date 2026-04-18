@@ -7,7 +7,8 @@ describe('parseUA — return shape', () => {
     const result = parseUA(UA.chrome.windows)
     const keys: Array<keyof typeof result> = [
       'browser', 'version', 'engine', 'os', 'osVersion',
-      'device', 'isWebview', 'language', 'platform'
+      'device', 'arch', 'isWebview', 'isHeadless', 'isBot', 'botName',
+      'language', 'platform'
     ]
     for (const key of keys) {
       expect(result).toHaveProperty(key)
@@ -108,6 +109,33 @@ describe('parseUA — windowsVersion override', () => {
     const r = parseUA(UA.chrome.windows, { windowsVersion: '11' })
     expect(r.os).toBe('Windows')
     expect(r.osVersion).toBe('11')
+  })
+})
+
+describe('parseUA — new fields (arch, isBot, isHeadless)', () => {
+  it('Windows x64 Chrome → arch: x86_64', () => {
+    expect(parseUA(UA.chrome.windows).arch).toBe('x86_64')
+  })
+
+  it('regular Chrome → isBot: false, botName: unknown', () => {
+    const r = parseUA(UA.chrome.windows)
+    expect(r.isBot).toBe(false)
+    expect(r.botName).toBe('unknown')
+  })
+
+  it('Googlebot UA → isBot: true, botName: Googlebot', () => {
+    const r = parseUA('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)')
+    expect(r.isBot).toBe(true)
+    expect(r.botName).toBe('Googlebot')
+  })
+
+  it('normal Chrome → isHeadless: false', () => {
+    expect(parseUA(UA.chrome.windows).isHeadless).toBe(false)
+  })
+
+  it('HeadlessChrome UA → isHeadless: true', () => {
+    const ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/124.0.0.0 Safari/537.36'
+    expect(parseUA(ua).isHeadless).toBe(true)
   })
 })
 

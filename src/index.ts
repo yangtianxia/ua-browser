@@ -5,10 +5,13 @@ import { getNavContext, getLanguage } from './utils/navigator.js'
 import type { EnvOption } from './types.js'
 
 // ── Named exports (tree-shakeable) ──────────────────────────────────────────
-export type { EnvOption, BrowserName, OsName, EngineName, DeviceName } from './types.js'
+export type { EnvOption, BrowserName, OsName, EngineName, DeviceName, ArchName, BotName } from './types.js'
 export { parseUA } from './parse.js'
 export { getLanguage, getNavContext } from './utils/navigator.js'
 export { getWindowsVersion } from './utils/windows-version.js'
+export { detectBot } from './detectors/bot.js'
+export { detectArch } from './detectors/arch.js'
+export { detectHeadless } from './detectors/headless.js'
 export { VERSION }
 
 /** Check whether a UA string indicates an Android webview environment. */
