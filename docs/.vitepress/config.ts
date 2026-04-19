@@ -16,32 +16,27 @@ export default defineConfig({
 
     nav: [
       { text: '指南', link: '/guide/getting-started' },
-      { text: 'API', link: '/api/' },
       { text: 'Playground', link: '/playground' },
       { text: '更新日志', link: '/changelog' },
     ],
 
-    sidebar: {
-      '/guide/': [
-        {
-          text: '指南',
-          items: [
-            { text: '快速开始', link: '/guide/getting-started' },
-            { text: '使用示例', link: '/guide/examples' },
-            { text: '内置支持列表', link: '/guide/support-list' },
-          ],
-        },
-      ],
-      '/api/': [
-        {
-          text: 'API 参考',
-          items: [
-            { text: '总览', link: '/api/' },
-            { text: '类型定义', link: '/api/types' },
-          ],
-        },
-      ],
-    },
+    sidebar: [
+      {
+        text: '指南',
+        items: [
+          { text: '快速开始', link: '/guide/getting-started' },
+          { text: '使用示例', link: '/guide/examples' },
+          { text: '内置支持列表', link: '/guide/support-list' },
+        ],
+      },
+      {
+        text: 'API 参考',
+        items: [
+          { text: '总览', link: '/api/' },
+          { text: '类型定义', link: '/api/types' },
+        ],
+      },
+    ],
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/yangtianxia/ua-browser' },
@@ -52,6 +47,8 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024 yangtianxia',
     },
+
+    outline: false,
 
     search: {
       provider: 'local',
