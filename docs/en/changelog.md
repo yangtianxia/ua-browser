@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.0.1
+
+### Added
+
+- Browser detection: Samsung Internet, DuckDuckGo, Puffin
+- AI crawler detection: GPTBot, ClaudeBot, PerplexityBot, CCBot, AdsBot
+- OS detection: Tizen, KaiOS
+- Device type: `TV` (Smart TV)
+- Headless detection: jsdom, Selenium, Playwright markers
+
+### Fixed
+
+- Android devices without `Mobile` marker were incorrectly classified as PC — now correctly identified as Tablet
+
+### Docs
+
+- Playground UI supports Chinese / English switching
+- Full English documentation site (VitePress i18n)
+
+---
+
 ## v1.0.0
 
 ### Added

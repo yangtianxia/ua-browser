@@ -1,5 +1,26 @@
 # 更新日志
 
+## v1.0.1
+
+### 新增
+
+- 新增浏览器检测：Samsung Internet、DuckDuckGo、Puffin
+- 新增 AI 爬虫检测：GPTBot、ClaudeBot、PerplexityBot、CCBot、AdsBot
+- 新增操作系统检测：Tizen、KaiOS
+- 新增设备类型：`TV`（智能电视）
+- 无头浏览器检测补充 jsdom、Selenium、Playwright 标记
+
+### 修复
+
+- Android 设备无 `Mobile` 标记时误判为 PC，现正确识别为平板
+
+### 文档
+
+- Playground 支持中英文界面切换
+- 新增完整英文文档站（VitePress i18n 双语）
+
+---
+
 ## v1.0.0
 
 ### 新增
