@@ -4,9 +4,10 @@ export default defineConfig({
   title: 'uaBrowser',
   description: '通过 User Agent 检测浏览器、系统及设备类型，零依赖',
   lang: 'zh-CN',
+  base: '/ua-browser/',
 
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/ua-browser/favicon.ico' }],
   ],
 
   themeConfig: {
