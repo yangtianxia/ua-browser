@@ -1,5 +1,60 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useData } from 'vitepress'
+
+const { lang } = useData()
+const isEn = computed(() => lang.value === 'en-US')
+
+const i18n = computed(() => isEn.value
+  ? {
+      presetsLabel: 'Presets:',
+      currentBrowser: 'Current Browser',
+      placeholder: 'Enter a User Agent string...',
+      parse: 'Parse',
+      loading: 'Loading...',
+      yes: 'Yes',
+      no: 'No',
+      rawJson: 'Raw JSON',
+      empty: 'Parse result will appear here',
+      fields: {
+        browser: 'Browser',
+        version: 'Version',
+        engine: 'Engine',
+        os: 'OS',
+        device: 'Device',
+        arch: 'Arch',
+        language: 'Language',
+        platform: 'Platform',
+        bot: 'Bot',
+        headless: 'Headless',
+        webview: 'Webview',
+      },
+    }
+  : {
+      presetsLabel: '预设：',
+      currentBrowser: '当前浏览器',
+      placeholder: '输入 User Agent 字符串...',
+      parse: '解析',
+      loading: '加载中...',
+      yes: '是',
+      no: '否',
+      rawJson: '原始 JSON',
+      empty: '解析结果将显示在此处',
+      fields: {
+        browser: '浏览器',
+        version: '版本',
+        engine: '内核',
+        os: '操作系统',
+        device: '设备',
+        arch: '架构',
+        language: '语言',
+        platform: '平台',
+        bot: '爬虫',
+        headless: 'Headless',
+        webview: 'Webview',
+      },
+    }
+)
 
 interface ParseResult {
   browser: string
@@ -102,28 +157,31 @@ function useCurrentUA() {
 const tags = computed(() => {
   if (!result.value) return []
   const r = result.value
+  const t = i18n.value
   const list: { label: string; value: string; type: string }[] = []
   if (r.isBot) list.push({ label: 'Bot', value: r.botName, type: 'danger' })
-  if (r.isHeadless) list.push({ label: 'Headless', value: '是', type: 'warning' })
-  if (r.isWebview) list.push({ label: 'Webview', value: '是', type: 'warning' })
+  if (r.isHeadless) list.push({ label: 'Headless', value: t.yes, type: 'warning' })
+  if (r.isWebview) list.push({ label: 'Webview', value: t.yes, type: 'warning' })
   return list
 })
 
 const fields = computed(() => {
   if (!result.value) return []
   const r = result.value
+  const f = i18n.value.fields
+  const t = i18n.value
   return [
-    { label: '浏览器', value: r.browser },
-    { label: '版本', value: r.version },
-    { label: '内核', value: r.engine },
-    { label: '操作系统', value: `${r.os} ${r.osVersion}`.trim() },
-    { label: '设备', value: r.device },
-    { label: '架构', value: r.arch },
-    { label: '语言', value: r.language },
-    { label: '平台', value: r.platform },
-    { label: '爬虫', value: r.isBot ? r.botName : '否' },
-    { label: 'Headless', value: r.isHeadless ? '是' : '否' },
-    { label: 'Webview', value: r.isWebview ? '是' : '否' },
+    { label: f.browser, value: r.browser },
+    { label: f.version, value: r.version },
+    { label: f.engine, value: r.engine },
+    { label: f.os, value: `${r.os} ${r.osVersion}`.trim() },
+    { label: f.device, value: r.device },
+    { label: f.arch, value: r.arch },
+    { label: f.language, value: r.language },
+    { label: f.platform, value: r.platform },
+    { label: f.bot, value: r.isBot ? r.botName : t.no },
+    { label: f.headless, value: r.isHeadless ? t.yes : t.no },
+    { label: f.webview, value: r.isWebview ? t.yes : t.no },
   ]
 })
 </script>
@@ -132,7 +190,7 @@ const fields = computed(() => {
   <div class="playground">
     <div class="playground-left">
       <div class="playground-presets">
-        <span class="presets-label">预设：</span>
+        <span class="presets-label">{{ i18n.presetsLabel }}</span>
         <button
           v-for="item in PRESET_UAS"
           :key="item.label"
@@ -145,7 +203,7 @@ const fields = computed(() => {
           :class="['preset-btn', 'preset-btn--current', { 'preset-btn--active': selectedKey === 'current' }]"
           @click="useCurrentUA"
         >
-          当前浏览器
+          {{ i18n.currentBrowser }}
         </button>
       </div>
 
@@ -153,14 +211,14 @@ const fields = computed(() => {
         <textarea
           v-model="uaInput"
           class="ua-textarea"
-          placeholder="输入 User Agent 字符串..."
+          :placeholder="i18n.placeholder"
           rows="6"
           spellcheck="false"
           @keydown.enter.ctrl="parse"
           @keydown.enter.meta="parse"
         />
         <button class="parse-btn" :disabled="!loaded" @click="parse">
-          {{ loaded ? '解析' : '加载中...' }}
+          {{ loaded ? i18n.parse : i18n.loading }}
         </button>
       </div>
     </div>
@@ -185,11 +243,11 @@ const fields = computed(() => {
         </div>
 
         <details class="result-raw">
-          <summary>原始 JSON</summary>
+          <summary>{{ i18n.rawJson }}</summary>
           <pre>{{ JSON.stringify(result, null, 2) }}</pre>
         </details>
       </template>
-      <div v-else class="result-empty">解析结果将显示在此处</div>
+      <div v-else class="result-empty">{{ i18n.empty }}</div>
     </div>
   </div>
 </template>
