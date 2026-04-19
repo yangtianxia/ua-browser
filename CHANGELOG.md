@@ -1,5 +1,19 @@
 # ua-browser
 
+## 1.0.1
+
+### Patch Changes
+
+- 新增浏览器、爬虫、操作系统检测支持，完善文档与国际化
+
+  - 新增浏览器检测：Samsung Internet、DuckDuckGo、Puffin
+  - 新增 AI 爬虫检测：GPTBot、ClaudeBot、PerplexityBot、CCBot、AdsBot
+  - 新增操作系统检测：Tizen、KaiOS
+  - 新增设备类型：TV（智能电视），修复 Android 平板识别缺失
+  - 无头浏览器检测补充 jsdom、Selenium、Playwright 标记
+  - Playground 支持中英文界面切换
+  - 新增完整英文 VitePress 文档站（i18n 双语）
+
 ## 1.0.0
 
 ### Major Changes
