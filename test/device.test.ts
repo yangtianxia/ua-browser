@@ -29,6 +29,21 @@ describe('detectDevice', () => {
     expect(detectDevice(UA.safari.ios)).toBe('Mobile')
   })
 
+  it('Android tablet (no Mobile marker) → Tablet', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 10; SM-T515) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Safari/537.36'
+    expect(detectDevice(ua)).toBe('Tablet')
+  })
+
+  it('Samsung Smart TV → TV', () => {
+    const ua = 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/6.0 TV Safari/538.1'
+    expect(detectDevice(ua)).toBe('TV')
+  })
+
+  it('HbbTV device → TV', () => {
+    const ua = 'Mozilla/5.0 (Linux; HbbTV/1.4.7 (+PVR+DL; Philips; TV; ; ; ;) CE-HTML/1.0 NETTV/4.4.0 SmartTV2018)'
+    expect(detectDevice(ua)).toBe('TV')
+  })
+
   it('empty UA → PC', () => {
     expect(detectDevice('')).toBe('PC')
   })
