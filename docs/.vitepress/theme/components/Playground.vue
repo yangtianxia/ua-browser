@@ -247,7 +247,8 @@ const fields = computed(() => {
   color: var(--vp-c-brand-1);
 }
 
-.preset-btn--active {
+.preset-btn--active,
+.preset-btn--active:hover {
   background: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-1);
   color: #fff;
