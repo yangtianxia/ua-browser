@@ -1,4 +1,4 @@
-import pkg from '../package.json' assert { type: 'json' }
+import pkg from '../package.json' with { type: 'json' }
 const { version: VERSION } = pkg
 import { parseUA } from './parse.js'
 import { getNavContext, getLanguage } from './utils/navigator.js'
