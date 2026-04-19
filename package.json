@@ -23,6 +23,7 @@
   ],
   "sideEffects": false,
   "scripts": {
+    "release": "pnpm build && changeset publish",
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
