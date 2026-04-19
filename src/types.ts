@@ -81,6 +81,8 @@ export type OsName =
   | 'iOS'
   | 'Chrome OS'
   | 'WebOS'
+  | 'Tizen'
+  | 'KaiOS'
   | 'unknown'
 
 export type DeviceName = 'Mobile' | 'Tablet' | 'PC'

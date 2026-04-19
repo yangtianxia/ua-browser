@@ -52,6 +52,20 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('11')
   })
 
+  it('Tizen Smart TV', () => {
+    const ua = 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/6.0 TV Safari/538.1'
+    const r = detectOs(ua)
+    expect(r.os).toBe('Tizen')
+    expect(r.osVersion).toBe('6.0')
+  })
+
+  it('KaiOS feature phone', () => {
+    const ua = 'Mozilla/5.0 (Mobile; LYF/F90M/LYF-F90M; Android 4.4.2; rv:65.0) Gecko/65.0 Firefox/65.0 KAIOS/2.5.2'
+    const r = detectOs(ua)
+    expect(r.os).toBe('KaiOS')
+    expect(r.osVersion).toBe('2.5.2')
+  })
+
   it('returns unknown for empty UA', () => {
     const r = detectOs('')
     expect(r.os).toBe('unknown')
