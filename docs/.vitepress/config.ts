@@ -8,6 +8,7 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', href: '/ua-browser/favicon.ico' }],
+    ['script', {}, `var _hmt = _hmt || [];(function() {var hm = document.createElement("script");hm.src = "https://hm.baidu.com/hm.js?039f7362d3cebddced40c9a853536a89";var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm, s);})();`],
   ],
 
   themeConfig: {
