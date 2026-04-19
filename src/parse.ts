@@ -42,7 +42,8 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   // Only runs when a nav context is provided (browser environment).
   if (nav) {
     const chromeGlobal = typeof chrome !== 'undefined' ? chrome : undefined
-    const chromeMajor = parseInt((/Chrome\/([\d]+)/.exec(ua) ?? [])[1] ?? '0', 10)
+    const chromeMatch = /Chrome\/([\d]+)/.exec(ua)
+    const chromeMajor = chromeMatch ? parseInt(chromeMatch[1], 10) : 0
 
     if (chromeGlobal) {
       if (chromeGlobal.adblock2345 || chromeGlobal.common2345) {
@@ -67,7 +68,9 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
         }
 
         if (is360) {
-          if (getMimeType(nav, 'application/gameplugin') || !nav.connection?.saveData) {
+          // 360EE only when saveData is explicitly enabled; default to 360SE
+          const saveDataEnabled = nav.connection?.saveData === true
+          if (getMimeType(nav, 'application/gameplugin') || !saveDataEnabled) {
             browser = '360SE'
           } else {
             browser = '360EE'
@@ -81,9 +84,8 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   // Baidu UA can include Opera token — Opera takes priority
   if (browser === 'Baidu' && /(Opera|OPR|OPT)/.test(ua)) {
     browser = 'Opera'
-    version = ((/OPR\/([\d.]+)/.exec(ua) ?? [])[1]) ??
-              ((/OPT\/([\d.]+)/.exec(ua) ?? [])[1]) ??
-              ((/Opera\/([\d.]+)/.exec(ua) ?? [])[1]) ?? 'unknown'
+    const opVer = /OPR\/([\d.]+)/.exec(ua) ?? /OPT\/([\d.]+)/.exec(ua) ?? /Opera\/([\d.]+)/.exec(ua)
+    version = opVer?.[1] ?? 'unknown'
   }
 
   // Generic "SomethingBrowser/x.y" catch-all: Chrome-based third-party browsers
