@@ -32,6 +32,7 @@ export default defineConfig({
           text: '指南',
           items: [
             { text: '快速开始', link: '/guide/getting-started' },
+            { text: '内置支持列表', link: '/guide/support-list' },
             { text: '从 v0.x 迁移', link: '/guide/migration' },
           ],
         },
