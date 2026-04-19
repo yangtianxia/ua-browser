@@ -28,7 +28,7 @@ export default defineConfig({
           {
             text: '快速开始',
             link: '/guide/getting-started',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: '安装', link: '/guide/getting-started#安装' },
               { text: '基本用法', link: '/guide/getting-started#基本用法' },
@@ -41,7 +41,7 @@ export default defineConfig({
           {
             text: '使用示例',
             link: '/guide/examples',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: '设备跳转', link: '/guide/examples#设备跳转' },
               { text: '拦截爬虫请求', link: '/guide/examples#拦截爬虫请求' },
@@ -59,7 +59,7 @@ export default defineConfig({
           {
             text: '内置支持列表',
             link: '/guide/support-list',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: '浏览器', link: '/guide/support-list#浏览器' },
               { text: '操作系统', link: '/guide/support-list#操作系统' },
@@ -78,7 +78,7 @@ export default defineConfig({
           {
             text: '总览',
             link: '/api/',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: '默认导出', link: '/api/#默认导出' },
               { text: '命名导出', link: '/api/#命名导出' },
@@ -87,7 +87,7 @@ export default defineConfig({
           {
             text: '类型定义',
             link: '/api/types',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'EnvOption', link: '/api/types#envoption' },
               { text: 'BrowserName', link: '/api/types#browsername' },
