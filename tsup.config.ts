@@ -19,6 +19,7 @@ export default defineConfig([
     format: ['iife'],
     globalName: 'uaBrowser',
     clean: false,
+    minify: true,
     treeshake: true,
     target: 'es2018',
     sourcemap: true,
