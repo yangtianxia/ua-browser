@@ -15,7 +15,7 @@ export async function getWindowsVersion(nav: NavContext): Promise<string | null>
   }
   try {
     const data = await nav.userAgentData.getHighEntropyValues(['platformVersion'])
-    const major = parseInt(data['platformVersion']?.split('.')[0] ?? '0', 10)
+    const major = parseInt(data['platformVersion']?.split('.')[0] || '0', 10)
     return major >= 13 ? '11' : '10'
   } catch {
     return null

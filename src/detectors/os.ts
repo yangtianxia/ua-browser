@@ -45,7 +45,8 @@ export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
           osVersion = mapped
         } else if (matchedDef.name === 'Windows') {
           // For unknown Windows NT versions, fall back to the integer part
-          osVersion = parseInt(normalised, 10).toString()
+          const n = parseInt(normalised, 10)
+          osVersion = isNaN(n) ? 'unknown' : n.toString()
         }
       } else {
         osVersion = normalised
