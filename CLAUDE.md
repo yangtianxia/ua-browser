@@ -105,6 +105,32 @@ npx changeset version # bump versions and update CHANGELOG.md
 
 ---
 
+## Git 工作流规范
+
+### 分支策略
+
+- **所有功能、修复、文档 PR 的目标分支为 `dev`**，不得直接合并到 `main`
+- **`main` 只接受来自 `dev` 的发布 PR**，或紧急 hotfix
+- 分支命名：`feat/xxx`、`fix/xxx`、`docs/xxx`（不含 `claude`、`ai` 等词）
+- **禁止直接推送到 `dev` 或 `main`**，所有变更必须通过功能分支提 PR 后合并
+
+### 发版流程（changeset）
+
+每次发布新版本必须更新 `CHANGELOG.md`：
+
+1. 开发完成后在 `dev` 分支运行：
+   ```bash
+   npx changeset        # 交互式选择 patch/minor/major，填写变更描述
+   npx changeset version # 自动升级 package.json 版本号并写入 CHANGELOG.md
+   ```
+2. 提交 `CHANGELOG.md` 和 `package.json` 的变更到 `dev`
+3. 从 `dev` 向 `main` 提发布 PR
+4. 合并后触发 npm 发布
+
+> **禁止**手动修改版本号或跳过 changeset 步骤发布版本，确保每个版本都有对应的 changelog 条目。
+
+---
+
 ## Architecture
 
 ### Core design principles
