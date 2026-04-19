@@ -64,6 +64,7 @@ export default defineConfig({
               { text: '浏览器', link: '/guide/support-list#浏览器' },
               { text: '操作系统', link: '/guide/support-list#操作系统' },
               { text: '渲染内核', link: '/guide/support-list#渲染内核' },
+              { text: '设备类型', link: '/guide/support-list#设备类型' },
               { text: 'CPU 架构', link: '/guide/support-list#cpu-架构' },
               { text: '爬虫 / 机器人', link: '/guide/support-list#爬虫--机器人' },
               { text: '无头 / 自动化浏览器', link: '/guide/support-list#无头--自动化浏览器' },

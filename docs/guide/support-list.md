@@ -20,6 +20,9 @@
 | Opera | `Opera` | 70 |
 | Vivaldi | `Vivaldi` | 80 |
 | Yandex 浏览器 | `Yandex` | 90 |
+| Samsung Internet | `Samsung Internet` | 92 |
+| DuckDuckGo 浏览器 | `DuckDuckGo` | 94 |
+| Puffin | `Puffin` | 96 |
 | Arora | `Arora` | 100 |
 | Lunascape | `Lunascape` | 110 |
 | QupZilla | `QupZilla` | 120 |
@@ -86,6 +89,8 @@
 | macOS | `MacOS` | `10.15.7`... |
 | HarmonyOS | `HarmonyOS` | `2`（基于 Android 版本映射） |
 | Chrome OS | `Chrome OS` | — |
+| Tizen | `Tizen` | `6.0`、`5.5`...（三星智能电视 / 可穿戴） |
+| KaiOS | `KaiOS` | `2.5`、`3.0`...（发展中国家功能机） |
 | Linux | `Linux` | — |
 | Ubuntu | `Ubuntu` | — |
 | Debian | `Debian` | — |
@@ -130,6 +135,17 @@ Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为
 
 ---
 
+## 设备类型
+
+| 类型 | `DeviceName` | 判断规则 |
+| :-- | :-- | :-- |
+| 手机 | `Mobile` | UA 含 `Mobi` 或 `iPh` |
+| 平板 | `Tablet` | UA 含 `iPad`、`Tablet`、`Pad`；或 Android 无 `Mobile` 标识；或 iPadOS（`MacIntel` + 触点 > 1） |
+| 智能电视 | `TV` | UA 含 `SMART-TV`、`HbbTV`、`SmartTV`、`Android TV`、`GoogleTV` |
+| 桌面 | `PC` | 以上均不匹配 |
+
+---
+
 ## CPU 架构
 
 检测规则按优先级从高到低，首个匹配项胜出：
@@ -162,6 +178,16 @@ Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为
 | PetalBot | `PetalBot` | 华为 |
 | Applebot | `Applebot` | Apple |
 
+### AI / LLM 爬虫
+
+| 爬虫 | `BotName` | 归属 |
+| :-- | :-- | :-- |
+| GPTBot | `GPTBot` | OpenAI |
+| ClaudeBot | `ClaudeBot` | Anthropic |
+| PerplexityBot | `PerplexityBot` | Perplexity AI |
+| CCBot | `CCBot` | Common Crawl |
+| AdsBot-Google | `AdsBot` | Google Ads |
+
 ### 社交媒体爬虫
 
 | 爬虫 | `BotName` | 归属 |
@@ -190,7 +216,14 @@ Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为
 
 | 特征 | 场景 |
 | :-- | :-- |
-| `HeadlessChrome` | Chrome 无头模式 |
+| `HeadlessChrome` | Chrome 无头模式（`--headless`） |
+| `Headless` | 通用无头标识 |
 | `PhantomJS` | PhantomJS |
 | `Electron/` | Electron 应用 |
 | `Playwright` | Playwright 自动化测试 |
+| `jsdom/` | Node.js DOM 模拟（Jest / Vitest 测试环境） |
+| `Selenium` | 部分 Selenium / WebDriver 配置 |
+
+::: warning 注意
+Cypress、WebdriverIO 默认不修改 UA，无法从 UA 层面检测。现代隐身模式（如 puppeteer-stealth）可绕过以上所有标识，本检测仅覆盖未经伪装的常见场景。
+:::
