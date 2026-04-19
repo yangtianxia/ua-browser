@@ -62,19 +62,19 @@ const PRESET_UAS = [
 
 const uaInput = ref('')
 const result = ref<ParseResult | null>(null)
-const parseUA = ref<((ua: string) => ParseResult) | null>(null)
+const uaBrowser = ref<((ua: string) => ParseResult) | null>(null)
 const loaded = ref(false)
 
 onMounted(async () => {
   const mod = await import('ua-browser')
-  parseUA.value = mod.parseUA
+  uaBrowser.value = mod.default
   loaded.value = true
   useCurrentUA()
 })
 
 function parse() {
-  if (!parseUA.value || !uaInput.value.trim()) return
-  result.value = parseUA.value(uaInput.value.trim())
+  if (!uaBrowser.value || !uaInput.value.trim()) return
+  result.value = uaBrowser.value(uaInput.value.trim())
 }
 
 function usePreset(ua: string) {
@@ -140,7 +140,7 @@ const fields = computed(() => {
           v-model="uaInput"
           class="ua-textarea"
           placeholder="输入 User Agent 字符串..."
-          rows="5"
+          rows="6"
           spellcheck="false"
           @keydown.enter.ctrl="parse"
           @keydown.enter.meta="parse"
@@ -152,7 +152,7 @@ const fields = computed(() => {
     </div>
 
     <div class="playground-right">
-      <div v-if="result" class="playground-result">
+      <template v-if="result">
         <div v-if="tags.length" class="result-tags">
           <span
             v-for="tag in tags"
@@ -174,10 +174,8 @@ const fields = computed(() => {
           <summary>原始 JSON</summary>
           <pre>{{ JSON.stringify(result, null, 2) }}</pre>
         </details>
-      </div>
-      <div v-else class="playground-empty">
-        <span>解析结果将显示在此处</span>
-      </div>
+      </template>
+      <div v-else class="result-empty">解析结果将显示在此处</div>
     </div>
   </div>
 </template>
@@ -186,17 +184,19 @@ const fields = computed(() => {
 .playground {
   display: flex;
   gap: 24px;
+  align-items: flex-start;
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
   padding: 24px;
-  margin: 24px 0;
   background: var(--vp-c-bg-soft);
-  align-items: flex-start;
 }
 
 .playground-left {
-  flex: 0 0 42%;
+  flex: 0 0 38%;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .playground-right {
@@ -209,7 +209,6 @@ const fields = computed(() => {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  margin-bottom: 16px;
 }
 
 .presets-label {
@@ -247,6 +246,7 @@ const fields = computed(() => {
 
 .ua-textarea {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -257,7 +257,6 @@ const fields = computed(() => {
   line-height: 1.6;
   resize: vertical;
   transition: border-color 0.2s;
-  box-sizing: border-box;
 }
 
 .ua-textarea:focus {
@@ -287,12 +286,11 @@ const fields = computed(() => {
   opacity: 0.85;
 }
 
-.playground-empty {
+.result-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 120px;
+  min-height: 160px;
   color: var(--vp-c-text-3);
   font-size: 13px;
   border: 1px dashed var(--vp-c-divider);
@@ -301,8 +299,9 @@ const fields = computed(() => {
 
 .result-tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .result-tag {
@@ -324,7 +323,7 @@ const fields = computed(() => {
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -356,7 +355,7 @@ const fields = computed(() => {
 }
 
 .result-raw {
-  margin-top: 16px;
+  margin-top: 14px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
   overflow: hidden;
