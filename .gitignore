@@ -19,4 +19,4 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?docs/.vitepress/dist\ndocs/.vitepress/cache

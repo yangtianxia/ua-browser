@@ -29,7 +29,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "docs:dev": "pnpm build && vitepress dev docs",
+    "docs:build": "pnpm build && vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "repository": {
     "type": "git",
@@ -53,11 +56,13 @@
     "@changesets/cli": "^2.29.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "tsup": "^8.0.2",
     "typescript": "^5.4.0",
+    "vitepress": "^1.6.4",
     "vitest": "^1.6.0",
-    "@vitest/coverage-v8": "^1.6.0"
+    "vue": "^3.5.32"
   }
 }
