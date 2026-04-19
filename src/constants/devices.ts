@@ -4,6 +4,6 @@ export interface DeviceDef {
 }
 
 export const DEVICE_DEFS: readonly DeviceDef[] = [
-  { name: 'Mobile', detect: /(Mobi|iPh|480)/ },
-  { name: 'Tablet', detect: /(Tablet|Pad|Nexus 7)/ }
+  { name: 'Mobile', detect: /(Mobi|iPh)/ },
+  { name: 'Tablet', detect: /(Tablet|Pad)/ }
 ] as const

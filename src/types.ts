@@ -85,7 +85,7 @@ export type OsName =
   | 'KaiOS'
   | 'unknown'
 
-export type DeviceName = 'Mobile' | 'Tablet' | 'PC'
+export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV'
 
 export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
