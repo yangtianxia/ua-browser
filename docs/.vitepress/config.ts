@@ -18,13 +18,7 @@ export default defineConfig({
       { text: '指南', link: '/guide/getting-started' },
       { text: 'API', link: '/api/' },
       { text: 'Playground', link: '/playground' },
-      {
-        text: 'v1.0.0',
-        items: [
-          { text: '更新日志', link: '/changelog' },
-          { text: '从 v0.x 迁移', link: '/guide/migration' },
-        ],
-      },
+      { text: '更新日志', link: '/changelog' },
     ],
 
     sidebar: {
@@ -35,7 +29,6 @@ export default defineConfig({
             { text: '快速开始', link: '/guide/getting-started' },
             { text: '使用示例', link: '/guide/examples' },
             { text: '内置支持列表', link: '/guide/support-list' },
-            { text: '从 v0.x 迁移', link: '/guide/migration' },
           ],
         },
       ],
