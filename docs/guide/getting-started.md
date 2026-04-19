@@ -56,6 +56,7 @@ import {
   parseUA,          // 纯函数版本，适合 SSR / Node.js
   isWebview,        // 检测 Android Webview
   isWechatMiniapp,  // 检测微信小程序
+  getNavContext,    // 读取当前浏览器 navigator 上下文
   getLanguage,      // 获取浏览器语言
   getWindowsVersion,// 异步获取精确 Windows 版本
   detectBot,        // 爬虫检测

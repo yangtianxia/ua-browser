@@ -21,7 +21,7 @@ uaBrowser(ua?: string): EnvOption
 ```typescript
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.isWechatMiniapp(): boolean
-uaBrowser.getLanguage(): string
+uaBrowser.getLanguage(nav: NavContext): string
 uaBrowser.VERSION: string
 ```
 
@@ -110,12 +110,36 @@ detectHeadless(ua: string): boolean
 
 ---
 
-### `getLanguage()`
+### `getNavContext()`
 
-获取标准化的浏览器语言，如 `'zh-CN'`、`'en-US'`。
+读取当前浏览器的 `navigator` 并返回 [`NavContext`](/api/types#navcontext) 对象，在 Node.js 中返回空的安全对象。
 
 ```typescript
-getLanguage(): string
+import { getNavContext } from 'ua-browser'
+
+getNavContext(): NavContext
+```
+
+通常与 `parseUA` 配合使用，将浏览器环境注入纯函数：
+
+```typescript
+const nav = getNavContext()
+const result = parseUA(navigator.userAgent, { nav })
+
+console.log(result.language) // 'zh-CN'
+console.log(result.platform) // 'Win32'
+```
+
+---
+
+### `getLanguage(nav)`
+
+从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言，如 `'zh-CN'`、`'en-US'`。
+
+```typescript
+import { getLanguage, getNavContext } from 'ua-browser'
+
+getLanguage(nav: NavContext): string
 ```
 
 ---

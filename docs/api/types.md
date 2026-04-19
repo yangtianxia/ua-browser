@@ -90,3 +90,40 @@ type BotName =
   | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'PetalBot'
   | 'GenericBot' | 'unknown'
 ```
+
+---
+
+## NavContext
+
+浏览器环境的可注入子集，用于隔离副作用、方便测试。`getNavContext()` 在浏览器中读取真实的 `navigator`，在 Node.js 中返回空对象。
+
+```typescript
+interface NavContext {
+  userAgent:       string
+  platform:        string
+  language:        string
+  browserLanguage?: string
+  maxTouchPoints:  number
+  mimeTypes?:      MimeTypeArray
+  connection?: {
+    saveData?: boolean
+  }
+  userAgentData?: {
+    platform: string
+    getHighEntropyValues(hints: string[]): Promise<Record<string, string>>
+  }
+}
+```
+
+---
+
+## ParseOptions
+
+`parseUA()` 的第二个参数。
+
+```typescript
+interface ParseOptions {
+  nav?:            NavContext       // 注入浏览器环境上下文（浏览器端按需传入）
+  windowsVersion?: string | null   // 预先 await getWindowsVersion() 的结果
+}
+```
