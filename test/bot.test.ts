@@ -60,6 +60,41 @@ describe('detectBot', () => {
       expect(r.botName).toBe('AhrefsBot')
     })
 
+    it('detects GPTBot', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('GPTBot')
+    })
+
+    it('detects ClaudeBot', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ClaudeBot/0.1; +claudebot@anthropic.com'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('ClaudeBot')
+    })
+
+    it('detects PerplexityBot', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; PerplexityBot/1.0; +https://docs.perplexity.ai/docs/perplexitybot'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('PerplexityBot')
+    })
+
+    it('detects CCBot (Common Crawl)', () => {
+      const ua = 'CCBot/2.0 (https://commoncrawl.org/faq/)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('CCBot')
+    })
+
+    it('detects AdsBot-Google', () => {
+      const ua = 'AdsBot-Google (+http://www.google.com/adsbot.html)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('AdsBot')
+    })
+
     it('detects generic bot by keyword', () => {
       const ua = 'MyCustomCrawler/1.0 (a custom web crawler)'
       const r = detectBot(ua)
