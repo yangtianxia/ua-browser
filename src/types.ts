@@ -1,139 +1,152 @@
-export type HashOptions = Record<string, string>
+export type EngineName =
+  | 'Trident'
+  | 'Presto'
+  | 'WebKit'
+  | 'Gecko'
+  | 'KHTML'
+  | 'Blink'
+  | 'EdgeHTML'
+  | 'unknown'
 
-export type OsVersionType =
+export type BrowserName =
+  | 'Safari'
+  | 'Chrome'
+  | 'IE'
+  | 'Edge'
+  | 'Firefox'
+  | 'Firefox Focus'
+  | 'Firefox Nightly'
+  | 'Chromium'
+  | 'Opera'
+  | 'Vivaldi'
+  | 'Yandex'
+  | 'Arora'
+  | 'Lunascape'
+  | 'QupZilla'
+  | 'Coc Coc'
+  | 'Kindle'
+  | 'Iceweasel'
+  | 'Konqueror'
+  | 'Iceape'
+  | 'SeaMonkey'
+  | 'Epiphany'
+  | '360'
+  | '360EE'
+  | '360SE'
+  | 'UC'
+  | 'QQBrowser'
+  | 'QQ'
+  | 'Baidu'
+  | 'Maxthon'
+  | 'Sogou'
+  | 'Liebao'
+  | '2345Explorer'
+  | '115Browser'
+  | 'TheWorld'
+  | 'XiaoMi'
+  | 'Vivo'
+  | 'Huawei'
+  | 'OPPO'
+  | 'Quark'
+  | 'Qiyu'
+  | 'Wechat'
+  | 'Wechat Miniapp'
+  | 'WechatWork'
+  | 'Taobao'
+  | 'Alipay'
+  | 'Weibo'
+  | 'Douban'
+  | 'Suning'
+  | 'iQiYi'
+  | 'DingTalk'
+  | 'Douyin'
+  | 'unknown'
+
+export type OsName =
+  | 'Windows'
+  | 'Linux'
+  | 'MacOS'
   | 'Android'
-  | 'iOS'
+  | 'HarmonyOS'
+  | 'Ubuntu'
+  | 'FreeBSD'
   | 'Debian'
   | 'Windows Phone'
-  | 'MacOS'
+  | 'BlackBerry'
+  | 'MeeGo'
+  | 'Symbian'
+  | 'iOS'
+  | 'Chrome OS'
   | 'WebOS'
-  | 'HarmonyOS'
-  | 'Windows'
+  | 'unknown'
 
-export type EnvWebview = {
+export type DeviceName = 'Mobile' | 'Tablet' | 'PC'
+
+export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
+
+export type BotName =
+  | 'Googlebot'
+  | 'Bingbot'
+  | 'Baiduspider'
+  | 'Bytespider'
+  | 'YandexBot'
+  | 'DuckDuckBot'
+  | 'Slurp'
+  | 'Sogou'
+  | '360Spider'
+  | 'Applebot'
+  | 'Facebookbot'
+  | 'Twitterbot'
+  | 'LinkedInBot'
+  | 'SemrushBot'
+  | 'AhrefsBot'
+  | 'MJ12bot'
+  | 'PetalBot'
+  | 'GenericBot'
+  | 'unknown'
+
+export interface EnvOption {
+  browser: BrowserName
+  version: string
+  engine: EngineName
+  os: OsName
+  osVersion: string
+  device: DeviceName
+  arch: ArchName
   isWebview: boolean
+  isHeadless: boolean
+  isBot: boolean
+  botName: BotName
+  language: string
+  platform: string
 }
 
-export type EnvPart = Record<'version' | 'osVersion' | 'platfrom' | 'languge', string>
-
-export type EnvOption = EnvPart & EnvWebview & {
-  engine:
-    | 'Trident'
-    | 'Presto'
-    | 'WebKit'
-    | 'Gecko'
-    | 'KHTML'
-    | 'Blink'
-    | 'EdgeHTML'
-    | 'unknown'
-  browser:
-    | 'Safari'
-    | 'Chrome'
-    | 'IE'
-    | 'Edge'
-    | 'Firefox'
-    | 'Firefox Focus'
-    | 'Chromium'
-    | 'Opera'
-    | 'Vivaldi'
-    | 'Yandex'
-    | 'Arora'
-    | 'Lunascape'
-    | 'QupZilla'
-    | 'Coc Coc'
-    | 'Kindle'
-    | 'Iceweasel'
-    | 'Konqueror'
-    | 'Iceape'
-    | 'SeaMonkey'
-    | 'Epiphany'
-    | '360'
-    | '360EE'
-    | '360SE'
-    | 'UC'
-    | 'QQBrowser'
-    | 'QQ'
-    | 'Baidu'
-    | 'Maxthon'
-    | 'Sogou'
-    | 'Liebao'
-    | '2345Explorer'
-    | '115Browser'
-    | 'TheWorld'
-		| 'OPPO'
-    | 'XiaoMi'
-    | 'Quark'
-    | 'Qiyu'
-    | 'Wechat'
-    | 'WechatWork'
-    | 'Taobao'
-    | 'Alipay'
-    | 'Weibo'
-    | 'Douban'
-    | 'Suning'
-    | 'iQiYi'
-    | 'DingTalk'
-    | 'Huawei'
-    | 'Vivo'
-    | 'Firefox Nightly'
-    | 'Wechat Miniapp'
-		| 'Douyin'
-    | 'unknown'
-  os:
-    | 'Windows'
-    | 'Linux'
-    | 'MacOS'
-    | 'Android'
-    | 'HarmonyOS'
-    | 'Ubuntu'
-    | 'FreeBSD'
-    | 'Debian'
-    | 'Windows Phone'
-    | 'BlackBerry'
-    | 'MeeGo'
-    | 'Symbian'
-    | 'iOS'
-    | 'Chrome OS'
-    | 'WebOS'
-    | 'unknown'
-  device:
-    | 'Mobile'
-    | 'Tablet'
-    | 'Pc'
-}
-
-declare function uaBrowser(ua?: string): EnvOption
-
-declare namespace uaBrowser {
-  /** 检查 `webview` 浏览环境，仅支持 `android` */
-  function isWebview(ua: string): boolean
-  /** 检查微信小程序 */
-  function isWechatMiniapp(): boolean
-  /** 浏览器语言 */
-  function getLanguage(): string
-  /** 当前版本 */
-  const VERSION: string
-}
-
-export default uaBrowser
+// ---------------------------------------------------------------------------
+// Global type augmentations for browser-specific APIs used during detection
+// ---------------------------------------------------------------------------
 
 declare global {
   const __wxjs_environment: string
 
-  const chrome: {
-    adblock2345: any
-    common2345: any
-  }
+  // eslint-disable-next-line no-var
+  var chrome: {
+    adblock2345?: unknown
+    common2345?: unknown
+  } | undefined
 
-  const showModalDialog: any
+  // eslint-disable-next-line no-var
+  var showModalDialog: unknown
 
-  const u2f: any
+  // eslint-disable-next-line no-var
+  var u2f: unknown
 
-  // Navigator
   interface Navigator {
-    browserLanguage: string
-		userAgentData: Record<string, any>
-    connection: Record<string, any>
+    browserLanguage?: string
+    userAgentData?: {
+      platform: string
+      getHighEntropyValues(hints: string[]): Promise<Record<string, string>>
+    }
+    connection?: { saveData?: boolean }
   }
 }
 
