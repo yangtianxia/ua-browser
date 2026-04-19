@@ -1,8 +1,8 @@
-# 类型定义
+# Type Definitions
 
 ## EnvOption
 
-`uaBrowser()` 和 `parseUA()` 的返回类型。
+The return type of `uaBrowser()` and `parseUA()`.
 
 ```typescript
 interface EnvOption {
@@ -30,6 +30,7 @@ interface EnvOption {
 type BrowserName =
   | 'Safari' | 'Chrome' | 'IE' | 'Edge' | 'Firefox' | 'Firefox Focus'
   | 'Firefox Nightly' | 'Chromium' | 'Opera' | 'Vivaldi' | 'Yandex'
+  | 'Samsung Internet' | 'DuckDuckGo' | 'Puffin'
   | 'Arora' | 'Lunascape' | 'QupZilla' | 'Coc Coc' | 'Kindle'
   | 'Iceweasel' | 'Konqueror' | 'Iceape' | 'SeaMonkey' | 'Epiphany'
   | '360' | '360EE' | '360SE' | 'UC' | 'QQBrowser' | 'QQ' | 'Baidu'
@@ -59,7 +60,7 @@ type OsName =
   | 'Windows' | 'Linux' | 'MacOS' | 'Android' | 'HarmonyOS'
   | 'Ubuntu' | 'FreeBSD' | 'Debian' | 'Windows Phone'
   | 'BlackBerry' | 'MeeGo' | 'Symbian' | 'iOS' | 'Chrome OS'
-  | 'WebOS' | 'unknown'
+  | 'WebOS' | 'Tizen' | 'KaiOS' | 'unknown'
 ```
 
 ---
@@ -67,7 +68,7 @@ type OsName =
 ## DeviceName
 
 ```typescript
-type DeviceName = 'Mobile' | 'Tablet' | 'PC'
+type DeviceName = 'Mobile' | 'Tablet' | 'TV' | 'PC'
 ```
 
 ---
@@ -88,6 +89,7 @@ type BotName =
   | 'YandexBot' | 'DuckDuckBot' | 'Slurp' | 'Sogou' | '360Spider'
   | 'Applebot' | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot'
   | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'PetalBot'
+  | 'GPTBot' | 'ClaudeBot' | 'PerplexityBot' | 'CCBot' | 'AdsBot'
   | 'GenericBot' | 'unknown'
 ```
 
@@ -95,7 +97,7 @@ type BotName =
 
 ## NavContext
 
-浏览器环境的可注入子集，用于隔离副作用、方便测试。`getNavContext()` 在浏览器中读取真实的 `navigator`，在 Node.js 中返回空对象。
+An injectable subset of the browser environment, used to isolate side effects and enable testing. `getNavContext()` reads the real `navigator` in browsers and returns an empty object in Node.js.
 
 ```typescript
 interface NavContext {
@@ -119,11 +121,11 @@ interface NavContext {
 
 ## ParseOptions
 
-`parseUA()` 的第二个参数。
+The second argument to `parseUA()`.
 
 ```typescript
 interface ParseOptions {
-  nav?:            NavContext       // 注入浏览器环境上下文（浏览器端按需传入）
-  windowsVersion?: string | null   // 预先 await getWindowsVersion() 的结果
+  nav?:            NavContext       // inject browser environment context
+  windowsVersion?: string | null   // pre-resolved result of getWindowsVersion()
 }
 ```

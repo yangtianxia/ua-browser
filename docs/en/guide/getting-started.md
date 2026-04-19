@@ -1,6 +1,6 @@
-# 快速开始
+# Getting Started
 
-## 安装
+## Installation
 
 ::: code-group
 
@@ -18,15 +18,15 @@ yarn add ua-browser
 
 :::
 
-## 基本用法
+## Basic Usage
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-// 自动读取当前浏览器 UA
+// Automatically reads the current browser's UA
 const info = uaBrowser()
 
-// 或传入自定义 UA 字符串
+// Or pass a custom UA string
 const info = uaBrowser('Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...')
 
 console.log(info)
@@ -42,38 +42,38 @@ console.log(info)
 //   isHeadless: false,
 //   isBot:      false,
 //   botName:    'unknown',
-//   language:   'zh-CN',
+//   language:   'en-US',
 //   platform:   'Win32'
 // }
 ```
 
-## 命名导出（Tree-shakeable）
+## Named Exports (Tree-shakeable)
 
-按需引入单个功能，减小打包体积：
+Import only what you need to keep your bundle small:
 
 ```typescript
 import {
-  parseUA,          // 纯函数版本，适合 SSR / Node.js
-  isWebview,        // 检测 Android Webview
-  isWechatMiniapp,  // 检测微信小程序
-  getNavContext,    // 读取当前浏览器 navigator 上下文
-  getLanguage,      // 获取浏览器语言
-  getWindowsVersion,// 异步获取精确 Windows 版本
-  detectBot,        // 爬虫检测
-  detectArch,       // CPU 架构检测
-  detectHeadless,   // 无头浏览器检测
-  VERSION           // 当前版本号
+  parseUA,           // Pure function, ideal for SSR / Node.js
+  isWebview,         // Detect Android Webview
+  isWechatMiniapp,   // Detect WeChat Mini Program
+  getNavContext,     // Read current browser navigator context
+  getLanguage,       // Get browser language from NavContext
+  getWindowsVersion, // Async: accurately detect Windows 10 / 11
+  detectBot,         // Standalone bot detection
+  detectArch,        // Standalone CPU architecture detection
+  detectHeadless,    // Standalone headless browser detection
+  VERSION            // Current library version
 } from 'ua-browser'
 ```
 
-## Node.js / SSR 用法
+## Node.js / SSR
 
-在服务端使用 `parseUA` 纯函数，传入 UA 字符串：
+Use the pure `parseUA` function and pass the UA string from the request header:
 
 ```typescript
 import { parseUA } from 'ua-browser'
 
-// 解析来自请求头的 UA
+// Parse UA from request header
 const ua = req.headers['user-agent'] ?? ''
 const result = parseUA(ua)
 
@@ -81,9 +81,9 @@ console.log(result.browser) // 'Chrome'
 console.log(result.os)      // 'Windows'
 ```
 
-### 精确 Windows 11 检测
+### Accurate Windows 10 / 11 Detection
 
-Windows 11 与 Windows 10 的 UA 字符串相同，需借助 `navigator.userAgentData` 异步获取：
+Windows 10 and 11 share the same UA string. Use `navigator.userAgentData` to distinguish them:
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
@@ -92,10 +92,10 @@ const nav = getNavContext()
 const windowsVersion = await getWindowsVersion(nav)
 const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 
-console.log(result.osVersion) // '11' 或 '10'
+console.log(result.osVersion) // '11' or '10'
 ```
 
-## 浏览器（CDN）用法
+## Browser (CDN)
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/ua-browser/dist/index.min.js"></script>
@@ -105,22 +105,22 @@ console.log(result.osVersion) // '11' 或 '10'
 </script>
 ```
 
-## 独立检测器
+## Standalone Detectors
 
 ```typescript
 import { detectBot, detectArch, detectHeadless } from 'ua-browser'
 
 const ua = navigator.userAgent
 
-// 爬虫检测
+// Bot detection
 const { isBot, botName } = detectBot(ua)
 // isBot: true, botName: 'Googlebot'
 
-// CPU 架构检测
+// CPU architecture detection
 const arch = detectArch(ua)
 // 'x86_64' | 'arm64' | 'arm' | 'x86' | 'unknown'
 
-// 无头浏览器检测
+// Headless browser detection
 const isHeadless = detectHeadless(ua)
 // true | false
 ```

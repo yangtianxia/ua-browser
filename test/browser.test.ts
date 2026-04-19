@@ -157,6 +157,32 @@ describe('detectBrowser', () => {
     })
   })
 
+  describe('international browsers', () => {
+    it('detects Samsung Internet', () => {
+      const r = detectBrowser(UA.samsungInternet.mobile)
+      expect(r.browser).toBe('Samsung Internet')
+      expect(r.version).toBe('24.0')
+    })
+
+    it('detects DuckDuckGo Browser on iOS', () => {
+      const r = detectBrowser(UA.duckduckgo.ios)
+      expect(r.browser).toBe('DuckDuckGo')
+      expect(r.version).toBe('7')
+    })
+
+    it('detects DuckDuckGo Browser on Android', () => {
+      const r = detectBrowser(UA.duckduckgo.android)
+      expect(r.browser).toBe('DuckDuckGo')
+      expect(r.version).toBe('5')
+    })
+
+    it('detects Puffin', () => {
+      const r = detectBrowser(UA.puffin.android)
+      expect(r.browser).toBe('Puffin')
+      expect(r.version).toBe('9.7.2.51166')
+    })
+  })
+
   describe('priority disambiguation', () => {
     it('Edge UA is detected as Edge, not Chrome', () => {
       expect(detectBrowser(UA.edge.chromium).browser).toBe('Edge')

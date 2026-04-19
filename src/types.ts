@@ -20,6 +20,9 @@ export type BrowserName =
   | 'Opera'
   | 'Vivaldi'
   | 'Yandex'
+  | 'Samsung Internet'
+  | 'DuckDuckGo'
+  | 'Puffin'
   | 'Arora'
   | 'Lunascape'
   | 'QupZilla'
@@ -78,9 +81,11 @@ export type OsName =
   | 'iOS'
   | 'Chrome OS'
   | 'WebOS'
+  | 'Tizen'
+  | 'KaiOS'
   | 'unknown'
 
-export type DeviceName = 'Mobile' | 'Tablet' | 'PC'
+export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV'
 
 export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
@@ -102,6 +107,11 @@ export type BotName =
   | 'AhrefsBot'
   | 'MJ12bot'
   | 'PetalBot'
+  | 'GPTBot'
+  | 'ClaudeBot'
+  | 'PerplexityBot'
+  | 'CCBot'
+  | 'AdsBot'
   | 'GenericBot'
   | 'unknown'
 

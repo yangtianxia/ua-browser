@@ -1,10 +1,10 @@
-# API 参考
+# API Reference
 
-## 默认导出
+## Default Export
 
 ### `uaBrowser(ua?)`
 
-解析 UA 并返回完整的环境信息对象。
+Parse a UA string and return a full environment info object.
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -12,11 +12,11 @@ import uaBrowser from 'ua-browser'
 uaBrowser(ua?: string): EnvOption
 ```
 
-| 参数 | 类型 | 说明 |
+| Parameter | Type | Description |
 | :-- | :-- | :-- |
-| `ua` | `string` | 可选。UA 字符串，省略时自动读取 `navigator.userAgent` |
+| `ua` | `string` | Optional. UA string. Omit to read `navigator.userAgent` automatically. |
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**Returns:** [`EnvOption`](/en/api/types#envoption)
 
 ```typescript
 uaBrowser.isWebview(ua: string): boolean
@@ -27,11 +27,11 @@ uaBrowser.VERSION: string
 
 ---
 
-## 命名导出
+## Named Exports
 
 ### `parseUA(ua, options?)`
 
-纯函数版本，适合 SSR / Node.js 环境。
+Pure function version, suitable for SSR / Node.js environments.
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -41,8 +41,8 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 
 ```typescript
 interface ParseOptions {
-  nav?: NavContext       // 注入浏览器环境上下文
-  windowsVersion?: string | null  // 预先获取的 Windows 版本
+  nav?: NavContext       // inject browser environment context
+  windowsVersion?: string | null  // pre-resolved Windows version
 }
 ```
 
@@ -50,7 +50,7 @@ interface ParseOptions {
 
 ### `isWebview(ua)`
 
-检测 UA 中是否包含 `; wv`（Android Webview 标识）。
+Detect whether the UA contains `; wv` (Android Webview marker).
 
 ```typescript
 isWebview(ua: string): boolean
@@ -60,7 +60,7 @@ isWebview(ua: string): boolean
 
 ### `isWechatMiniapp()`
 
-检测当前运行环境是否为微信小程序。
+Detect whether the current environment is a WeChat Mini Program.
 
 ```typescript
 isWechatMiniapp(): boolean
@@ -70,19 +70,19 @@ isWechatMiniapp(): boolean
 
 ### `getWindowsVersion(nav)`
 
-异步获取精确的 Windows 版本（用于区分 Windows 10 / 11）。
+Asynchronously get the accurate Windows version (to distinguish Windows 10 / 11).
 
 ```typescript
 getWindowsVersion(nav: NavContext): Promise<string | null>
 ```
 
-需在调用 `parseUA` 前 `await`，然后作为 `windowsVersion` 选项传入。
+`await` this before calling `parseUA`, then pass the result as the `windowsVersion` option.
 
 ---
 
 ### `detectBot(ua)`
 
-独立爬虫检测器。
+Standalone bot detector.
 
 ```typescript
 detectBot(ua: string): { isBot: boolean; botName: BotName }
@@ -92,7 +92,7 @@ detectBot(ua: string): { isBot: boolean; botName: BotName }
 
 ### `detectArch(ua)`
 
-独立 CPU 架构检测器。
+Standalone CPU architecture detector.
 
 ```typescript
 detectArch(ua: string): ArchName
@@ -102,7 +102,7 @@ detectArch(ua: string): ArchName
 
 ### `detectHeadless(ua)`
 
-独立无头浏览器检测器。
+Standalone headless browser detector.
 
 ```typescript
 detectHeadless(ua: string): boolean
@@ -112,7 +112,7 @@ detectHeadless(ua: string): boolean
 
 ### `getNavContext()`
 
-读取当前浏览器的 `navigator` 并返回 [`NavContext`](/api/types#navcontext) 对象，在 Node.js 中返回空的安全对象。
+Read the current browser's `navigator` and return a [`NavContext`](/en/api/types#navcontext) object. Returns a safe empty object in Node.js.
 
 ```typescript
 import { getNavContext } from 'ua-browser'
@@ -120,13 +120,13 @@ import { getNavContext } from 'ua-browser'
 getNavContext(): NavContext
 ```
 
-通常与 `parseUA` 配合使用，将浏览器环境注入纯函数：
+Typically used with `parseUA` to inject browser context into the pure function:
 
 ```typescript
 const nav = getNavContext()
 const result = parseUA(navigator.userAgent, { nav })
 
-console.log(result.language) // 'zh-CN'
+console.log(result.language) // 'en-US'
 console.log(result.platform) // 'Win32'
 ```
 
@@ -134,7 +134,7 @@ console.log(result.platform) // 'Win32'
 
 ### `getLanguage(nav)`
 
-从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言，如 `'zh-CN'`、`'en-US'`。
+Extract the normalized browser language from a [`NavContext`](/en/api/types#navcontext), e.g. `'en-US'`, `'zh-CN'`.
 
 ```typescript
 import { getLanguage, getNavContext } from 'ua-browser'
@@ -146,7 +146,7 @@ getLanguage(nav: NavContext): string
 
 ### `VERSION`
 
-当前库版本号，与 `package.json` 中的 `version` 字段一致。
+The current library version, matching the `version` field in `package.json`.
 
 ```typescript
 VERSION: string

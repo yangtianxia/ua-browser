@@ -20,11 +20,13 @@ export const OS_DEFS: readonly OsDef[] = [
   { name: 'Ubuntu',         detect: /Ubuntu/,                         versionPattern: null },
   { name: 'Chrome OS',      detect: /CrOS/,                           versionPattern: null },
   { name: 'Linux',          detect: /(Linux|X11)/,                    versionPattern: null },
+  { name: 'Tizen',          detect: /Tizen/,                          versionPattern: /Tizen ([\d.]+)/ },
   { name: 'iOS',            detect: /like Mac OS X/,                  versionPattern: /OS ([\d_]+) like/ },
   { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/ },
   { name: 'HarmonyOS',      detect: /HarmonyOS/,                      versionPattern: /Android ([\d.]+)[;)]/,
     versionLookup: { '10': '2' } },
   { name: 'Android',        detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
+  { name: 'KaiOS',          detect: /KAIOS/,                          versionPattern: /KAIOS\/([\d.]+)/ },
   { name: 'Windows',        detect: /Windows/,                        versionPattern: /Windows NT ([\d.]+)/,
     versionLookup: {
       '10': '10', '6.4': '10', '6.3': '8.1', '6.2': '8',
