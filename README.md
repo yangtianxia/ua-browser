@@ -5,20 +5,20 @@
 [![license](https://img.shields.io/npm/l/ua-browser)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6)](https://www.typescriptlang.org/)
 
-通过 User Agent 检测浏览器、操作系统、设备类型、渲染内核、CPU 架构、爬虫及无头浏览器。零依赖，支持浏览器与 Node.js 双环境。
+Detect browser, OS, device type, rendering engine, CPU architecture, bots, and headless browsers from User Agent strings. Zero dependencies. Works in both browser and Node.js environments.
 
-**[📖 文档](https://yangtianxia.github.io/ua-browser/)** · **[🎮 Playground](https://yangtianxia.github.io/ua-browser/playground)**
+**[📖 Documentation](https://yangtianxia.github.io/ua-browser/)** · **[🎮 Playground](https://yangtianxia.github.io/ua-browser/playground)** · **[中文](./README.zh-CN.md)**
 
-## 特性
+## Features
 
-- **全面检测** — 浏览器、OS、渲染内核、设备类型（Mobile / Tablet / TV / PC）、CPU 架构、爬虫、无头浏览器
-- **AI 爬虫识别** — 内置 GPTBot、ClaudeBot、PerplexityBot 等主流 AI 抓取机器人
-- **零依赖** — 无任何运行时依赖，gzip 后体积极小
-- **纯函数** — `parseUA()` 无全局状态，天然支持 SSR / Node.js
-- **TypeScript** — 完整类型定义，`BrowserName`、`OsName` 等均为精确字面量联合类型
-- **Tree-shakeable** — 所有功能按需导入，不引入多余代码
+- **Comprehensive detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
+- **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
+- **Zero dependencies** — no runtime dependencies, tiny bundle size after gzip
+- **Pure function** — `parseUA()` has no global state, works seamlessly with SSR / Node.js
+- **TypeScript** — full type definitions with precise literal union types (`BrowserName`, `OsName`, etc.)
+- **Tree-shakeable** — import only what you need
 
-## 安装
+## Installation
 
 ```sh
 npm i ua-browser
@@ -28,7 +28,7 @@ pnpm add ua-browser
 yarn add ua-browser
 ```
 
-## 快速上手
+## Quick Start
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -48,16 +48,16 @@ console.log(info)
 //   isHeadless: false,
 //   isBot:      false,
 //   botName:    'unknown',
-//   language:   'zh-CN',
+//   language:   'en-US',
 //   platform:   'Win32'
 // }
 ```
 
-> 传入自定义 UA 字符串：`uaBrowser('Mozilla/5.0 ...')`
+> Pass a custom UA string: `uaBrowser('Mozilla/5.0 ...')`
 
-## 使用
+## Usage
 
-### 浏览器环境
+### Browser
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -65,17 +65,17 @@ import uaBrowser from 'ua-browser'
 const { browser, os, device } = uaBrowser()
 
 if (device === 'Mobile') {
-  // 跳转移动版
+  // redirect to mobile version
 }
 
 if (browser === 'Wechat') {
-  // 微信内置浏览器逻辑
+  // WeChat in-app browser logic
 }
 ```
 
 ### Node.js / SSR
 
-使用 `parseUA` 纯函数，传入请求头中的 UA 字符串：
+Use the pure `parseUA` function with the UA string from the request header:
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -84,7 +84,7 @@ const ua = req.headers['user-agent'] ?? ''
 const { browser, os, isBot } = parseUA(ua)
 
 if (isBot) {
-  // 拦截或放行爬虫
+  // block or allow crawlers
 }
 ```
 
@@ -97,9 +97,9 @@ if (isBot) {
 </script>
 ```
 
-### 精确区分 Windows 10 / 11
+### Accurate Windows 10 / 11 Detection
 
-Windows 10 和 11 的 UA 字符串相同，需借助 Client Hints API 异步获取：
+Windows 10 and 11 share the same UA string. Use the Client Hints API to distinguish them:
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
@@ -108,68 +108,68 @@ const nav = getNavContext()
 const windowsVersion = await getWindowsVersion(nav)
 const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 
-console.log(result.osVersion) // '10' 或 '11'
+console.log(result.osVersion) // '10' or '11'
 ```
 
 ## API
 
-### 默认导出 `uaBrowser(ua?)`
+### Default export `uaBrowser(ua?)`
 
-在浏览器环境中自动注入 `navigator` 上下文（语言、平台、MIME 类型等）。
+Automatically injects the `navigator` context (language, platform, MIME types, etc.) in browser environments.
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-uaBrowser()           // 自动读取 navigator.userAgent
-uaBrowser(customUA)   // 传入自定义 UA，仍注入当前浏览器上下文
+uaBrowser()          // reads navigator.userAgent automatically
+uaBrowser(customUA)  // custom UA string, still injects browser context
 ```
 
-### 命名导出（按需引入）
+### Named exports (tree-shakeable)
 
 ```typescript
 import {
-  parseUA,           // 纯函数，适合 SSR / Node.js
-  getNavContext,     // 读取当前浏览器 navigator 上下文
-  getWindowsVersion, // 异步精确区分 Windows 10 / 11
-  getLanguage,       // 从 NavContext 获取浏览器语言
-  isWebview,         // 检测 Android Webview（UA 含 "; wv"）
-  isWechatMiniapp,   // 检测微信小程序运行环境
-  detectBot,         // 独立爬虫检测
-  detectArch,        // 独立 CPU 架构检测
-  detectHeadless,    // 独立无头浏览器检测
-  VERSION,           // 当前版本号
+  parseUA,           // pure function, ideal for SSR / Node.js
+  getNavContext,     // read current browser navigator context
+  getWindowsVersion, // async: accurately distinguish Windows 10 / 11
+  getLanguage,       // extract browser language from NavContext
+  isWebview,         // detect Android Webview (UA contains "; wv")
+  isWechatMiniapp,   // detect WeChat Mini Program environment
+  detectBot,         // standalone bot detection
+  detectArch,        // standalone CPU architecture detection
+  detectHeadless,    // standalone headless browser detection
+  VERSION,           // current library version
 } from 'ua-browser'
 ```
 
-### 返回值 `EnvOption`
+### Return value `EnvOption`
 
-| 字段 | 类型 | 说明 |
+| Field | Type | Description |
 | :-- | :-- | :-- |
-| `browser` | `BrowserName` | 浏览器名称 |
-| `version` | `string` | 浏览器版本 |
-| `engine` | `EngineName` | 渲染内核 |
-| `os` | `OsName` | 操作系统 |
-| `osVersion` | `string` | 系统版本 |
-| `device` | `DeviceName` | 设备类型：`Mobile` \| `Tablet` \| `TV` \| `PC` |
-| `arch` | `ArchName` | CPU 架构 |
-| `isWebview` | `boolean` | 是否为 Android Webview |
-| `isHeadless` | `boolean` | 是否为无头 / 自动化浏览器 |
-| `isBot` | `boolean` | 是否为爬虫 / 机器人 |
-| `botName` | `BotName` | 爬虫名称 |
-| `language` | `string` | 浏览器语言，如 `zh-CN` |
-| `platform` | `string` | 平台标识，如 `Win32` |
+| `browser` | `BrowserName` | Browser name |
+| `version` | `string` | Browser version |
+| `engine` | `EngineName` | Rendering engine |
+| `os` | `OsName` | Operating system |
+| `osVersion` | `string` | OS version |
+| `device` | `DeviceName` | Device type: `Mobile` \| `Tablet` \| `TV` \| `PC` |
+| `arch` | `ArchName` | CPU architecture |
+| `isWebview` | `boolean` | Whether running in Android Webview |
+| `isHeadless` | `boolean` | Whether running in a headless / automated browser |
+| `isBot` | `boolean` | Whether the UA belongs to a bot / crawler |
+| `botName` | `BotName` | Bot name |
+| `language` | `string` | Browser language, e.g. `en-US` |
+| `platform` | `string` | Platform identifier, e.g. `Win32` |
 
-> 所有字段在无法识别时统一返回 `'unknown'`，不返回空字符串或 `null`。
+> All fields return `'unknown'` when undetected — never an empty string or `null`.
 
-## 支持范围
+## Supported
 
-内置超过 60 种浏览器、17 种操作系统、19 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
+Over 60 browsers, 17 operating systems, and 19 bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
 
-部分覆盖：
-- **浏览器** — Chrome、Safari、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音等
-- **操作系统** — Windows、macOS、Android、iOS、HarmonyOS、Tizen、KaiOS 等
-- **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot 等
-- **设备** — Mobile、Tablet、TV、PC（含三星 Smart TV、HbbTV 标准）
+Highlights:
+- **Browsers** — Chrome, Safari, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok and more
+- **OS** — Windows, macOS, Android, iOS, HarmonyOS, Tizen, KaiOS and more
+- **AI bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot and more
+- **Devices** — Mobile, Tablet, TV (Samsung Smart TV, HbbTV), PC
 
 ## License
 
