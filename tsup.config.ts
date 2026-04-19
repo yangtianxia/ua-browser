@@ -1,23 +1,30 @@
 import { defineConfig } from 'tsup'
 
-export default defineConfig({
-  entry: { index: 'src/index.ts' },
-  format: ['esm', 'cjs', 'iife'],
-  globalName: 'uaBrowser',
-  dts: true,
-  clean: true,
-  minify: false,
-  sourcemap: true,
-  treeshake: true,
-  target: 'es2018',
-  outExtension({ format }) {
-    if (format === 'esm') return { js: '.mjs' }
-    if (format === 'cjs') return { js: '.cjs' }
-    return { js: '.min.js' }
+export default defineConfig([
+  {
+    entry: { index: 'src/index.ts' },
+    format: ['esm', 'cjs'],
+    dts: true,
+    clean: true,
+    treeshake: true,
+    target: 'es2018',
+    sourcemap: true,
+    outExtension({ format }) {
+      if (format === 'esm') return { js: '.mjs' }
+      return { js: '.cjs' }
+    },
   },
-  rollupOptions: {
-    output: {
-      exports: 'named'
-    }
-  }
-})
+  {
+    entry: { index: 'src/iife.ts' },
+    format: ['iife'],
+    globalName: 'uaBrowser',
+    clean: false,
+    minify: true,
+    treeshake: true,
+    target: 'es2018',
+    sourcemap: true,
+    outExtension() {
+      return { js: '.min.js' }
+    },
+  },
+])
