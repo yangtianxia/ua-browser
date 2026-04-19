@@ -62,36 +62,47 @@ const PRESET_UAS = [
 
 const uaInput = ref('')
 const result = ref<ParseResult | null>(null)
-const uaBrowser = ref<((ua: string) => ParseResult) | null>(null)
+const selectedKey = ref<string | null>(null)
 const loaded = ref(false)
+
+let _uaBrowser: ((ua?: string) => ParseResult) | null = null
+let _parseUA: ((ua: string) => ParseResult) | null = null
 
 onMounted(async () => {
   const mod = await import('ua-browser')
-  uaBrowser.value = mod.default
+  _uaBrowser = mod.default
+  _parseUA = mod.parseUA
   loaded.value = true
   useCurrentUA()
 })
 
 function parse() {
-  if (!uaBrowser.value || !uaInput.value.trim()) return
-  result.value = uaBrowser.value(uaInput.value.trim())
+  if (!_parseUA || !uaInput.value.trim()) return
+  // 手动输入时清除预设选中
+  selectedKey.value = null
+  result.value = _parseUA(uaInput.value.trim())
 }
 
 function usePreset(ua: string) {
+  if (!_parseUA) return
   uaInput.value = ua
-  parse()
+  selectedKey.value = ua
+  // 预设 UA 不注入 nav，language/platform 返回 unknown
+  result.value = _parseUA(ua)
 }
 
 function useCurrentUA() {
-  if (typeof navigator === 'undefined') return
+  if (!_uaBrowser || typeof navigator === 'undefined') return
   uaInput.value = navigator.userAgent
-  parse()
+  selectedKey.value = 'current'
+  // 当前浏览器使用默认导出，注入真实 nav 上下文
+  result.value = _uaBrowser()
 }
 
 const tags = computed(() => {
   if (!result.value) return []
   const r = result.value
-  const list = []
+  const list: { label: string; value: string; type: string }[] = []
   if (r.isBot) list.push({ label: 'Bot', value: r.botName, type: 'danger' })
   if (r.isHeadless) list.push({ label: 'Headless', value: '是', type: 'warning' })
   if (r.isWebview) list.push({ label: 'Webview', value: '是', type: 'warning' })
@@ -125,12 +136,15 @@ const fields = computed(() => {
         <button
           v-for="item in PRESET_UAS"
           :key="item.label"
-          class="preset-btn"
+          :class="['preset-btn', { 'preset-btn--active': selectedKey === item.ua }]"
           @click="usePreset(item.ua)"
         >
           {{ item.label }}
         </button>
-        <button class="preset-btn preset-btn--current" @click="useCurrentUA">
+        <button
+          :class="['preset-btn', 'preset-btn--current', { 'preset-btn--active': selectedKey === 'current' }]"
+          @click="useCurrentUA"
+        >
           当前浏览器
         </button>
       </div>
@@ -233,9 +247,10 @@ const fields = computed(() => {
   color: var(--vp-c-brand-1);
 }
 
-.preset-btn--current {
+.preset-btn--active {
+  background: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
+  color: #fff;
 }
 
 .playground-input {

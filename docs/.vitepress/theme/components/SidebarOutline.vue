@@ -1,107 +1,100 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useData, useRoute } from 'vitepress'
+import { useData, useRoute, onContentUpdated } from 'vitepress'
 
 const { page } = useData()
 const route = useRoute()
+const targetEl = ref<HTMLElement | null>(null)
 const activeSlug = ref('')
-
 let observer: IntersectionObserver | null = null
 
-function setup() {
+function findTarget() {
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>('.VPSidebarItem.is-active')
+  )
+  // 取最深层的活跃项（叶子节点，不包含其他活跃子项的那个）
+  targetEl.value =
+    items.filter((el) => !el.querySelector('.VPSidebarItem.is-active')).pop() ?? null
+}
+
+function setupObserver() {
   observer?.disconnect()
   activeSlug.value = ''
 
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>('.vp-doc h2[id], .vp-doc h3[id]')
+  )
+  if (!headings.length) return
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((e) => e.isIntersecting)
+      if (visible.length) {
+        activeSlug.value = (visible[0].target as HTMLElement).id
+      }
+    },
+    { rootMargin: '-64px 0px -60% 0px', threshold: 0 }
+  )
+  headings.forEach((el) => observer!.observe(el))
+}
+
+function refresh() {
   nextTick(() => {
-    const headings = Array.from(
-      document.querySelectorAll<HTMLElement>('.vp-doc h2[id], .vp-doc h3[id]')
-    )
-    if (!headings.length) return
-
-    observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            activeSlug.value = (entry.target as HTMLElement).id
-            break
-          }
-        }
-      },
-      { rootMargin: '-64px 0px -60% 0px', threshold: 0 }
-    )
-
-    headings.forEach((el) => observer!.observe(el))
+    findTarget()
+    setupObserver()
   })
 }
 
-onMounted(setup)
+onMounted(refresh)
 onUnmounted(() => observer?.disconnect())
-watch(() => route.path, () => setTimeout(setup, 200))
+onContentUpdated(refresh)
+watch(() => route.path, () => setTimeout(refresh, 150))
 </script>
 
 <template>
-  <div v-if="page.headers?.length" class="sidebar-outline">
-    <div class="outline-title">本页目录</div>
-    <nav class="outline-nav">
+  <Teleport v-if="targetEl && page.headers?.length" :to="targetEl">
+    <nav class="spo-nav">
       <a
         v-for="h in page.headers"
         :key="h.slug"
         :href="'#' + h.slug"
-        :class="['outline-link', `level-${h.level}`, { active: activeSlug === h.slug }]"
+        :class="['spo-link', `level-${h.level}`, { active: activeSlug === h.slug }]"
       >{{ h.title }}</a>
     </nav>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
-.sidebar-outline {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--vp-c-divider);
-}
-
-.outline-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--vp-c-text-2);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0 12px;
-  margin-bottom: 8px;
-}
-
-.outline-nav {
+.spo-nav {
   display: flex;
   flex-direction: column;
+  padding: 4px 0 8px;
 }
 
-.outline-link {
+.spo-link {
   display: block;
-  padding: 4px 12px;
-  font-size: 13px;
+  padding: 3px 16px 3px 28px;
+  font-size: 12.5px;
+  line-height: 1.5;
   color: var(--vp-c-text-2);
   text-decoration: none;
   border-radius: 6px;
-  transition: color 0.2s, background 0.2s;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5;
+  transition: color 0.2s, background 0.2s;
 }
 
-.outline-link.level-3 {
-  padding-left: 24px;
-  font-size: 12px;
+.spo-link.level-3 {
+  padding-left: 40px;
 }
 
-.outline-link:hover {
+.spo-link:hover {
   color: var(--vp-c-text-1);
-  background: var(--vp-c-default-soft);
 }
 
-.outline-link.active {
+.spo-link.active {
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
   font-weight: 500;
 }
 </style>
