@@ -119,69 +119,89 @@ const fields = computed(() => {
 
 <template>
   <div class="playground">
-    <div class="playground-presets">
-      <span class="presets-label">预设：</span>
-      <button
-        v-for="item in PRESET_UAS"
-        :key="item.label"
-        class="preset-btn"
-        @click="usePreset(item.ua)"
-      >
-        {{ item.label }}
-      </button>
-      <button class="preset-btn preset-btn--current" @click="useCurrentUA">
-        当前浏览器
-      </button>
-    </div>
-
-    <div class="playground-input">
-      <textarea
-        v-model="uaInput"
-        class="ua-textarea"
-        placeholder="输入 User Agent 字符串..."
-        rows="3"
-        spellcheck="false"
-        @keydown.enter.ctrl="parse"
-        @keydown.enter.meta="parse"
-      />
-      <button class="parse-btn" :disabled="!loaded" @click="parse">
-        {{ loaded ? '解析' : '加载中...' }}
-      </button>
-    </div>
-
-    <div v-if="result" class="playground-result">
-      <div v-if="tags.length" class="result-tags">
-        <span
-          v-for="tag in tags"
-          :key="tag.label"
-          :class="['result-tag', `result-tag--${tag.type}`]"
+    <div class="playground-left">
+      <div class="playground-presets">
+        <span class="presets-label">预设：</span>
+        <button
+          v-for="item in PRESET_UAS"
+          :key="item.label"
+          class="preset-btn"
+          @click="usePreset(item.ua)"
         >
-          {{ tag.label }}: {{ tag.value }}
-        </span>
+          {{ item.label }}
+        </button>
+        <button class="preset-btn preset-btn--current" @click="useCurrentUA">
+          当前浏览器
+        </button>
       </div>
 
-      <div class="result-grid">
-        <div v-for="field in fields" :key="field.label" class="result-item">
-          <span class="result-label">{{ field.label }}</span>
-          <span class="result-value">{{ field.value || '—' }}</span>
+      <div class="playground-input">
+        <textarea
+          v-model="uaInput"
+          class="ua-textarea"
+          placeholder="输入 User Agent 字符串..."
+          rows="5"
+          spellcheck="false"
+          @keydown.enter.ctrl="parse"
+          @keydown.enter.meta="parse"
+        />
+        <button class="parse-btn" :disabled="!loaded" @click="parse">
+          {{ loaded ? '解析' : '加载中...' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="playground-right">
+      <div v-if="result" class="playground-result">
+        <div v-if="tags.length" class="result-tags">
+          <span
+            v-for="tag in tags"
+            :key="tag.label"
+            :class="['result-tag', `result-tag--${tag.type}`]"
+          >
+            {{ tag.label }}: {{ tag.value }}
+          </span>
         </div>
-      </div>
 
-      <details class="result-raw">
-        <summary>原始 JSON</summary>
-        <pre>{{ JSON.stringify(result, null, 2) }}</pre>
-      </details>
+        <div class="result-grid">
+          <div v-for="field in fields" :key="field.label" class="result-item">
+            <span class="result-label">{{ field.label }}</span>
+            <span class="result-value">{{ field.value || '—' }}</span>
+          </div>
+        </div>
+
+        <details class="result-raw">
+          <summary>原始 JSON</summary>
+          <pre>{{ JSON.stringify(result, null, 2) }}</pre>
+        </details>
+      </div>
+      <div v-else class="playground-empty">
+        <span>解析结果将显示在此处</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .playground {
+  display: flex;
+  gap: 24px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
   background: var(--vp-c-bg-soft);
+  align-items: flex-start;
+}
+
+.playground-left {
+  flex: 0 0 42%;
+  min-width: 0;
+}
+
+.playground-right {
+  flex: 1;
+  min-width: 0;
 }
 
 .playground-presets {
@@ -221,12 +241,12 @@ const fields = computed(() => {
 
 .playground-input {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .ua-textarea {
-  flex: 1;
+  width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -237,6 +257,7 @@ const fields = computed(() => {
   line-height: 1.6;
   resize: vertical;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .ua-textarea:focus {
@@ -245,7 +266,8 @@ const fields = computed(() => {
 }
 
 .parse-btn {
-  padding: 8px 20px;
+  align-self: flex-start;
+  padding: 8px 24px;
   border-radius: 8px;
   border: none;
   background: var(--vp-c-brand-1);
@@ -265,8 +287,16 @@ const fields = computed(() => {
   opacity: 0.85;
 }
 
-.playground-result {
-  margin-top: 20px;
+.playground-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 120px;
+  color: var(--vp-c-text-3);
+  font-size: 13px;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 8px;
 }
 
 .result-tags {
@@ -294,7 +324,7 @@ const fields = computed(() => {
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -306,7 +336,7 @@ const fields = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background: var(--vp-c-bg);
 }
 
@@ -318,10 +348,11 @@ const fields = computed(() => {
 }
 
 .result-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--vp-c-text-1);
   font-family: var(--vp-font-family-mono);
+  word-break: break-all;
 }
 
 .result-raw {
@@ -345,5 +376,16 @@ const fields = computed(() => {
   font-size: 13px;
   line-height: 1.6;
   overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .playground {
+    flex-direction: column;
+  }
+
+  .playground-left {
+    flex: none;
+    width: 100%;
+  }
 }
 </style>
