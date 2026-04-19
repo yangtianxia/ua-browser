@@ -23,6 +23,16 @@ describe('detectHeadless', () => {
     expect(detectHeadless(ua)).toBe(true)
   })
 
+  it('jsdom UA → true', () => {
+    const ua = 'Mozilla/5.0 (linux) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/20.0.3'
+    expect(detectHeadless(ua)).toBe(true)
+  })
+
+  it('Selenium WebDriver UA → true', () => {
+    const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Selenium/4.0'
+    expect(detectHeadless(ua)).toBe(true)
+  })
+
   it('normal Chrome → false', () => {
     expect(detectHeadless(UA.chrome.windows)).toBe(false)
   })
