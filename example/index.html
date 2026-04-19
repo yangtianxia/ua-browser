@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>uaBrowser - 浏览器检测</title>
   <meta name="description" content="通过userAgent和浏览器环境变量检测浏览器、系统及设备类型的常用工具。">
-	<meta name="keywords" content="Useragent,用户代理,浏览器判断,浏览器类型,浏览器信息">
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ua-browser@0.1.7/dist/index.min.js"></script>
+  <meta name="keywords" content="Useragent,用户代理,浏览器判断,浏览器类型,浏览器信息">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ua-browser@1.0.0/dist/index.min.js"></script>
   <style>
     a{
       text-decoration: none;
@@ -18,7 +18,7 @@
     }
     .wrapper{
       width: 100%;
-      max-width: 960px;
+      max-width: 1200px;
       margin: 0 auto;
     }
     .container{
@@ -35,6 +35,7 @@
       line-height: 24px;
       font-size: 14px;
       border-radius: 6px;
+      word-break: break-all;
     }
     .module .code2 {
       background: #ececec;
@@ -53,6 +54,8 @@
       padding: 8px 5px;
       line-height: 24px;
       border: 1px solid #eee;
+      font-size: 13px;
+      word-break: break-word;
     }
 
     .mod-foot .btn{
@@ -110,11 +113,11 @@
     <div class="container">
       <div class="module">
         <script>
-          var info = new uaBrowser()
+          var info = uaBrowser()
 
           console.log(info)
 
-          if (info.device!='Mobile') {
+          if (info.device != 'Mobile') {
             document.writeln('<table>\
               <caption><div class="code">'+'当前浏览器：'+navigator.userAgent+'</div></caption>\
               <thead>\
@@ -124,7 +127,12 @@
                   <th>内核</th>\
                   <th>操作系统</th>\
                   <th>设备</th>\
+                  <th>架构</th>\
                   <th>语言</th>\
+                  <th>平台</th>\
+                  <th>Headless</th>\
+                  <th>Bot</th>\
+                  <th>Bot名称</th>\
                 </tr>\
               </thead>\
               <tbody>\
@@ -134,7 +142,12 @@
                   <td>'+info.engine+'</td>\
                   <td>'+info.os+' '+info.osVersion+'</td>\
                   <td>'+info.device+'</td>\
+                  <td>'+info.arch+'</td>\
                   <td>'+info.language+'</td>\
+                  <td>'+info.platform+'</td>\
+                  <td>'+info.isHeadless+'</td>\
+                  <td>'+info.isBot+'</td>\
+                  <td>'+info.botName+'</td>\
                 </tr>\
               </tbody>\
             </table>');
@@ -161,21 +174,25 @@
                 <tr>\
                   <th>操作系统</th>\
                   <th>设备</th>\
+                  <th>架构</th>\
                   <th>语言</th>\
+                  <th>Bot</th>\
                 </tr>\
               </thead>\
               <tbody>\
                 <tr>\
                   <td>'+info.os+' '+info.osVersion+'</td>\
                   <td>'+info.device+'</td>\
+                  <td>'+info.arch+'</td>\
                   <td>'+info.language+'</td>\
+                  <td>'+(info.isBot ? info.botName : 'false')+'</td>\
                 </tr>\
               </tbody>\
             </table>')
           }
         </script>
         <script>
-          var useragents = [{"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.3", "pct": 41.89}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.", "pct": 24.32}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.3", "pct": 9.46}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.3", "pct": 6.76}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.", "pct": 5.41}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.80 Mobile/15E148 Safari/604.", "pct": 2.7}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Mobile/15E148 Safari/604.", "pct": 1.35}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/317.0.634488990 Mobile/15E148 Safari/604.", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10.0.99; S109 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/95.0.4638.74 Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; U; Android 9; sk-sk; Redmi Note 7 Build/PKQ1.180904.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/112.0.5615.136 Mobile Safari/537.36 XiaoMi/MiuiBrowser/14.10.1-g", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 9; moto x4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10; MAR-LX1A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Mobile Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/24.0 Chrome/117.0.0.0 Mobile Safari/537.3", "pct": 1.35}]
+          var useragents = [{"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.3", "pct": 41.89}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.", "pct": 24.32}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.3", "pct": 9.46}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.3", "pct": 6.76}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.", "pct": 5.41}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.80 Mobile/15E148 Safari/604.", "pct": 2.7}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Mobile/15E148 Safari/604.", "pct": 1.35}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/317.0.634488990 Mobile/15E148 Safari/604.", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10.0.99; S109 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/95.0.4638.74 Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; U; Android 9; sk-sk; Redmi Note 7 Build/PKQ1.180904.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/112.0.5615.136 Mobile Safari/537.36 XiaoMi/MiuiBrowser/14.10.1-g", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 9; moto x4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10; MAR-LX1A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Mobile Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/24.0 Chrome/117.0.0.0 Mobile Safari/537.3", "pct": 1.35}, {"ua": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)", "pct": 0.5}, {"ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/124.0.0.0 Safari/537.36", "pct": 0.5}]
           for (var item of useragents) {
             var info = uaBrowser(item.ua)
 
@@ -190,7 +207,11 @@
                   <th>内核</th>\
                   <th>操作系统</th>\
                   <th>设备</th>\
+                  <th>架构</th>\
                   <th>语言</th>\
+                  <th>Headless</th>\
+                  <th>Bot</th>\
+                  <th>Bot名称</th>\
                 </tr>\
               </thead>\
               <tbody>\
@@ -200,7 +221,11 @@
                   <td>'+info.engine+'</td>\
                   <td>'+info.os+' '+info.osVersion+'</td>\
                   <td>'+info.device+'</td>\
+                  <td>'+info.arch+'</td>\
                   <td>'+info.language+'</td>\
+                  <td>'+info.isHeadless+'</td>\
+                  <td>'+info.isBot+'</td>\
+                  <td>'+info.botName+'</td>\
                 </tr>\
               </tbody>\
             </table>');
