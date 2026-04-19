@@ -112,6 +112,7 @@ npx changeset version # bump versions and update CHANGELOG.md
 - **所有功能、修复、文档 PR 的目标分支为 `dev`**，不得直接合并到 `main`
 - **`main` 只接受来自 `dev` 的发布 PR**，或紧急 hotfix
 - 分支命名：`feat/xxx`、`fix/xxx`、`docs/xxx`（不含 `claude`、`ai` 等词）
+- **禁止直接推送到 `dev` 或 `main`**，所有变更必须通过功能分支提 PR 后合并
 
 ### 发版流程（changeset）
 
