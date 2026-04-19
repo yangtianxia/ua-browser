@@ -105,6 +105,11 @@ export type BotName =
   | 'AhrefsBot'
   | 'MJ12bot'
   | 'PetalBot'
+  | 'GPTBot'
+  | 'ClaudeBot'
+  | 'PerplexityBot'
+  | 'CCBot'
+  | 'AdsBot'
   | 'GenericBot'
   | 'unknown'
 

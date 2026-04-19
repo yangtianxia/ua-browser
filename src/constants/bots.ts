@@ -16,6 +16,11 @@ export type BotName =
   | 'AhrefsBot'
   | 'MJ12bot'
   | 'PetalBot'
+  | 'GPTBot'
+  | 'ClaudeBot'
+  | 'PerplexityBot'
+  | 'CCBot'
+  | 'AdsBot'
   | 'GenericBot'
   | 'unknown'
 
@@ -42,9 +47,15 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'Twitterbot',  detect: /Twitterbot/ },
   { name: 'LinkedInBot', detect: /LinkedInBot/ },
   // SEO tools
-  { name: 'SemrushBot',  detect: /SemrushBot/ },
-  { name: 'AhrefsBot',   detect: /AhrefsBot/ },
-  { name: 'MJ12bot',     detect: /MJ12bot/ },
+  { name: 'SemrushBot',    detect: /SemrushBot/ },
+  { name: 'AhrefsBot',     detect: /AhrefsBot/ },
+  { name: 'MJ12bot',       detect: /MJ12bot/ },
+  // AI / LLM crawlers
+  { name: 'GPTBot',        detect: /GPTBot/ },
+  { name: 'ClaudeBot',     detect: /ClaudeBot/ },
+  { name: 'PerplexityBot', detect: /PerplexityBot/ },
+  { name: 'CCBot',         detect: /CCBot/ },
+  { name: 'AdsBot',        detect: /AdsBot-Google/ },
   // Generic catch-all (must be last)
-  { name: 'GenericBot',  detect: /(bot|crawler|spider|crawling|scraper)/i }
+  { name: 'GenericBot',    detect: /(bot|crawler|spider|crawling|scraper)/i }
 ] as const
