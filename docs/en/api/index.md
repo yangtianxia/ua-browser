@@ -78,6 +78,8 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 `await` this before calling `parseUA`, then pass the result as the `windowsVersion` option.
 
+> **Note:** Requires `navigator.userAgentData` (Client Hints API). Browser-only — returns `null` in Node.js or when the API is unavailable.
+
 ---
 
 ### `detectBot(ua)`

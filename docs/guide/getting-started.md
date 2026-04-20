@@ -47,9 +47,9 @@ console.log(info)
 // }
 ```
 
-## 命名导出（Tree-shakeable）
+## 命名导出
 
-按需引入单个功能，减小打包体积：
+按需引入单个功能：
 
 ```typescript
 import {
@@ -83,7 +83,7 @@ console.log(result.os)      // 'Windows'
 
 ### 精确 Windows 11 检测
 
-Windows 11 与 Windows 10 的 UA 字符串相同，需借助 `navigator.userAgentData` 异步获取：
+Windows 11 与 Windows 10 的 UA 字符串相同，需借助 `navigator.userAgentData` 异步获取。**仅限浏览器环境**，Node.js 下返回 `null`：
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
