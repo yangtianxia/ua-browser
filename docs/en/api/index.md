@@ -80,6 +80,8 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 > **Note:** Requires `navigator.userAgentData` (Client Hints API). Browser-only — returns `null` in Node.js or when the API is unavailable.
 
+> **Note:** Requires `navigator.userAgentData` (Client Hints API). Browser-only — returns `null` in Node.js or when the API is unavailable.
+
 ---
 
 ### `detectBot(ua)`

@@ -80,6 +80,8 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 > **注意：** 依赖 `navigator.userAgentData`（Client Hints API），仅限支持该 API 的现代浏览器。Node.js 或不支持时返回 `null`。
 
+> **注意：** 依赖 `navigator.userAgentData`（Client Hints API），仅限支持该 API 的现代浏览器。Node.js 或不支持时返回 `null`。
+
 ---
 
 ### `detectBot(ua)`
