@@ -49,7 +49,7 @@ console.log(info)
 
 ## Named Exports (Tree-shakeable)
 
-Import only what you need to keep your bundle small:
+Import specific functions — Vite / Rollup / webpack 5+ will eliminate unused code automatically:
 
 ```typescript
 import {
@@ -83,7 +83,7 @@ console.log(result.os)      // 'Windows'
 
 ### Accurate Windows 10 / 11 Detection
 
-Windows 10 and 11 share the same UA string. Use `navigator.userAgentData` to distinguish them:
+Windows 10 and 11 share the same UA string. Use `navigator.userAgentData` to distinguish them. **Browser-only** — returns `null` in Node.js:
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
