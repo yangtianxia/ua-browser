@@ -16,7 +16,7 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, and h
 - **Zero dependencies** — no runtime dependencies, tiny bundle size after gzip
 - **Pure function** — `parseUA()` has no global state, works seamlessly with SSR / Node.js
 - **TypeScript** — full type definitions with precise literal union types (`BrowserName`, `OsName`, etc.)
-- **Tree-shakeable** — import only what you need
+- **Tree-shakeable** — named exports + `sideEffects: false`, unused code eliminated by Vite / Rollup / webpack 5+
 
 ## Installation
 
