@@ -47,9 +47,9 @@ console.log(info)
 // }
 ```
 
-## Named Exports
+## Named Exports (Tree-shakeable)
 
-Import specific functions using named imports:
+Import specific functions — Vite / Rollup / webpack 5+ will eliminate unused code automatically:
 
 ```typescript
 import {

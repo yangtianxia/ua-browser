@@ -47,9 +47,9 @@ console.log(info)
 // }
 ```
 
-## 命名导出
+## 命名导出（Tree-shakeable）
 
-按需引入单个功能：
+按需引入单个功能，Vite / Rollup / webpack 5+ 会自动移除未使用的代码：
 
 ```typescript
 import {
