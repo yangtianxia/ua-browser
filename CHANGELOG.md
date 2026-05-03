@@ -1,5 +1,17 @@
 # ua-browser
 
+## 1.0.2
+
+### Patch Changes
+
+- Fix OS detection order bugs and iOS Safari version parsing
+
+  - Fix Chrome OS misidentified as Linux (Chrome OS UA contains X11)
+  - Fix HarmonyOS misidentified as Android (HarmonyOS UA contains Android)
+  - Fix Windows Phone misidentified as Windows (Windows Phone UA contains Windows)
+  - Fix iOS 26+ Safari osVersion showing frozen value (18.7) instead of real version from Version/ token
+  - Fix Playground mobile layout: reduce padding for two-column result grid on small screens
+
 ## 1.0.1
 
 ### Patch Changes
