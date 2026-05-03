@@ -49,6 +49,27 @@ describe('parseUA — full pipeline', () => {
     const r = parseUA(UA.safari.ios)
     expect(r.browser).toBe('Safari')
     expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('17.4')
+    expect(r.engine).toBe('WebKit')
+    expect(r.device).toBe('Mobile')
+  })
+
+  it('Safari on iOS 26 — CPU iPhone OS frozen at 18_7, Version/ reflects real version', () => {
+    const r = parseUA(UA.safari.ios26)
+    expect(r.browser).toBe('Safari')
+    expect(r.version).toBe('26.4')
+    expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('26.4')
+    expect(r.engine).toBe('WebKit')
+    expect(r.device).toBe('Mobile')
+  })
+
+  it('Chrome on iOS 26 — CriOS reports real OS version', () => {
+    const r = parseUA(UA.chrome.crios26)
+    expect(r.browser).toBe('Chrome')
+    expect(r.version).toBe('147.0.7727.99')
+    expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('26.4.2')
     expect(r.engine).toBe('WebKit')
     expect(r.device).toBe('Mobile')
   })

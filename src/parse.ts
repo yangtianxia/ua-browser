@@ -25,7 +25,8 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   const { nav, windowsVersion } = options
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os, osVersion } = detectOs(ua, windowsVersion)
+  const { os, osVersion: rawOsVersion } = detectOs(ua, windowsVersion)
+  let osVersion = rawOsVersion
   const device = detectDevice(ua, nav)
   const arch = detectArch(ua)
   const { isBot, botName } = detectBot(ua)
@@ -120,6 +121,16 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
       }
     } catch {
       // not in WeChat miniapp context
+    }
+  }
+
+  // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
+  // The Version/ token reliably reflects the real Safari/iOS version.
+  // When Version/ major > CPU iPhone OS major, use Version/ as the real osVersion.
+  if (os === 'iOS' && browser === 'Safari') {
+    const m = /Version\/([\d.]+)/.exec(ua)
+    if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
+      osVersion = m[1]
     }
   }
 
