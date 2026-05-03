@@ -16,6 +16,12 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('124.0.6367.88')
     })
 
+    it('detects Chrome iOS 26 (CriOS)', () => {
+      const r = detectBrowser(UA.chrome.crios26)
+      expect(r.browser).toBe('Chrome')
+      expect(r.version).toBe('147.0.7727.99')
+    })
+
     it('detects Edge Chromium', () => {
       const r = detectBrowser(UA.edge.chromium)
       expect(r.browser).toBe('Edge')
@@ -68,6 +74,12 @@ describe('detectBrowser', () => {
       const r = detectBrowser(UA.safari.ios)
       expect(r.browser).toBe('Safari')
       expect(r.version).toBe('17.4')
+    })
+
+    it('detects Safari iOS 26 (decoupled version)', () => {
+      const r = detectBrowser(UA.safari.ios26)
+      expect(r.browser).toBe('Safari')
+      expect(r.version).toBe('26.4')
     })
 
     it('detects IE11', () => {
