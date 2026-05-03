@@ -66,6 +66,26 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('2.5.2')
   })
 
+  it('Chrome OS → Chrome OS (not misidentified as Linux via X11)', () => {
+    const ua = 'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    const r = detectOs(ua)
+    expect(r.os).toBe('Chrome OS')
+  })
+
+  it('Windows Phone → Windows Phone (not misidentified as Windows)', () => {
+    const ua = 'Mozilla/5.0 (Windows Phone 10.0; Android 6.0.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Mobile Safari/537.36 Edge/15.15254'
+    const r = detectOs(ua)
+    expect(r.os).toBe('Windows Phone')
+    expect(r.osVersion).toBe('10.0')
+  })
+
+  it('HarmonyOS → HarmonyOS (not misidentified as Android)', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 10; HarmonyOS; ANA-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 HuaweiBrowser/11.0.8.301 Mobile Safari/537.36'
+    const r = detectOs(ua)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('2')
+  })
+
   it('returns unknown for empty UA', () => {
     const r = detectOs('')
     expect(r.os).toBe('unknown')

@@ -454,6 +454,8 @@ const fields = computed(() => {
 @media (max-width: 768px) {
   .playground {
     flex-direction: column;
+    padding: 12px;
+    gap: 16px;
   }
 
   .playground-left {

@@ -1,5 +1,17 @@
 # ua-browser
 
+## 1.0.2
+
+### Patch Changes
+
+- 修复 OS 检测顺序及 iOS Safari 版本误判
+
+  - 修复 Chrome OS 被误识别为 Linux（Chrome OS UA 含 X11）
+  - 修复 HarmonyOS 被误识别为 Android（HarmonyOS UA 含 Android）
+  - 修复 Windows Phone 被误识别为 Windows（Windows Phone UA 含 Windows）
+  - 修复 iOS 26+ Safari osVersion 显示冻结值（18.7）而非 Version/ 真实版本
+  - 修复 Playground 手机端边距过大导致结果只显示一列的问题
+
 ## 1.0.1
 
 ### Patch Changes

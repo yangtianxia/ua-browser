@@ -1,6 +1,6 @@
 {
   "name": "ua-browser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "uaBrowser - Browser, OS, engine and device detection from user agent strings. Supports Node.js. Zero dependencies.",
   "type": "module",
   "main": "./dist/index.cjs",
