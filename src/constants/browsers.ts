@@ -33,14 +33,9 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   { name: 'Samsung Internet', priority: 92,  detect: /SamsungBrowser/,      versionPattern: /SamsungBrowser\/([\d.]+)/ },
   { name: 'DuckDuckGo',       priority: 94,  detect: /DuckDuckGo\//,        versionPattern: /DuckDuckGo\/([\d.]+)/ },
   { name: 'Puffin',           priority: 96,  detect: /Puffin\//,            versionPattern: /Puffin\/([\d.]+)/ },
-  { name: 'Arora',            priority: 100, detect: /Arora/,               versionPattern: /Arora\/([\d.]+)/ },
-  { name: 'Lunascape',     priority: 110, detect: /Lunascape/,           versionPattern: /Lunascape[\s]([\d.]+)/ },
-  { name: 'QupZilla',      priority: 120, detect: /QupZilla/,            versionPattern: /QupZilla[\s]([\d.]+)/ },
   { name: 'Coc Coc',       priority: 130, detect: /coc_coc_browser/,     versionPattern: /coc_coc_browser\/([\d.]+)/ },
   { name: 'Kindle',        priority: 140, detect: /(Kindle|Silk\/)/,     versionPattern: /Version\/([\d.]+)/ },
-  { name: 'Iceweasel',     priority: 150, detect: /Iceweasel/,           versionPattern: /Iceweasel\/([\d.]+)/ },
   { name: 'Konqueror',     priority: 160, detect: /Konqueror/,           versionPattern: /Konqueror\/([\d.]+)/ },
-  { name: 'Iceape',        priority: 170, detect: /Iceape/,              versionPattern: /Iceape\/([\d.]+)/ },
   { name: 'SeaMonkey',     priority: 180, detect: /SeaMonkey/,           versionPattern: /SeaMonkey\/([\d.]+)/ },
   { name: 'Epiphany',      priority: 190, detect: /Epiphany/,            versionPattern: /Epiphany\/([\d.]+)/ },
   { name: 'Maxthon',       priority: 200, detect: /Maxthon/,             versionPattern: /Maxthon\/([\d.]+)/ },
@@ -82,5 +77,12 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   { name: 'Suning',        priority: 560, detect: /SNEBUY-APP/,          versionPattern: /SNEBUY-APP([\d.]+)/ },
   { name: 'iQiYi',         priority: 570, detect: /IqiyiApp/,            versionPattern: /IqiyiVersion\/([\d.]+)/ },
   { name: 'DingTalk',      priority: 580, detect: /DingTalk/,            versionPattern: /DingTalk\/([\d.]+)/ },
-  { name: 'Douyin',        priority: 590, detect: /aweme/,               versionPattern: /app_version\/([\d.]+)/ }
+  { name: 'Douyin',        priority: 590, detect: /aweme/,               versionPattern: /app_version\/([\d.]+)/ },
+  { name: 'Bilibili',      priority: 592, detect: /BiliBili\//,           versionPattern: /BiliBili\/([\d.]+)/ },
+  { name: 'Kuaishou',      priority: 594, detect: /Kwai\//,               versionPattern: /Kwai\/([\d.]+)/ },
+  { name: 'Xiaohongshu',   priority: 596, detect: /Xiaohongshu\//,        versionPattern: /Xiaohongshu\/([\d.]+)/ },
+  { name: 'Feishu',        priority: 597, detect: /(Lark|Feishu)\//,      versionPattern: [/Lark\/([\d.]+)/, /Feishu\/([\d.]+)/] },
+  { name: 'Toutiao',       priority: 598, detect: /NewsArticle\//,        versionPattern: /NewsArticle\/([\d.]+)/ },
+  { name: 'JD',            priority: 599, detect: /jdpingou\//,           versionPattern: /jdpingou\/([\d.]+)/ },
+  { name: 'Meituan',       priority: 600, detect: /MeituanHybrid\//,      versionPattern: /MeituanHybrid\/([\d.]+)/ }
 ] as const
