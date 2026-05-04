@@ -102,6 +102,30 @@ const PRESET_UAS = [
     ua: 'Mozilla/5.0 (Linux; Android 12; SM-G991B Build/SP1A.210812.016; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/98.0.4758.87 Mobile Safari/537.36 MicroMessenger/8.0.30',
   },
   {
+    label: 'Bilibili / Android',
+    ua: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 BiliBili/6.24.0 os/android model/SM-G991B mobi_app/android',
+  },
+  {
+    label: 'Douyin / Android',
+    ua: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 aweme/20.6.0 app_version/20.6.0',
+  },
+  {
+    label: 'Feishu / Android',
+    ua: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Lark/6.8.9 RangersAppID/1305903',
+  },
+  {
+    label: 'HarmonyOS Next',
+    ua: 'Mozilla/5.0 (Linux; HarmonyOS 5.0.0; HUAWEI GT5 Pro Build/HUAWEIAGT5Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+  },
+  {
+    label: 'Samsung Internet',
+    ua: 'Mozilla/5.0 (Linux; Android 14; SAMSUNG SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/24.0 Chrome/117.0.0.0 Mobile Safari/537.36',
+  },
+  {
+    label: 'Samsung TV',
+    ua: 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.5) AppleWebKit/538.1 (KHTML, like Gecko) Version/6.5 TV Safari/538.1',
+  },
+  {
     label: 'Googlebot',
     ua: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
   },
