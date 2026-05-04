@@ -96,6 +96,28 @@ export const UA = {
   openHarmony: {
     standard: 'Mozilla/5.0 (Linux; OpenHarmony 4.1; HONOR X8b Build/HONORX8b) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
   },
+  // New App WebViews
+  bilibili: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 BiliBili/6.24.0 os/android model/SM-G991B mobi_app/android'
+  },
+  kuaishou: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Kwai/10.2.40.5370'
+  },
+  xiaohongshu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Xiaohongshu/7.51.1'
+  },
+  feishu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Lark/6.8.9 RangersAppID/1305903'
+  },
+  toutiao: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 NewsArticle/8.7.5'
+  },
+  jd: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 jdpingou/3.5.0'
+  },
+  meituan: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MeituanHybrid/1.0'
+  },
   // Empty / edge cases
   empty: '',
   node: 'node-fetch/1.0 (+https://github.com/node-fetch/node-fetch)'

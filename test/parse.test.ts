@@ -194,6 +194,50 @@ describe('parseUA — new fields (arch, isBot, isHeadless)', () => {
   })
 })
 
+describe('parseUA — miniapp runtime detection', () => {
+  it('Wechat UA + __wxjs_environment → Wechat Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).__wxjs_environment = 'miniprogram'
+    const r = parseUA(UA.wechat.mobile)
+    expect(r.browser).toBe('Wechat Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).__wxjs_environment
+  })
+
+  it('Alipay UA + window.my.getSystemInfo → Alipay Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).window = { my: { getSystemInfo: () => {} } }
+    const r = parseUA(UA.alipay.mobile)
+    expect(r.browser).toBe('Alipay Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).window
+  })
+
+  it('Baidu UA + swan.getSystemInfo → Baidu Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).swan = { getSystemInfo: () => {} }
+    const r = parseUA(UA.baidu.mobile)
+    expect(r.browser).toBe('Baidu Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).swan
+  })
+
+  it('Douyin UA + tt.getSystemInfo → Douyin Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).tt = { getSystemInfo: () => {} }
+    const r = parseUA(UA.douyin.mobile)
+    expect(r.browser).toBe('Douyin Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).tt
+  })
+
+  it('QQ UA + qq.getSystemInfo → QQ Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).qq = { getSystemInfo: () => {} }
+    const r = parseUA(UA.qq.qq)
+    expect(r.browser).toBe('QQ Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).qq
+  })
+
+  it('Kuaishou UA + ks.getSystemInfo → Kuaishou Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).ks = { getSystemInfo: () => {} }
+    const r = parseUA(UA.kuaishou.mobile)
+    expect(r.browser).toBe('Kuaishou Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).ks
+  })
+})
+
 describe('parseUA — edge cases', () => {
   it('empty UA → all unknowns', () => {
     const r = parseUA('')

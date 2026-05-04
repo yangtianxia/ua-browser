@@ -23,14 +23,9 @@
 | Samsung Internet | `Samsung Internet` | 92 |
 | DuckDuckGo 浏览器 | `DuckDuckGo` | 94 |
 | Puffin | `Puffin` | 96 |
-| Arora | `Arora` | 100 |
-| Lunascape | `Lunascape` | 110 |
-| QupZilla | `QupZilla` | 120 |
 | Coc Coc（越南） | `Coc Coc` | 130 |
 | Amazon Kindle / Silk | `Kindle` | 140 |
-| Iceweasel | `Iceweasel` | 150 |
 | Konqueror | `Konqueror` | 160 |
-| Iceape | `Iceape` | 170 |
 | SeaMonkey | `SeaMonkey` | 180 |
 | Epiphany | `Epiphany` | 190 |
 | 傲游浏览器 | `Maxthon` | 200 |
@@ -72,10 +67,28 @@
 | 爱奇艺 | `iQiYi` | 570 |
 | 钉钉 | `DingTalk` | 580 |
 | 抖音 | `Douyin` | 590 |
+| 哔哩哔哩 | `Bilibili` | 592 |
+| 快手 | `Kuaishou` | 594 |
+| 小红书 | `Xiaohongshu` | 596 |
+| 飞书 / Lark | `Feishu` | 597 |
+| 今日头条 | `Toutiao` | 598 |
+| 京东（拼购） | `JD` | 599 |
+| 美团 | `Meituan` | 600 |
 
-::: tip 微信小程序
-微信小程序通过 `isWechatMiniapp()` 单独检测（依赖 `__wxjs_environment` 全局变量），`browser` 字段返回 `'Wechat Miniapp'`。
+::: tip 小程序检测
+各平台小程序通过运行时全局变量检测，`browser` 字段返回对应 Miniapp 值：
+
+| 平台 | 辅助函数 | `browser` 返回值 | 全局变量 |
+| :-- | :-- | :-- | :-- |
+| 微信 | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
+| 支付宝 | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
+| 百度 | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
+| 抖音 | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
+| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
+| 快手 | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
 :::
+
+
 
 ---
 

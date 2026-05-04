@@ -23,14 +23,9 @@ Detection priority runs from lowest to highest. When multiple rules match the sa
 | Samsung Internet | `Samsung Internet` | 92 |
 | DuckDuckGo Browser | `DuckDuckGo` | 94 |
 | Puffin | `Puffin` | 96 |
-| Arora | `Arora` | 100 |
-| Lunascape | `Lunascape` | 110 |
-| QupZilla | `QupZilla` | 120 |
 | Coc Coc (Vietnam) | `Coc Coc` | 130 |
 | Amazon Kindle / Silk | `Kindle` | 140 |
-| Iceweasel | `Iceweasel` | 150 |
 | Konqueror | `Konqueror` | 160 |
-| Iceape | `Iceape` | 170 |
 | SeaMonkey | `SeaMonkey` | 180 |
 | Epiphany | `Epiphany` | 190 |
 | Maxthon | `Maxthon` | 200 |
@@ -72,10 +67,28 @@ Detection priority runs from lowest to highest. When multiple rules match the sa
 | iQiYi | `iQiYi` | 570 |
 | DingTalk | `DingTalk` | 580 |
 | TikTok (Douyin) | `Douyin` | 590 |
+| Bilibili | `Bilibili` | 592 |
+| Kuaishou (Kwai) | `Kuaishou` | 594 |
+| Xiaohongshu (RedNote) | `Xiaohongshu` | 596 |
+| Feishu / Lark | `Feishu` | 597 |
+| Toutiao (Today's Headlines) | `Toutiao` | 598 |
+| JD (Pingou) | `JD` | 599 |
+| Meituan | `Meituan` | 600 |
 
-::: tip WeChat Mini Program
-WeChat Mini Programs are detected separately via `isWechatMiniapp()` (relies on the `__wxjs_environment` global). The `browser` field returns `'Wechat Miniapp'`.
+::: tip Mini Program detection
+Each platform's mini programs are detected via runtime global variables. The `browser` field returns the corresponding Miniapp value:
+
+| Platform | Helper function | `browser` value | Runtime global |
+| :-- | :-- | :-- | :-- |
+| WeChat | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
+| Alipay | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
+| Baidu | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
+| Douyin | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
+| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
+| Kuaishou | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
 :::
+
+
 
 ---
 
