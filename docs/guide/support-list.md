@@ -23,14 +23,9 @@
 | Samsung Internet | `Samsung Internet` | 92 |
 | DuckDuckGo 浏览器 | `DuckDuckGo` | 94 |
 | Puffin | `Puffin` | 96 |
-| Arora | `Arora` | 100 |
-| Lunascape | `Lunascape` | 110 |
-| QupZilla | `QupZilla` | 120 |
 | Coc Coc（越南） | `Coc Coc` | 130 |
 | Amazon Kindle / Silk | `Kindle` | 140 |
-| Iceweasel | `Iceweasel` | 150 |
 | Konqueror | `Konqueror` | 160 |
-| Iceape | `Iceape` | 170 |
 | SeaMonkey | `SeaMonkey` | 180 |
 | Epiphany | `Epiphany` | 190 |
 | 傲游浏览器 | `Maxthon` | 200 |
@@ -72,10 +67,28 @@
 | 爱奇艺 | `iQiYi` | 570 |
 | 钉钉 | `DingTalk` | 580 |
 | 抖音 | `Douyin` | 590 |
+| 哔哩哔哩 | `Bilibili` | 592 |
+| 快手 | `Kuaishou` | 594 |
+| 小红书 | `Xiaohongshu` | 596 |
+| 飞书 / Lark | `Feishu` | 597 |
+| 今日头条 | `Toutiao` | 598 |
+| 京东（拼购） | `JD` | 599 |
+| 美团 | `Meituan` | 600 |
 
-::: tip 微信小程序
-微信小程序通过 `isWechatMiniapp()` 单独检测（依赖 `__wxjs_environment` 全局变量），`browser` 字段返回 `'Wechat Miniapp'`。
+::: tip 小程序检测
+各平台小程序通过运行时全局变量检测，`browser` 字段返回对应 Miniapp 值：
+
+| 平台 | 辅助函数 | `browser` 返回值 | 全局变量 |
+| :-- | :-- | :-- | :-- |
+| 微信 | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
+| 支付宝 | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
+| 百度 | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
+| 抖音 | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
+| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
+| 快手 | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
 :::
+
+
 
 ---
 
@@ -87,7 +100,8 @@
 | Android | `Android` | `14`、`13`、`12`... |
 | iOS | `iOS` | `17.4`、`16.0`... |
 | macOS | `MacOS` | `10.15.7`... |
-| HarmonyOS | `HarmonyOS` | `2`（基于 Android 版本映射） |
+| HarmonyOS | `HarmonyOS` | `2`、`3`、`4`（Android 版本映射）；`5.0.0`（HarmonyOS Next 直接提取） |
+| OpenHarmony | `OpenHarmony` | `4.1`、`3.2`... |
 | Chrome OS | `Chrome OS` | — |
 | Tizen | `Tizen` | `6.0`、`5.5`...（三星智能电视 / 可穿戴） |
 | KaiOS | `KaiOS` | `2.5`、`3.0`...（发展中国家功能机） |
@@ -100,6 +114,19 @@
 | MeeGo | `MeeGo` | — |
 | Symbian | `Symbian` | — |
 | WebOS | `WebOS` | — |
+
+::: info HarmonyOS 版本映射
+HarmonyOS 2/3/4 基于 Android 兼容层，UA 含 `Android` 字段，版本通过映射表推算：
+
+| Android NT 版本 | HarmonyOS 版本 |
+| :-- | :-- |
+| 10 | `2` |
+| 11 | `3` |
+| 12 | `3` |
+| 13 | `4` |
+
+HarmonyOS Next（5.0+）UA 不含 `Android` 字段，版本从 `HarmonyOS 5.0.0` 直接提取。
+:::
 
 ::: info Windows 版本映射
 UA 中的 `Windows NT` 版本号映射如下：
@@ -128,9 +155,14 @@ UA 中的 `Windows NT` 版本号映射如下：
 | EdgeHTML | `EdgeHTML` | Edge（旧版，< 79） |
 | Presto | `Presto` | Opera（旧版，< 15） |
 | KHTML | `KHTML` | Konqueror |
+| ArkWeb | `ArkWeb` | HarmonyOS Next 内置渲染引擎（部分 UA 显式携带） |
 
 ::: tip Blink 升级
 Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为 `Blink`。
+:::
+
+::: info ArkWeb
+ArkWeb 仅在 HarmonyOS Next 的部分 UA 中显式出现 `ArkWeb` token。无该 token 的 HarmonyOS UA 仍会正确识别为 `Blink`（基于 Chromium 内核）。
 :::
 
 ---
@@ -148,15 +180,24 @@ Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为
 
 ## CPU 架构
 
-检测规则按优先级从高到低，首个匹配项胜出：
+v1.1.0 起采用四层优先级检测链，前层成功则跳过后层：
 
-| 架构 | `ArchName` | UA 特征 |
+| 层级 | 数据来源 | 覆盖场景 |
+| :--: | :-- | :-- |
+| 1 | UA Client Hints（`navigator.userAgentData`） | Chrome / Edge，精确 |
+| 2 | WebGL 渲染器字符串 | 解决 Apple Silicon vs Intel Mac 问题 |
+| 3 | `navigator.platform` 推断 | 同步，覆盖 iPhone / iPad / Linux aarch64 |
+| 4 | UA 字符串模式匹配 | 兜底，与 v1.0 行为一致 |
+
+**输出值：**
+
+| 架构 | `ArchName` | 常见 UA / 信号特征 |
 | :-- | :-- | :-- |
-| ARM 64 位 | `arm64` | `aarch64`、`arm64`、`ARM64` |
-| ARM 32 位 | `arm` | `ARM`（独立单词） |
-| x86 64 位 | `x86_64` | `x86_64`、`Win64`、`WOW64`、`x64;`、`amd64` |
-| x86 32 位 | `x86` | `i386`、`i686`、`x86;` |
-| 未知 | `unknown` | 无匹配 |
+| ARM 64 位 | `arm64` | Client Hints `arm/64`；WebGL `Apple M1/M2/A15`；platform `iPhone/iPad`；UA `aarch64`、`arm64` |
+| ARM 32 位 | `arm` | Client Hints `arm/32`；platform `arm`；UA `ARM` |
+| x86 64 位 | `x86_64` | Client Hints `x86/64`；WebGL `Intel/AMD/NVIDIA`；platform `Win64`；UA `x86_64`、`WOW64` |
+| x86 32 位 | `x86` | Client Hints `x86/32`；platform `Win32`；UA `i686` |
+| 未知 | `unknown` | 以上均无匹配 |
 
 ---
 
@@ -227,3 +268,42 @@ Chrome 28 之前基于 WebKit。检测到 Chrome 28+ 时，内核自动升级为
 ::: warning 注意
 Cypress、WebdriverIO 默认不修改 UA，无法从 UA 层面检测。现代隐身模式（如 puppeteer-stealth）可绕过以上所有标识，本检测仅覆盖未经伪装的常见场景。
 :::
+
+---
+
+## 运行时浏览器兼容性
+
+本节说明 `ua-browser` 自身代码能在哪些浏览器中运行，与「能检测哪些浏览器」是两个独立问题。
+
+### 核心函数
+
+`parseUA()`、`detectBrowser()`、`detectOs()` 等所有同步检测函数为**纯正则运算**，无任何浏览器 API 依赖，可在所有现代 JS 环境（浏览器、Node.js、Deno、SSR）中运行。
+
+### 构建产物 JS 语法
+
+| 特性 | 源码 | 构建产物（`target: es2018`） |
+| :-- | :--: | :-- |
+| 可选链 `?.` | ✓ | 转译为 `(x == null ? void 0 : x.y)` |
+| 空值合并 `??` | ✓ | 转译为等价 ES5 写法 |
+| `async / await` | ✓ | 保留（ES2017，在 es2018 目标范围内）|
+
+**最低语法兼容版本：** Chrome 63 / Safari 12 / Firefox 55 / Edge 79（Chromium）
+
+### `getEnvContext()` 各 API 兼容性
+
+| API | Chrome | Safari | Firefox | Edge | 说明 |
+| :-- | :--: | :--: | :--: | :--: | :-- |
+| `canvas` + `measureText` | 9+ | 3.1+ | 3.5+ | 12+ | 字体探针，用于确认 OS 检测结果 |
+| `WebGL` 渲染器 | 9+ | 8+ | 4+ | 12+ | 解决 Apple Silicon vs Intel Mac |
+| `window.matchMedia` | 9+ | 5.1+ | 6+ | 12+ | 触屏 / 悬停能力检测 |
+| `navigator.hardwareConcurrency` | 37+ | 10.1+ | 48+ | 15+ | CPU 核心数 |
+| `navigator.deviceMemory` | 63+ | ✗ | ✗ | 79+ | 内存大小，Chrome 独有 |
+| `userAgentData.getHighEntropyValues` | 90+ | ✗ | ✗ | 90+ | UA Client Hints，最精确的 arch 来源 |
+
+::: tip 降级策略
+所有 DOM API 调用均包裹在 `try/catch` 与 `typeof window !== 'undefined'` 判断中。Safari / Firefox 不支持的 API 会静默跳过，`getEnvContext()` 在任何环境下都不会抛出异常。
+:::
+
+### `parseHeaders()` 兼容性
+
+纯服务端函数，无浏览器 API 依赖。Client Hints 头部（`Sec-CH-UA-Arch` 等）仅 Chrome / Edge 90+ 会自动发送；Safari / Firefox 不发送，此时 `arch` 等字段退回到 UA 字符串匹配结果。

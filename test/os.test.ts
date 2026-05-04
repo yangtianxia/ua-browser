@@ -79,11 +79,39 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('10.0')
   })
 
-  it('HarmonyOS → HarmonyOS (not misidentified as Android)', () => {
-    const ua = 'Mozilla/5.0 (Linux; Android 10; HarmonyOS; ANA-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 HuaweiBrowser/11.0.8.301 Mobile Safari/537.36'
-    const r = detectOs(ua)
+  it('HarmonyOS legacy (Android 10) → HarmonyOS 2', () => {
+    const r = detectOs(UA.harmonyOs.legacy)
     expect(r.os).toBe('HarmonyOS')
     expect(r.osVersion).toBe('2')
+  })
+
+  it('HarmonyOS with Android 11 base → HarmonyOS 3', () => {
+    const r = detectOs(UA.harmonyOs.android11)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('3')
+  })
+
+  it('HarmonyOS with Android 13 base → HarmonyOS 4', () => {
+    const r = detectOs(UA.harmonyOs.android13)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('4')
+  })
+
+  it('HarmonyOS Next (5.0+, no Android token) → HarmonyOS 5.0.0', () => {
+    const r = detectOs(UA.harmonyOs.next)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('5.0.0')
+  })
+
+  it('HarmonyOS ArkWeb UA → HarmonyOS (not misidentified as Android)', () => {
+    const r = detectOs(UA.harmonyOs.arkWeb)
+    expect(r.os).toBe('HarmonyOS')
+  })
+
+  it('OpenHarmony → OpenHarmony with version', () => {
+    const r = detectOs(UA.openHarmony.standard)
+    expect(r.os).toBe('OpenHarmony')
+    expect(r.osVersion).toBe('4.1')
   })
 
   it('returns unknown for empty UA', () => {

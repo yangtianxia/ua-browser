@@ -116,8 +116,20 @@ describe('parseUA — full pipeline', () => {
 })
 
 describe('parseUA — webview detection', () => {
-  it('; wv in UA → isWebview: true', () => {
+  it('Android ; wv → isWebview: true', () => {
     expect(parseUA(UA.webview.android).isWebview).toBe(true)
+  })
+
+  it('iOS WKWebView (no Version/, no Safari/) → isWebview: true', () => {
+    expect(parseUA(UA.webview.iosWKWebView).isWebview).toBe(true)
+  })
+
+  it('iOS Safari (has Version/ and Safari/) → isWebview: false', () => {
+    expect(parseUA(UA.safari.ios).isWebview).toBe(false)
+  })
+
+  it('CriOS on iOS (has Safari/) → isWebview: false', () => {
+    expect(parseUA(UA.chrome.crios).isWebview).toBe(false)
   })
 
   it('no ; wv → isWebview: false', () => {
@@ -130,6 +142,28 @@ describe('parseUA — windowsVersion override', () => {
     const r = parseUA(UA.chrome.windows, { windowsVersion: '11' })
     expect(r.os).toBe('Windows')
     expect(r.osVersion).toBe('11')
+  })
+})
+
+describe('parseUA — ctx option', () => {
+  it('ctx.windowsVersion supersedes options.windowsVersion', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US',
+      maxTouchPoints: 0, windowsVersion: '11' }
+    const r = parseUA(UA.chrome.windows, { ctx, windowsVersion: '10' })
+    expect(r.osVersion).toBe('11')
+  })
+
+  it('ctx.highEntropyData.architecture used for arch detection', () => {
+    const ctx = { userAgent: UA.safari.ios, platform: 'iPhone', language: 'en',
+      maxTouchPoints: 5, highEntropyData: { architecture: 'arm', bitness: '64' } }
+    const r = parseUA(UA.safari.ios, { ctx })
+    expect(r.arch).toBe('arm64')
+  })
+
+  it('ctx platform used as result.platform', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US', maxTouchPoints: 0 }
+    const r = parseUA(UA.chrome.windows, { ctx })
+    expect(r.platform).toBe('Win32')
   })
 })
 
@@ -157,6 +191,50 @@ describe('parseUA — new fields (arch, isBot, isHeadless)', () => {
   it('HeadlessChrome UA → isHeadless: true', () => {
     const ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/124.0.0.0 Safari/537.36'
     expect(parseUA(ua).isHeadless).toBe(true)
+  })
+})
+
+describe('parseUA — miniapp runtime detection', () => {
+  it('Wechat UA + __wxjs_environment → Wechat Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).__wxjs_environment = 'miniprogram'
+    const r = parseUA(UA.wechat.mobile)
+    expect(r.browser).toBe('Wechat Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).__wxjs_environment
+  })
+
+  it('Alipay UA + window.my.getSystemInfo → Alipay Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).window = { my: { getSystemInfo: () => {} } }
+    const r = parseUA(UA.alipay.mobile)
+    expect(r.browser).toBe('Alipay Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).window
+  })
+
+  it('Baidu UA + swan.getSystemInfo → Baidu Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).swan = { getSystemInfo: () => {} }
+    const r = parseUA(UA.baidu.mobile)
+    expect(r.browser).toBe('Baidu Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).swan
+  })
+
+  it('Douyin UA + tt.getSystemInfo → Douyin Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).tt = { getSystemInfo: () => {} }
+    const r = parseUA(UA.douyin.mobile)
+    expect(r.browser).toBe('Douyin Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).tt
+  })
+
+  it('QQ UA + qq.getSystemInfo → QQ Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).qq = { getSystemInfo: () => {} }
+    const r = parseUA(UA.qq.qq)
+    expect(r.browser).toBe('QQ Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).qq
+  })
+
+  it('Kuaishou UA + ks.getSystemInfo → Kuaishou Miniapp', () => {
+    ;(globalThis as unknown as Record<string, unknown>).ks = { getSystemInfo: () => {} }
+    const r = parseUA(UA.kuaishou.mobile)
+    expect(r.browser).toBe('Kuaishou Miniapp')
+    delete (globalThis as unknown as Record<string, unknown>).ks
   })
 })
 

@@ -6,13 +6,17 @@ import { detectDevice } from './detectors/device.js'
 import { detectBot } from './detectors/bot.js'
 import { detectArch } from './detectors/arch.js'
 import { detectHeadless } from './detectors/headless.js'
+import { isWebview } from './detectors/webview.js'
 import { getMimeType, getLanguage, type NavContext } from './utils/navigator.js'
+import type { EnvContext } from './utils/env-context.js'
 
 export interface ParseOptions {
   /** Nav context to use for language, platform, MIME-type checks, and device detection. */
   nav?: NavContext
   /** Pre-resolved Windows version string (from getWindowsVersion()). Pass to avoid async races. */
   windowsVersion?: string | null
+  /** Full env context from getEnvContext() — supersedes nav and windowsVersion when provided. */
+  ctx?: EnvContext
 }
 
 /**
@@ -22,13 +26,15 @@ export interface ParseOptions {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
-  const { nav, windowsVersion } = options
+  const effectiveNav: NavContext | undefined = options.ctx ?? options.nav
+  const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os, osVersion: rawOsVersion } = detectOs(ua, windowsVersion)
+  const { os, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
   let osVersion = rawOsVersion
-  const device = detectDevice(ua, nav)
-  const arch = detectArch(ua)
+  const device = detectDevice(ua, effectiveNav)
+  const arch = detectArch(ua, options.ctx)
+  const nav = effectiveNav
   const { isBot, botName } = detectBot(ua)
   const isHeadless = detectHeadless(ua)
   const language = nav ? getLanguage(nav) : 'unknown'
@@ -124,6 +130,62 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
+  // Alipay Miniapp — my is a reserved word; accessed via window.my
+  if (browser === 'Alipay') {
+    try {
+      if (typeof window !== 'undefined' &&
+          typeof (window as unknown as { my?: { getSystemInfo?: unknown } }).my?.getSystemInfo === 'function') {
+        browser = 'Alipay Miniapp'
+      }
+    } catch {
+      // not in Alipay miniapp context
+    }
+  }
+
+  // Baidu Smart Miniapp (swan)
+  if (browser === 'Baidu') {
+    try {
+      if (typeof swan !== 'undefined' && typeof swan?.getSystemInfo === 'function') {
+        browser = 'Baidu Miniapp'
+      }
+    } catch {
+      // not in Baidu miniapp context
+    }
+  }
+
+  // Douyin Miniapp (tt)
+  if (browser === 'Douyin') {
+    try {
+      if (typeof tt !== 'undefined' && typeof tt?.getSystemInfo === 'function') {
+        browser = 'Douyin Miniapp'
+      }
+    } catch {
+      // not in Douyin miniapp context
+    }
+  }
+
+  // QQ Miniapp (qq)
+  if (browser === 'QQ') {
+    try {
+      if (typeof qq !== 'undefined' && typeof qq?.getSystemInfo === 'function') {
+        browser = 'QQ Miniapp'
+      }
+    } catch {
+      // not in QQ miniapp context
+    }
+  }
+
+  // Kuaishou Miniapp (ks)
+  if (browser === 'Kuaishou') {
+    try {
+      if (typeof ks !== 'undefined' && typeof ks?.getSystemInfo === 'function') {
+        browser = 'Kuaishou Miniapp'
+      }
+    } catch {
+      // not in Kuaishou miniapp context
+    }
+  }
+
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
   // The Version/ token reliably reflects the real Safari/iOS version.
   // When Version/ major > CPU iPhone OS major, use Version/ as the real osVersion.
@@ -144,7 +206,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     osVersion,
     device,
     arch,
-    isWebview: /; wv/.test(ua),
+    isWebview: isWebview(ua),
     isHeadless,
     isBot,
     botName,

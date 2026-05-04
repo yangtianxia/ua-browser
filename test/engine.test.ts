@@ -46,4 +46,12 @@ describe('detectEngine', () => {
     const yandexUA = 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 YaBrowser/24.1.0 Safari/537.36'
     expect(detectEngine(yandexUA, 'Yandex', '24.1.0')).toBe('Blink')
   })
+
+  it('HarmonyOS ArkWeb UA → ArkWeb (not WebKit)', () => {
+    expect(detectEngine(UA.harmonyOs.arkWeb, 'Chrome', '124.0.0.0')).toBe('ArkWeb')
+  })
+
+  it('HarmonyOS Next without ArkWeb token → Blink', () => {
+    expect(detectEngine(UA.harmonyOs.next, 'Chrome', '124.0.0.0')).toBe('Blink')
+  })
 })

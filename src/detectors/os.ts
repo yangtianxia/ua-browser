@@ -1,6 +1,6 @@
 import type { OsName } from '../types.js'
 import { OS_DEFS } from '../constants/os.js'
-import { extractVersion } from '../utils/extract.js'
+import { extractVersion, extractVersionFromPatterns } from '../utils/extract.js'
 
 export interface OsResult {
   os: OsName
@@ -29,7 +29,9 @@ export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
   let osVersion = 'unknown'
 
   if (matchedDef.versionPattern) {
-    const raw = extractVersion(ua, matchedDef.versionPattern)
+    const raw = Array.isArray(matchedDef.versionPattern)
+      ? extractVersionFromPatterns(ua, matchedDef.versionPattern)
+      : extractVersion(ua, matchedDef.versionPattern)
 
     if (raw !== null) {
       // Normalise iOS underscore-separated version: "17_4_1" → "17.4.1"
@@ -47,6 +49,9 @@ export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
           // For unknown Windows NT versions, fall back to the integer part
           const n = parseInt(normalised, 10)
           osVersion = isNaN(n) ? 'unknown' : n.toString()
+        } else {
+          // For other OS types (e.g. HarmonyOS Next), use raw version directly
+          osVersion = normalised
         }
       } else {
         osVersion = normalised

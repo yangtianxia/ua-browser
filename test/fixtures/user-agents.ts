@@ -82,7 +82,41 @@ export const UA = {
   },
   // OS-specific
   webview: {
-    android: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36; wv)'
+    android: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36; wv)',
+    iosWKWebView: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+  },
+  // HarmonyOS / OpenHarmony
+  harmonyOs: {
+    legacy: 'Mozilla/5.0 (Linux; Android 10; HarmonyOS; ANA-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 HuaweiBrowser/11.0.8.301 Mobile Safari/537.36',
+    android11: 'Mozilla/5.0 (Linux; Android 11; NOH-AN00; HarmonyOS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.48 Mobile Safari/537.36',
+    android13: 'Mozilla/5.0 (Linux; Android 13; HarmonyOS; HUAWEI Mate60Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
+    next: 'Mozilla/5.0 (Linux; HarmonyOS 5.0.0; HUAWEI GT5 Pro Build/HUAWEIAGT5Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+    arkWeb: 'Mozilla/5.0 (Linux; HarmonyOS 5.0; Huawei ArkWeb/4.1.6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+  },
+  openHarmony: {
+    standard: 'Mozilla/5.0 (Linux; OpenHarmony 4.1; HONOR X8b Build/HONORX8b) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
+  },
+  // New App WebViews
+  bilibili: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 BiliBili/6.24.0 os/android model/SM-G991B mobi_app/android'
+  },
+  kuaishou: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Kwai/10.2.40.5370'
+  },
+  xiaohongshu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Xiaohongshu/7.51.1'
+  },
+  feishu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Lark/6.8.9 RangersAppID/1305903'
+  },
+  toutiao: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 NewsArticle/8.7.5'
+  },
+  jd: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 jdpingou/3.5.0'
+  },
+  meituan: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MeituanHybrid/1.0'
   },
   // Empty / edge cases
   empty: '',

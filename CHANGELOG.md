@@ -1,5 +1,21 @@
 # ua-browser
 
+## 1.1.0
+
+### Minor Changes
+
+- 新增多信号融合检测架构（v1.1.0）：
+
+  - `getEnvContext()` 一次性采集所有浏览器环境信号（WebGL、Client Hints、字体探针、CSS media features）
+  - `ParseOptions.ctx` 新选项，将 EnvContext 传入 parseUA() 以启用多信号检测
+  - `parseHeaders()` + `ACCEPT_CH` 常量：服务端通过 HTTP Client Hints 头部实现精准检测（SSR 场景）
+  - `detectArch()` 升级为四层优先级链（Client Hints → WebGL → platform → UA 字符串）
+  - `isWebview()` 新增 iOS WKWebView 检测（补充 Android `;wv` 现有逻辑）
+  - HarmonyOS Next（5.0+）版本直接提取，无需依赖 Android 兼容层版本号
+  - 新增 HarmonyOS 版本映射（Android 11→3、12→3、13→4）
+  - 新增 OpenHarmony OS 检测（独立 OsName）
+  - 新增 ArkWeb 引擎检测
+
 ## 1.0.2
 
 ### Patch Changes

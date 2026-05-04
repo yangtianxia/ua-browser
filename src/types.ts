@@ -6,6 +6,7 @@ export type EngineName =
   | 'KHTML'
   | 'Blink'
   | 'EdgeHTML'
+  | 'ArkWeb'
   | 'unknown'
 
 export type BrowserName =
@@ -23,14 +24,9 @@ export type BrowserName =
   | 'Samsung Internet'
   | 'DuckDuckGo'
   | 'Puffin'
-  | 'Arora'
-  | 'Lunascape'
-  | 'QupZilla'
   | 'Coc Coc'
   | 'Kindle'
-  | 'Iceweasel'
   | 'Konqueror'
-  | 'Iceape'
   | 'SeaMonkey'
   | 'Epiphany'
   | '360'
@@ -63,6 +59,18 @@ export type BrowserName =
   | 'iQiYi'
   | 'DingTalk'
   | 'Douyin'
+  | 'Bilibili'
+  | 'Kuaishou'
+  | 'Xiaohongshu'
+  | 'Feishu'
+  | 'Toutiao'
+  | 'JD'
+  | 'Meituan'
+  | 'Alipay Miniapp'
+  | 'Baidu Miniapp'
+  | 'Douyin Miniapp'
+  | 'QQ Miniapp'
+  | 'Kuaishou Miniapp'
   | 'unknown'
 
 export type OsName =
@@ -71,6 +79,7 @@ export type OsName =
   | 'MacOS'
   | 'Android'
   | 'HarmonyOS'
+  | 'OpenHarmony'
   | 'Ubuntu'
   | 'FreeBSD'
   | 'Debian'
@@ -139,6 +148,15 @@ declare global {
   const __wxjs_environment: string
 
   // eslint-disable-next-line no-var
+  var swan: { getSystemInfo?: unknown } | undefined
+  // eslint-disable-next-line no-var
+  var tt: { getSystemInfo?: unknown } | undefined
+  // eslint-disable-next-line no-var
+  var qq: { getSystemInfo?: unknown } | undefined
+  // eslint-disable-next-line no-var
+  var ks: { getSystemInfo?: unknown } | undefined
+
+  // eslint-disable-next-line no-var
   var chrome: {
     adblock2345?: unknown
     common2345?: unknown
@@ -150,8 +168,13 @@ declare global {
   // eslint-disable-next-line no-var
   var u2f: unknown
 
+  interface Window {
+    my?: { getSystemInfo?: unknown }
+  }
+
   interface Navigator {
     browserLanguage?: string
+    deviceMemory?: number
     userAgentData?: {
       platform: string
       getHighEntropyValues(hints: string[]): Promise<Record<string, string>>
