@@ -128,16 +128,21 @@ uaBrowser(customUA)   // 传入自定义 UA，仍注入当前浏览器上下文
 
 ```typescript
 import {
-  parseUA,           // 纯函数，适合 SSR / Node.js
-  getNavContext,     // 读取当前浏览器 navigator 上下文
-  getWindowsVersion, // 异步精确区分 Windows 10 / 11
-  getLanguage,       // 从 NavContext 获取浏览器语言
-  isWebview,         // 检测 Android Webview（UA 含 "; wv"）
-  isWechatMiniapp,   // 检测微信小程序运行环境
-  detectBot,         // 独立爬虫检测
-  detectArch,        // 独立 CPU 架构检测
-  detectHeadless,    // 独立无头浏览器检测
-  VERSION,           // 当前版本号
+  parseUA,              // 纯函数，适合 SSR / Node.js
+  getNavContext,        // 读取当前浏览器 navigator 上下文
+  getWindowsVersion,    // 异步精确区分 Windows 10 / 11
+  getLanguage,          // 从 NavContext 获取浏览器语言
+  isWebview,            // 检测 Android Webview（UA 含 "; wv"）
+  isWechatMiniapp,      // 检测微信小程序运行环境
+  isAlipayMiniapp,      // 检测支付宝小程序运行环境
+  isBaiduMiniapp,       // 检测百度小程序运行环境
+  isDouyinMiniapp,      // 检测抖音小程序运行环境
+  isQQMiniapp,          // 检测 QQ 小程序运行环境
+  isKuaishouMiniapp,    // 检测快手小程序运行环境
+  detectBot,            // 独立爬虫检测
+  detectArch,           // 独立 CPU 架构检测
+  detectHeadless,       // 独立无头浏览器检测
+  VERSION,              // 当前版本号
 } from 'ua-browser'
 ```
 
@@ -163,11 +168,12 @@ import {
 
 ## 支持范围
 
-内置超过 60 种浏览器、17 种操作系统、19 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
+内置超过 70 种浏览器、17 种操作系统、19 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
 
 部分覆盖：
-- **浏览器** — Chrome、Safari、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音等
-- **操作系统** — Windows、macOS、Android、iOS、HarmonyOS、Tizen、KaiOS 等
+- **浏览器** — Chrome、Safari、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书等
+- **小程序** — 微信、支付宝、百度、抖音、QQ、快手（运行时全局变量检测）
+- **操作系统** — Windows、macOS、Android、iOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
 - **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot 等
 - **设备** — Mobile、Tablet、TV（含三星 Smart TV、HbbTV 标准）、PC
 

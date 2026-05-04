@@ -128,16 +128,21 @@ uaBrowser(customUA)  // custom UA string, still injects browser context
 
 ```typescript
 import {
-  parseUA,           // pure function, ideal for SSR / Node.js
-  getNavContext,     // read current browser navigator context
-  getWindowsVersion, // async: accurately distinguish Windows 10 / 11
-  getLanguage,       // extract browser language from NavContext
-  isWebview,         // detect Android Webview (UA contains "; wv")
-  isWechatMiniapp,   // detect WeChat Mini Program environment
-  detectBot,         // standalone bot detection
-  detectArch,        // standalone CPU architecture detection
-  detectHeadless,    // standalone headless browser detection
-  VERSION,           // current library version
+  parseUA,              // pure function, ideal for SSR / Node.js
+  getNavContext,        // read current browser navigator context
+  getWindowsVersion,    // async: accurately distinguish Windows 10 / 11
+  getLanguage,          // extract browser language from NavContext
+  isWebview,            // detect Android Webview (UA contains "; wv")
+  isWechatMiniapp,      // detect WeChat Mini Program environment
+  isAlipayMiniapp,      // detect Alipay Mini Program environment
+  isBaiduMiniapp,       // detect Baidu Smart Mini Program environment
+  isDouyinMiniapp,      // detect Douyin Mini Program environment
+  isQQMiniapp,          // detect QQ Mini Program environment
+  isKuaishouMiniapp,    // detect Kuaishou Mini Program environment
+  detectBot,            // standalone bot detection
+  detectArch,           // standalone CPU architecture detection
+  detectHeadless,       // standalone headless browser detection
+  VERSION,              // current library version
 } from 'ua-browser'
 ```
 
@@ -163,11 +168,12 @@ import {
 
 ## Supported
 
-Over 60 browsers, 17 operating systems, and 19 bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
+Over 70 browsers, 17 operating systems, and 19 bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
 
 Highlights:
-- **Browsers** — Chrome, Safari, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok and more
-- **OS** — Windows, macOS, Android, iOS, HarmonyOS, Tizen, KaiOS and more
+- **Browsers** — Chrome, Safari, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu and more
+- **Mini Programs** — WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou (runtime global detection)
+- **OS** — Windows, macOS, Android, iOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
 - **AI bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot and more
 - **Devices** — Mobile, Tablet, TV (Samsung Smart TV, HbbTV), PC
 
