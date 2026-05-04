@@ -167,6 +167,48 @@ describe('detectBrowser', () => {
       expect(r.browser).toBe('Douyin')
       expect(r.version).toBe('20.6.0')
     })
+
+    it('detects Bilibili', () => {
+      const r = detectBrowser(UA.bilibili.mobile)
+      expect(r.browser).toBe('Bilibili')
+      expect(r.version).toBe('6.24.0')
+    })
+
+    it('detects Kuaishou', () => {
+      const r = detectBrowser(UA.kuaishou.mobile)
+      expect(r.browser).toBe('Kuaishou')
+      expect(r.version).toBe('10.2.40.5370')
+    })
+
+    it('detects Xiaohongshu', () => {
+      const r = detectBrowser(UA.xiaohongshu.mobile)
+      expect(r.browser).toBe('Xiaohongshu')
+      expect(r.version).toBe('7.51.1')
+    })
+
+    it('detects Feishu (Lark token)', () => {
+      const r = detectBrowser(UA.feishu.mobile)
+      expect(r.browser).toBe('Feishu')
+      expect(r.version).toBe('6.8.9')
+    })
+
+    it('detects Toutiao', () => {
+      const r = detectBrowser(UA.toutiao.mobile)
+      expect(r.browser).toBe('Toutiao')
+      expect(r.version).toBe('8.7.5')
+    })
+
+    it('detects JD', () => {
+      const r = detectBrowser(UA.jd.mobile)
+      expect(r.browser).toBe('JD')
+      expect(r.version).toBe('3.5.0')
+    })
+
+    it('detects Meituan', () => {
+      const r = detectBrowser(UA.meituan.mobile)
+      expect(r.browser).toBe('Meituan')
+      expect(r.version).toBe('1.0')
+    })
   })
 
   describe('international browsers', () => {

@@ -3,6 +3,11 @@ import uaBrowser, {
   parseUA,
   isWebview,
   isWechatMiniapp,
+  isAlipayMiniapp,
+  isBaiduMiniapp,
+  isDouyinMiniapp,
+  isQQMiniapp,
+  isKuaishouMiniapp,
   getLanguage,
   getNavContext,
   getWindowsVersion,
@@ -119,4 +124,16 @@ describe('API surface', () => {
     const crios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/124.0.0.0 Mobile/15E148 Safari/604.1'
     expect(isWebview(crios)).toBe(false)
   })
+
+  it('isAlipayMiniapp is a function', () => { expect(typeof isAlipayMiniapp).toBe('function') })
+  it('isBaiduMiniapp is a function', () => { expect(typeof isBaiduMiniapp).toBe('function') })
+  it('isDouyinMiniapp is a function', () => { expect(typeof isDouyinMiniapp).toBe('function') })
+  it('isQQMiniapp is a function', () => { expect(typeof isQQMiniapp).toBe('function') })
+  it('isKuaishouMiniapp is a function', () => { expect(typeof isKuaishouMiniapp).toBe('function') })
+
+  it('uaBrowser.isAlipayMiniapp is a function', () => { expect(typeof uaBrowser.isAlipayMiniapp).toBe('function') })
+  it('uaBrowser.isBaiduMiniapp is a function', () => { expect(typeof uaBrowser.isBaiduMiniapp).toBe('function') })
+  it('uaBrowser.isDouyinMiniapp is a function', () => { expect(typeof uaBrowser.isDouyinMiniapp).toBe('function') })
+  it('uaBrowser.isQQMiniapp is a function', () => { expect(typeof uaBrowser.isQQMiniapp).toBe('function') })
+  it('uaBrowser.isKuaishouMiniapp is a function', () => { expect(typeof uaBrowser.isKuaishouMiniapp).toBe('function') })
 })
