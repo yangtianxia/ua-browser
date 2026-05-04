@@ -6,13 +6,17 @@ import { detectDevice } from './detectors/device.js'
 import { detectBot } from './detectors/bot.js'
 import { detectArch } from './detectors/arch.js'
 import { detectHeadless } from './detectors/headless.js'
+import { isWebview } from './detectors/webview.js'
 import { getMimeType, getLanguage, type NavContext } from './utils/navigator.js'
+import type { EnvContext } from './utils/env-context.js'
 
 export interface ParseOptions {
   /** Nav context to use for language, platform, MIME-type checks, and device detection. */
   nav?: NavContext
   /** Pre-resolved Windows version string (from getWindowsVersion()). Pass to avoid async races. */
   windowsVersion?: string | null
+  /** Full env context from getEnvContext() — supersedes nav and windowsVersion when provided. */
+  ctx?: EnvContext
 }
 
 /**
@@ -22,13 +26,15 @@ export interface ParseOptions {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
-  const { nav, windowsVersion } = options
+  const effectiveNav: NavContext | undefined = options.ctx ?? options.nav
+  const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os, osVersion: rawOsVersion } = detectOs(ua, windowsVersion)
+  const { os, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
   let osVersion = rawOsVersion
-  const device = detectDevice(ua, nav)
-  const arch = detectArch(ua)
+  const device = detectDevice(ua, effectiveNav)
+  const arch = detectArch(ua, options.ctx)
+  const nav = effectiveNav
   const { isBot, botName } = detectBot(ua)
   const isHeadless = detectHeadless(ua)
   const language = nav ? getLanguage(nav) : 'unknown'
@@ -144,7 +150,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     osVersion,
     device,
     arch,
-    isWebview: /; wv/.test(ua),
+    isWebview: isWebview(ua),
     isHeadless,
     isBot,
     botName,

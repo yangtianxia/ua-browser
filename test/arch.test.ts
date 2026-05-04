@@ -40,4 +40,49 @@ describe('detectArch', () => {
   it('empty UA → unknown', () => {
     expect(detectArch('')).toBe('unknown')
   })
+
+  it('Layer 1: Client Hints arm/64 → arm64', () => {
+    const ctx = { userAgent: UA.safari.ios, platform: '', language: '', maxTouchPoints: 5,
+      highEntropyData: { architecture: 'arm', bitness: '64' } }
+    expect(detectArch(UA.safari.ios, ctx)).toBe('arm64')
+  })
+
+  it('Layer 1: Client Hints arm/32 → arm', () => {
+    const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
+      highEntropyData: { architecture: 'arm', bitness: '32' } }
+    expect(detectArch('', ctx)).toBe('arm')
+  })
+
+  it('Layer 1: Client Hints x86/64 → x86_64', () => {
+    const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
+      highEntropyData: { architecture: 'x86', bitness: '64' } }
+    expect(detectArch('', ctx)).toBe('x86_64')
+  })
+
+  it('Layer 2: WebGL Apple M2 renderer → arm64', () => {
+    const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
+      webglRenderer: 'Apple M2' }
+    expect(detectArch('', ctx)).toBe('arm64')
+  })
+
+  it('Layer 2: WebGL Intel GPU renderer → x86_64', () => {
+    const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
+      webglRenderer: 'Intel Iris Pro OpenGL Engine' }
+    expect(detectArch('', ctx)).toBe('x86_64')
+  })
+
+  it('Layer 3: iPhone platform → arm64', () => {
+    const ctx = { userAgent: UA.safari.ios, platform: 'iPhone', language: '', maxTouchPoints: 5 }
+    expect(detectArch(UA.safari.ios, ctx)).toBe('arm64')
+  })
+
+  it('Layer 3: Win32 platform → x86', () => {
+    const ctx = { userAgent: '', platform: 'Win32', language: '', maxTouchPoints: 0 }
+    expect(detectArch('', ctx)).toBe('x86')
+  })
+
+  it('Layer 4 (UA fallback) used when ctx has no useful signals', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: '', language: '', maxTouchPoints: 0 }
+    expect(detectArch(UA.chrome.windows, ctx)).toBe('x86_64')  // Win64 in UA
+  })
 })

@@ -116,8 +116,20 @@ describe('parseUA — full pipeline', () => {
 })
 
 describe('parseUA — webview detection', () => {
-  it('; wv in UA → isWebview: true', () => {
+  it('Android ; wv → isWebview: true', () => {
     expect(parseUA(UA.webview.android).isWebview).toBe(true)
+  })
+
+  it('iOS WKWebView (no Version/, no Safari/) → isWebview: true', () => {
+    expect(parseUA(UA.webview.iosWKWebView).isWebview).toBe(true)
+  })
+
+  it('iOS Safari (has Version/ and Safari/) → isWebview: false', () => {
+    expect(parseUA(UA.safari.ios).isWebview).toBe(false)
+  })
+
+  it('CriOS on iOS (has Safari/) → isWebview: false', () => {
+    expect(parseUA(UA.chrome.crios).isWebview).toBe(false)
   })
 
   it('no ; wv → isWebview: false', () => {
@@ -130,6 +142,28 @@ describe('parseUA — windowsVersion override', () => {
     const r = parseUA(UA.chrome.windows, { windowsVersion: '11' })
     expect(r.os).toBe('Windows')
     expect(r.osVersion).toBe('11')
+  })
+})
+
+describe('parseUA — ctx option', () => {
+  it('ctx.windowsVersion supersedes options.windowsVersion', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US',
+      maxTouchPoints: 0, windowsVersion: '11' }
+    const r = parseUA(UA.chrome.windows, { ctx, windowsVersion: '10' })
+    expect(r.osVersion).toBe('11')
+  })
+
+  it('ctx.highEntropyData.architecture used for arch detection', () => {
+    const ctx = { userAgent: UA.safari.ios, platform: 'iPhone', language: 'en',
+      maxTouchPoints: 5, highEntropyData: { architecture: 'arm', bitness: '64' } }
+    const r = parseUA(UA.safari.ios, { ctx })
+    expect(r.arch).toBe('arm64')
+  })
+
+  it('ctx platform used as result.platform', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US', maxTouchPoints: 0 }
+    const r = parseUA(UA.chrome.windows, { ctx })
+    expect(r.platform).toBe('Win32')
   })
 })
 

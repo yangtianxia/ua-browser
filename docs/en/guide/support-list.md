@@ -87,7 +87,8 @@ WeChat Mini Programs are detected separately via `isWechatMiniapp()` (relies on 
 | Android | `Android` | `14`, `13`, `12`... |
 | iOS | `iOS` | `17.4`, `16.0`... |
 | macOS | `MacOS` | `10.15.7`... |
-| HarmonyOS | `HarmonyOS` | `2` (mapped from Android version) |
+| HarmonyOS | `HarmonyOS` | `2`, `3`, `4` (mapped from Android version); `5.0.0` (HarmonyOS Next, extracted directly) |
+| OpenHarmony | `OpenHarmony` | `4.1`, `3.2`... |
 | Chrome OS | `Chrome OS` | — |
 | Tizen | `Tizen` | `6.0`, `5.5`... (Samsung Smart TV / wearables) |
 | KaiOS | `KaiOS` | `2.5`, `3.0`... (feature phones in developing markets) |
@@ -100,6 +101,19 @@ WeChat Mini Programs are detected separately via `isWechatMiniapp()` (relies on 
 | MeeGo | `MeeGo` | — |
 | Symbian | `Symbian` | — |
 | WebOS | `WebOS` | — |
+
+::: info HarmonyOS version mapping
+HarmonyOS 2/3/4 is based on the Android compatibility layer. The UA contains an `Android` version token that is mapped to the HarmonyOS display version:
+
+| Android version | HarmonyOS version |
+| :-- | :-- |
+| 10 | `2` |
+| 11 | `3` |
+| 12 | `3` |
+| 13 | `4` |
+
+HarmonyOS Next (5.0+) UAs do not contain an `Android` token. The version is extracted directly from `HarmonyOS 5.0.0`.
+:::
 
 ::: info Windows NT version mapping
 
@@ -127,9 +141,14 @@ WeChat Mini Programs are detected separately via `isWechatMiniapp()` (relies on 
 | EdgeHTML | `EdgeHTML` | Edge (legacy, < 79) |
 | Presto | `Presto` | Opera (legacy, < 15) |
 | KHTML | `KHTML` | Konqueror |
+| ArkWeb | `ArkWeb` | HarmonyOS Next built-in rendering engine (explicit token only) |
 
 ::: tip Blink upgrade
 Before Chrome 28, the engine was WebKit. When Chrome 28+ is detected, the engine is automatically upgraded to `Blink`.
+:::
+
+::: info ArkWeb
+`ArkWeb` is only returned when the UA string explicitly contains the `ArkWeb` token. HarmonyOS Next UAs without the token are correctly identified as `Blink` (Chromium-based).
 :::
 
 ---
@@ -147,15 +166,24 @@ Before Chrome 28, the engine was WebKit. When Chrome 28+ is detected, the engine
 
 ## CPU Architecture
 
-Rules are evaluated from highest to lowest priority; the first match wins:
+As of v1.1.0, a four-layer priority chain is used. Earlier layers take precedence:
 
-| Architecture | `ArchName` | UA markers |
+| Layer | Signal source | Coverage |
+| :--: | :-- | :-- |
+| 1 | UA Client Hints (`navigator.userAgentData`) | Chrome / Edge — precise |
+| 2 | WebGL renderer string | Resolves Apple Silicon vs Intel Mac |
+| 3 | `navigator.platform` inference | Synchronous; covers iPhone / iPad / Linux aarch64 |
+| 4 | UA string pattern matching | Fallback — same as v1.0 behaviour |
+
+**Output values:**
+
+| Architecture | `ArchName` | Common UA / signal markers |
 | :-- | :-- | :-- |
-| ARM 64-bit | `arm64` | `aarch64`, `arm64`, `ARM64` |
-| ARM 32-bit | `arm` | `ARM` (standalone word) |
-| x86 64-bit | `x86_64` | `x86_64`, `Win64`, `WOW64`, `x64;`, `amd64` |
-| x86 32-bit | `x86` | `i386`, `i686`, `x86;` |
-| Unknown | `unknown` | No match |
+| ARM 64-bit | `arm64` | Client Hints `arm/64`; WebGL `Apple M1/M2/A15`; platform `iPhone/iPad`; UA `aarch64`, `arm64` |
+| ARM 32-bit | `arm` | Client Hints `arm/32`; platform `arm`; UA `ARM` |
+| x86 64-bit | `x86_64` | Client Hints `x86/64`; WebGL `Intel/AMD/NVIDIA`; platform `Win64`; UA `x86_64`, `WOW64` |
+| x86 32-bit | `x86` | Client Hints `x86/32`; platform `Win32`; UA `i686` |
+| Unknown | `unknown` | No match in any layer |
 
 ---
 
@@ -226,3 +254,42 @@ The following UA markers cause `isHeadless` to return `true`:
 ::: warning Note
 Cypress and WebdriverIO do not modify the UA by default and cannot be detected at the UA level. Modern stealth libraries (e.g. puppeteer-stealth) can bypass all of the above markers — this detection only covers common unmodified setups.
 :::
+
+---
+
+## Runtime Browser Compatibility
+
+This section describes which browsers can **run** `ua-browser` itself — separate from which browsers it can **detect**.
+
+### Core functions
+
+`parseUA()`, `detectBrowser()`, `detectOs()` and all other synchronous detection functions are **pure regex operations** with no browser API dependencies. They run in any modern JS environment (browser, Node.js, Deno, SSR).
+
+### Build output JS syntax
+
+| Feature | Source | Build output (`target: es2018`) |
+| :-- | :--: | :-- |
+| Optional chaining `?.` | ✓ | Transpiled to `(x == null ? void 0 : x.y)` |
+| Nullish coalescing `??` | ✓ | Transpiled to equivalent ES5 form |
+| `async / await` | ✓ | Kept as-is (ES2017, within es2018 target) |
+
+**Minimum syntax compatibility:** Chrome 63 / Safari 12 / Firefox 55 / Edge 79 (Chromium)
+
+### `getEnvContext()` API compatibility
+
+| API | Chrome | Safari | Firefox | Edge | Notes |
+| :-- | :--: | :--: | :--: | :--: | :-- |
+| `canvas` + `measureText` | 9+ | 3.1+ | 3.5+ | 12+ | Font probes for OS confirmation |
+| WebGL renderer | 9+ | 8+ | 4+ | 12+ | Resolves Apple Silicon vs Intel Mac |
+| `window.matchMedia` | 9+ | 5.1+ | 6+ | 12+ | Pointer / hover capability |
+| `navigator.hardwareConcurrency` | 37+ | 10.1+ | 48+ | 15+ | CPU core count |
+| `navigator.deviceMemory` | 63+ | ✗ | ✗ | 79+ | Memory size, Chrome-only |
+| `userAgentData.getHighEntropyValues` | 90+ | ✗ | ✗ | 90+ | UA Client Hints — most accurate arch source |
+
+::: tip Graceful degradation
+All DOM API calls are wrapped in `try/catch` and `typeof window !== 'undefined'` guards. APIs unavailable in Safari or Firefox are silently skipped. `getEnvContext()` never throws in any environment.
+:::
+
+### `parseHeaders()` compatibility
+
+Pure server-side function with no browser API dependencies. Client Hints headers (`Sec-CH-UA-Arch`, etc.) are only sent automatically by Chrome / Edge 90+. Safari and Firefox do not send them; in those cases `arch` and other fields fall back to UA string matching.

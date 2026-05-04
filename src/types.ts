@@ -6,6 +6,7 @@ export type EngineName =
   | 'KHTML'
   | 'Blink'
   | 'EdgeHTML'
+  | 'ArkWeb'
   | 'unknown'
 
 export type BrowserName =
@@ -71,6 +72,7 @@ export type OsName =
   | 'MacOS'
   | 'Android'
   | 'HarmonyOS'
+  | 'OpenHarmony'
   | 'Ubuntu'
   | 'FreeBSD'
   | 'Debian'
@@ -152,6 +154,7 @@ declare global {
 
   interface Navigator {
     browserLanguage?: string
+    deviceMemory?: number
     userAgentData?: {
       platform: string
       getHighEntropyValues(hints: string[]): Promise<Record<string, string>>

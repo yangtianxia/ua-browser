@@ -3,8 +3,8 @@ import type { OsName } from '../types.js'
 export interface OsDef {
   name: OsName
   detect: RegExp
-  /** Capture-group regex for OS version extraction. null = no version. */
-  versionPattern: RegExp | null
+  /** Capture-group regex(es) for OS version extraction. Tried in order; null = no version. */
+  versionPattern: RegExp | RegExp[] | null
   /** Lookup table: raw version token → display version. */
   versionLookup?: Record<string, string>
 }
@@ -28,9 +28,13 @@ export const OS_DEFS: readonly OsDef[] = [
   { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/ },
   { name: 'Android',        detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
   // HarmonyOS must come after Android: HarmonyOS UAs include "Android", so Android matches
-  // first, then HarmonyOS overrides it.
-  { name: 'HarmonyOS',      detect: /HarmonyOS/,                      versionPattern: /Android ([\d.]+)[;)]/,
-    versionLookup: { '10': '2' } },
+  // first, then HarmonyOS overrides it. versionPattern tries direct extraction first (5.0+
+  // pure HarmonyOS UAs don't have Android token), then falls back to Android version + lookup.
+  { name: 'HarmonyOS',      detect: /HarmonyOS/,
+    versionPattern: [/HarmonyOS[\s/]([\d.]+)/, /Android ([\d.]+)[;)]/],
+    versionLookup: { '10': '2', '11': '3', '12': '3', '13': '4' } },
+  // OpenHarmony (open-source base) must come after HarmonyOS to override any earlier match.
+  { name: 'OpenHarmony',    detect: /OpenHarmony/,                    versionPattern: /OpenHarmony[\s/]([\d.]+)/ },
   { name: 'KaiOS',          detect: /KAIOS/,                          versionPattern: /KAIOS\/([\d.]+)/ },
   // Windows must come before Windows Phone: Windows Phone UAs contain "Windows", so Windows
   // matches first, then Windows Phone overrides it.
