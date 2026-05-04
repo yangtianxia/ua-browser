@@ -4,10 +4,14 @@ import uaBrowser, {
   isWebview,
   isWechatMiniapp,
   getLanguage,
+  getNavContext,
   getWindowsVersion,
+  getEnvContext,
   detectBot,
   detectArch,
   detectHeadless,
+  parseHeaders,
+  ACCEPT_CH,
   VERSION
 } from '../src/index.js'
 
@@ -87,5 +91,32 @@ describe('API surface', () => {
   it('VERSION matches package.json version', async () => {
     const pkg = await import('../package.json', { assert: { type: 'json' } })
     expect(VERSION).toBe(pkg.default.version)
+  })
+
+  it('named export getNavContext is a function', () => {
+    expect(typeof getNavContext).toBe('function')
+  })
+
+  it('named export getEnvContext is a function', () => {
+    expect(typeof getEnvContext).toBe('function')
+  })
+
+  it('named export parseHeaders is a function', () => {
+    expect(typeof parseHeaders).toBe('function')
+  })
+
+  it('named export ACCEPT_CH is a string', () => {
+    expect(typeof ACCEPT_CH).toBe('string')
+    expect(ACCEPT_CH.length).toBeGreaterThan(0)
+  })
+
+  it('isWebview detects iOS WKWebView (no Version/, no Safari/)', () => {
+    const iosWKWebView = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+    expect(isWebview(iosWKWebView)).toBe(true)
+  })
+
+  it('isWebview does not flag CriOS as webview (has Safari/)', () => {
+    const crios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/124.0.0.0 Mobile/15E148 Safari/604.1'
+    expect(isWebview(crios)).toBe(false)
   })
 })
