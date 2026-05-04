@@ -130,6 +130,62 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
+  // Alipay Miniapp — my is a reserved word; accessed via window.my
+  if (browser === 'Alipay') {
+    try {
+      if (typeof window !== 'undefined' &&
+          typeof (window as unknown as { my?: { getSystemInfo?: unknown } }).my?.getSystemInfo === 'function') {
+        browser = 'Alipay Miniapp'
+      }
+    } catch {
+      // not in Alipay miniapp context
+    }
+  }
+
+  // Baidu Smart Miniapp (swan)
+  if (browser === 'Baidu') {
+    try {
+      if (typeof swan !== 'undefined' && typeof swan?.getSystemInfo === 'function') {
+        browser = 'Baidu Miniapp'
+      }
+    } catch {
+      // not in Baidu miniapp context
+    }
+  }
+
+  // Douyin Miniapp (tt)
+  if (browser === 'Douyin') {
+    try {
+      if (typeof tt !== 'undefined' && typeof tt?.getSystemInfo === 'function') {
+        browser = 'Douyin Miniapp'
+      }
+    } catch {
+      // not in Douyin miniapp context
+    }
+  }
+
+  // QQ Miniapp (qq)
+  if (browser === 'QQ') {
+    try {
+      if (typeof qq !== 'undefined' && typeof qq?.getSystemInfo === 'function') {
+        browser = 'QQ Miniapp'
+      }
+    } catch {
+      // not in QQ miniapp context
+    }
+  }
+
+  // Kuaishou Miniapp (ks)
+  if (browser === 'Kuaishou') {
+    try {
+      if (typeof ks !== 'undefined' && typeof ks?.getSystemInfo === 'function') {
+        browser = 'Kuaishou Miniapp'
+      }
+    } catch {
+      // not in Kuaishou miniapp context
+    }
+  }
+
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
   // The Version/ token reliably reflects the real Safari/iOS version.
   // When Version/ major > CPU iPhone OS major, use Version/ as the real osVersion.
