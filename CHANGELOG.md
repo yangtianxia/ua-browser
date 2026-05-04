@@ -1,5 +1,11 @@
 # ua-browser
 
+## 1.2.0
+
+### Minor Changes
+
+- 新增七款主流 App 内嵌 Webview 检测（Bilibili、快手、小红书、飞书、今日头条、京东、美团），新增六平台小程序运行时检测（微信、支付宝、百度、抖音、QQ、快手）及对应辅助函数，新增 TV 设备类型与 Android 平板判断规则，新增 Tizen/KaiOS 操作系统检测，新增 Samsung Internet/DuckDuckGo/Puffin 国际浏览器检测，新增 AI 爬虫检测（GPTBot、ClaudeBot 等），移除 5 个已停更浏览器（Arora、Lunascape、QupZilla、Iceweasel、Iceape）。
+
 ## 1.1.0
 
 ### Minor Changes
