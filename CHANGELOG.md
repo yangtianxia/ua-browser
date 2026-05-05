@@ -1,5 +1,11 @@
 # ua-browser
 
+## 1.3.0
+
+### Minor Changes
+
+- 移除小程序运行时检测功能（isWechatMiniapp 等），各平台 web-view 注入行为存在差异，待验证后重新实现
+
 ## 1.2.0
 
 ### Minor Changes
