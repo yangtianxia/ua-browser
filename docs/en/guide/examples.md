@@ -73,12 +73,19 @@ if (browser === 'IE') {
 
 ---
 
-## WeChat Environment Detection
+## Mini Program Detection
 
-Detect whether the app is running inside the WeChat browser or a Mini Program:
+Detect whether the app is running inside a Mini Program or an in-app browser across platforms:
 
 ```typescript
-import uaBrowser, { isWechatMiniapp } from 'ua-browser'
+import uaBrowser, {
+  isWechatMiniapp,
+  isAlipayMiniapp,
+  isBaiduMiniapp,
+  isDouyinMiniapp,
+  isQQMiniapp,
+  isKuaishouMiniapp,
+} from 'ua-browser'
 
 const { browser } = uaBrowser()
 
@@ -88,6 +95,21 @@ if (isWechatMiniapp()) {
 } else if (browser === 'Wechat') {
   // WeChat in-app browser
   initWechatSDK()
+} else if (isAlipayMiniapp()) {
+  // Alipay Mini Program
+  my.navigateTo({ url: '/pages/index/index' })
+} else if (isBaiduMiniapp()) {
+  // Baidu Smart Mini Program
+  swan.navigateTo({ url: '/pages/index/index' })
+} else if (isDouyinMiniapp()) {
+  // Douyin Mini Program
+  tt.navigateTo({ url: '/pages/index/index' })
+} else if (isQQMiniapp()) {
+  // QQ Mini Program
+  qq.navigateTo({ url: '/pages/index/index' })
+} else if (isKuaishouMiniapp()) {
+  // Kuaishou Mini Program
+  ks.navigateTo({ url: '/pages/index/index' })
 }
 ```
 
@@ -199,6 +221,47 @@ export function BrowserInfo() {
     <p>{info.browser} {info.version} on {info.os}</p>
   )
 }
+```
+
+---
+
+## High-Accuracy Architecture Detection (getEnvContext)
+
+Collect WebGL renderer, Client Hints, and other signals to distinguish Apple Silicon from Intel Mac:
+
+```typescript
+import { getEnvContext, parseUA } from 'ua-browser'
+
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+
+console.log(result.arch) // 'arm64' (Apple Silicon) or 'x86_64'
+```
+
+---
+
+## SSR Precise Detection (parseHeaders + Client Hints)
+
+Use HTTP Client Hints for accurate detection in Express / Next.js and similar server-side frameworks:
+
+```typescript
+import { parseHeaders, ACCEPT_CH } from 'ua-browser'
+
+// First response: tell the browser to send Client Hints
+app.use((req, res, next) => {
+  res.setHeader('Accept-CH', ACCEPT_CH)
+  next()
+})
+
+// Subsequent requests: precise arch / OS detection
+app.get('/api/info', (req, res) => {
+  const result = parseHeaders(req.headers)
+  res.json({
+    browser: result.browser,
+    os:      result.os,
+    arch:    result.arch, // 'x86_64' (from Sec-CH-UA-Arch)
+  })
+})
 ```
 
 ---
