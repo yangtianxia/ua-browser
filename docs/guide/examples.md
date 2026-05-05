@@ -73,21 +73,43 @@ if (browser === 'IE') {
 
 ---
 
-## 微信环境检测
+## 小程序环境检测
 
-判断是否在微信内置浏览器或小程序中运行：
+判断是否在各平台小程序或 App 内置浏览器中运行：
 
 ```typescript
-import uaBrowser, { isWechatMiniapp } from 'ua-browser'
+import uaBrowser, {
+  isWechatMiniapp,
+  isAlipayMiniapp,
+  isBaiduMiniapp,
+  isDouyinMiniapp,
+  isQQMiniapp,
+  isKuaishouMiniapp,
+} from 'ua-browser'
 
 const { browser } = uaBrowser()
 
 if (isWechatMiniapp()) {
-  // 微信小程序环境
+  // 微信小程序
   wx.navigateTo({ url: '/pages/index/index' })
 } else if (browser === 'Wechat') {
   // 微信内置浏览器
   initWechatSDK()
+} else if (isAlipayMiniapp()) {
+  // 支付宝小程序
+  my.navigateTo({ url: '/pages/index/index' })
+} else if (isBaiduMiniapp()) {
+  // 百度智能小程序
+  swan.navigateTo({ url: '/pages/index/index' })
+} else if (isDouyinMiniapp()) {
+  // 抖音小程序
+  tt.navigateTo({ url: '/pages/index/index' })
+} else if (isQQMiniapp()) {
+  // QQ 小程序
+  qq.navigateTo({ url: '/pages/index/index' })
+} else if (isKuaishouMiniapp()) {
+  // 快手小程序
+  ks.navigateTo({ url: '/pages/index/index' })
 }
 ```
 
@@ -199,6 +221,47 @@ export function BrowserInfo() {
     <p>{info.browser} {info.version} on {info.os}</p>
   )
 }
+```
+
+---
+
+## 高精度架构检测（getEnvContext）
+
+通过采集 WebGL 渲染器、Client Hints 等多维信号，区分 Apple Silicon 与 Intel Mac：
+
+```typescript
+import { getEnvContext, parseUA } from 'ua-browser'
+
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+
+console.log(result.arch) // 'arm64'（Apple Silicon）或 'x86_64'
+```
+
+---
+
+## SSR 精准检测（parseHeaders + Client Hints）
+
+在 Express / Next.js 等服务端框架中，利用 HTTP Client Hints 实现精准检测：
+
+```typescript
+import { parseHeaders, ACCEPT_CH } from 'ua-browser'
+
+// 第一次响应：通知浏览器上报 Client Hints
+app.use((req, res, next) => {
+  res.setHeader('Accept-CH', ACCEPT_CH)
+  next()
+})
+
+// 后续请求：精准解析架构、OS 等信息
+app.get('/api/info', (req, res) => {
+  const result = parseHeaders(req.headers)
+  res.json({
+    browser: result.browser,
+    os:      result.os,
+    arch:    result.arch, // 'x86_64'（来自 Sec-CH-UA-Arch）
+  })
+})
 ```
 
 ---

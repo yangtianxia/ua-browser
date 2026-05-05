@@ -4,7 +4,7 @@
 
 ### `uaBrowser(ua?)`
 
-解析 UA 并返回完整的环境信息对象。
+解析 UA 并返回完整的环境信息对象。在浏览器中自动注入 `navigator` 上下文。
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -18,10 +18,17 @@ uaBrowser(ua?: string): EnvOption
 
 **返回值：** [`EnvOption`](/api/types#envoption)
 
+默认导出对象同时挂载了以下静态方法：
+
 ```typescript
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.isWechatMiniapp(): boolean
-uaBrowser.getLanguage(nav: NavContext): string
+uaBrowser.isAlipayMiniapp(): boolean
+uaBrowser.isBaiduMiniapp(): boolean
+uaBrowser.isDouyinMiniapp(): boolean
+uaBrowser.isQQMiniapp(): boolean
+uaBrowser.isKuaishouMiniapp(): boolean
+uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
 ```
 
@@ -31,7 +38,7 @@ uaBrowser.VERSION: string
 
 ### `parseUA(ua, options?)`
 
-纯函数版本，适合 SSR / Node.js 环境。
+纯函数版本，适合 SSR / Node.js 环境，无任何全局副作用。
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -41,8 +48,9 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 
 ```typescript
 interface ParseOptions {
-  nav?: NavContext       // 注入浏览器环境上下文
+  nav?: NavContext              // 注入浏览器环境上下文（语言、平台等）
   windowsVersion?: string | null  // 预先获取的 Windows 版本
+  ctx?: EnvContext              // 多信号上下文，由 getEnvContext() 返回；传入后优先级高于 nav 和 windowsVersion
 }
 ```
 
@@ -50,7 +58,7 @@ interface ParseOptions {
 
 ### `isWebview(ua)`
 
-检测 UA 中是否包含 `; wv`（Android Webview 标识）。
+检测 UA 中是否包含 Android Webview 标识（`; wv`）或 iOS WKWebView 特征（无 `Version/` 且无 `Safari/`）。
 
 ```typescript
 isWebview(ua: string): boolean
@@ -60,10 +68,84 @@ isWebview(ua: string): boolean
 
 ### `isWechatMiniapp()`
 
-检测当前运行环境是否为微信小程序。
+检测当前运行环境是否为微信小程序（依赖 `__wxjs_environment` 全局变量）。
 
 ```typescript
 isWechatMiniapp(): boolean
+```
+
+---
+
+### 小程序检测函数
+
+各平台小程序通过运行时全局变量检测，仅在对应小程序环境中返回 `true`。
+
+| 函数 | 平台 | 检测依据 |
+| :-- | :-- | :-- |
+| `isAlipayMiniapp()` | 支付宝 | `window.my.getSystemInfo` |
+| `isBaiduMiniapp()` | 百度 | `swan.getSystemInfo` |
+| `isDouyinMiniapp()` | 抖音 | `tt.getSystemInfo` |
+| `isQQMiniapp()` | QQ | `qq.getSystemInfo` |
+| `isKuaishouMiniapp()` | 快手 | `ks.getSystemInfo` |
+
+```typescript
+import {
+  isAlipayMiniapp,
+  isBaiduMiniapp,
+  isDouyinMiniapp,
+  isQQMiniapp,
+  isKuaishouMiniapp,
+} from 'ua-browser'
+```
+
+当对应小程序全局 API 存在时，`parseUA()` 会自动将 `browser` 字段更新为对应的 Miniapp 值（如 `'Alipay Miniapp'`）。
+
+---
+
+### `getEnvContext()`
+
+一次性采集当前浏览器的所有环境信号（Client Hints、WebGL 渲染器、字体探针、媒体特性等），返回 `EnvContext` 对象。
+
+```typescript
+import { getEnvContext } from 'ua-browser'
+
+getEnvContext(): Promise<EnvContext>
+```
+
+采集到的信号用于提升架构检测精度（如区分 Apple Silicon 与 Intel Mac），以及提供更完整的运行时上下文。
+
+```typescript
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+
+console.log(result.arch)     // 'arm64'（基于 WebGL / Client Hints）
+console.log(result.language) // 'zh-CN'
+console.log(result.platform) // 'MacIntel'
+```
+
+> `getEnvContext()` 内所有 DOM API 均包裹在 `try/catch` 中，不会抛出异常。
+
+---
+
+### `parseHeaders(headers)`
+
+从 HTTP 请求头中解析 UA 及 Client Hints 信息，返回 `EnvOption`。适用于 SSR 精准检测场景。
+
+```typescript
+import { parseHeaders, ACCEPT_CH } from 'ua-browser'
+
+parseHeaders(headers: Record<string, string | string[] | undefined>): EnvOption
+```
+
+在响应头中返回 `ACCEPT_CH`，告知支持的浏览器（Chrome / Edge 90+）在后续请求中携带 Client Hints：
+
+```typescript
+// Express / Koa / Next.js API Route
+res.setHeader('Accept-CH', ACCEPT_CH)
+
+// 后续请求携带 Client Hints 后，parseHeaders 可精确识别架构等信息
+const result = parseHeaders(req.headers)
+console.log(result.arch) // 'x86_64'（从 Sec-CH-UA-Arch 读取）
 ```
 
 ---
@@ -78,9 +160,7 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 需在调用 `parseUA` 前 `await`，然后作为 `windowsVersion` 选项传入。
 
-> **注意：** 依赖 `navigator.userAgentData`（Client Hints API），仅限支持该 API 的现代浏览器。Node.js 或不支持时返回 `null`。
-
-> **注意：** 依赖 `navigator.userAgentData`（Client Hints API），仅限支持该 API 的现代浏览器。Node.js 或不支持时返回 `null`。
+> 依赖 `navigator.userAgentData`（Client Hints API），仅限支持该 API 的现代浏览器（Chrome 90+）；Node.js 或不支持时返回 `null`。
 
 ---
 
@@ -94,12 +174,12 @@ detectBot(ua: string): { isBot: boolean; botName: BotName }
 
 ---
 
-### `detectArch(ua)`
+### `detectArch(ua, ctx?)`
 
-独立 CPU 架构检测器。
+独立 CPU 架构检测器，支持传入 `EnvContext` 以启用多信号检测。
 
 ```typescript
-detectArch(ua: string): ArchName
+detectArch(ua: string, ctx?: EnvContext): ArchName
 ```
 
 ---
