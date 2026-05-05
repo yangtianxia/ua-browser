@@ -1,32 +1,38 @@
 # ua-browser
 
+## 1.3.1
+
+### Patch Changes
+
+- Added `uaBrowser.detect()` async API with optimized `EnvContext` construction
+
 ## 1.3.0
 
 ### Minor Changes
 
-- 移除小程序运行时检测功能（isWechatMiniapp 等），各平台 web-view 注入行为存在差异，待验证后重新实现
+- Removed miniapp runtime detection (`isWechatMiniapp` etc.) due to inconsistent web-view injection behavior across platforms; to be re-implemented after further validation
 
 ## 1.2.0
 
 ### Minor Changes
 
-- 新增七款主流 App 内嵌 Webview 检测（Bilibili、快手、小红书、飞书、今日头条、京东、美团），新增六平台小程序运行时检测（微信、支付宝、百度、抖音、QQ、快手）及对应辅助函数，新增 TV 设备类型与 Android 平板判断规则，新增 Tizen/KaiOS 操作系统检测，新增 Samsung Internet/DuckDuckGo/Puffin 国际浏览器检测，新增 AI 爬虫检测（GPTBot、ClaudeBot 等），移除 5 个已停更浏览器（Arora、Lunascape、QupZilla、Iceweasel、Iceape）。
+- Added detection for 7 mainstream app WebViews (Bilibili, Kuaishou, Xiaohongshu, Feishu, Toutiao, JD, Meituan). Added miniapp runtime detection across 6 platforms (WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou). Added TV device type and Android tablet rules. Added Tizen/KaiOS OS detection. Added Samsung Internet/DuckDuckGo/Puffin browser detection. Added AI crawler detection (GPTBot, ClaudeBot, etc.). Removed 5 discontinued browsers.
 
 ## 1.1.0
 
 ### Minor Changes
 
-- 新增多信号融合检测架构（v1.1.0）：
+- Introduced multi-signal fusion detection architecture (v1.1.0):
 
-  - `getEnvContext()` 一次性采集所有浏览器环境信号（WebGL、Client Hints、字体探针、CSS media features）
-  - `ParseOptions.ctx` 新选项，将 EnvContext 传入 parseUA() 以启用多信号检测
-  - `parseHeaders()` + `ACCEPT_CH` 常量：服务端通过 HTTP Client Hints 头部实现精准检测（SSR 场景）
-  - `detectArch()` 升级为四层优先级链（Client Hints → WebGL → platform → UA 字符串）
-  - `isWebview()` 新增 iOS WKWebView 检测（补充 Android `;wv` 现有逻辑）
-  - HarmonyOS Next（5.0+）版本直接提取，无需依赖 Android 兼容层版本号
-  - 新增 HarmonyOS 版本映射（Android 11→3、12→3、13→4）
-  - 新增 OpenHarmony OS 检测（独立 OsName）
-  - 新增 ArkWeb 引擎检测
+  - `getEnvContext()` collects all browser environment signals in one pass (WebGL, Client Hints, font probing, CSS media features)
+  - `ParseOptions.ctx` feeds EnvContext into `parseUA()` for multi-signal detection
+  - `parseHeaders()` + `ACCEPT_CH` constant for server-side HTTP Client Hints detection (SSR scenarios)
+  - `detectArch()` upgraded to a 4-tier priority chain (Client Hints → WebGL → platform → UA string)
+  - `isWebview()` now detects iOS WKWebView (complementing existing Android `;wv` logic)
+  - HarmonyOS Next (5.0+) version extracted directly, no longer dependent on Android compatibility layer version
+  - Added HarmonyOS version mapping (Android 11→3, 12→3, 13→4)
+  - Added OpenHarmony OS detection (independent OsName)
+  - Added ArkWeb engine detection
 
 ## 1.0.2
 

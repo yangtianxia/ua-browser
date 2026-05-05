@@ -19,3 +19,9 @@
   color: var(--vp-c-text-2);
   font-size: 15px;
 }
+
+@media (max-width: 768px) {
+  .pg-wrap {
+    padding: 18px 12px 24px;
+  }
+}

@@ -8,7 +8,7 @@ const isEn = computed(() => lang.value === 'en-US')
 const i18n = computed(() => isEn.value
   ? {
       presetsLabel: 'Presets:',
-      currentBrowser: 'Current Browser',
+      currentBrowser: 'Current Browser - Detect Mode',
       placeholder: 'Enter a User Agent string...',
       parse: 'Parse',
       loading: 'Loading...',
@@ -32,7 +32,7 @@ const i18n = computed(() => isEn.value
     }
   : {
       presetsLabel: '预设：',
-      currentBrowser: '当前浏览器',
+      currentBrowser: '当前浏览器（检测模式）',
       placeholder: '输入 User Agent 字符串...',
       parse: '解析',
       loading: '加载中...',
@@ -144,12 +144,12 @@ const result = ref<ParseResult | null>(null)
 const selectedKey = ref<string | null>(null)
 const loaded = ref(false)
 
-let _uaBrowser: ((ua?: string) => ParseResult) | null = null
+let _uaBrowser: ((ua?: string) => Promise<ParseResult>) | null = null
 let _parseUA: ((ua: string) => ParseResult) | null = null
 
 onMounted(async () => {
   const mod = await import('ua-browser')
-  _uaBrowser = mod.default
+  _uaBrowser = mod.default.detect
   _parseUA = mod.parseUA
   loaded.value = true
   useCurrentUA()
@@ -170,12 +170,12 @@ function usePreset(ua: string) {
   result.value = _parseUA(ua)
 }
 
-function useCurrentUA() {
+async function useCurrentUA() {
   if (!_uaBrowser || typeof navigator === 'undefined') return
   uaInput.value = navigator.userAgent
   selectedKey.value = 'current'
   // 当前浏览器使用默认导出，注入真实 nav 上下文
-  result.value = _uaBrowser()
+  result.value = await _uaBrowser()
 }
 
 const tags = computed(() => {
@@ -363,6 +363,7 @@ const fields = computed(() => {
 }
 
 .parse-btn {
+  width: 100%;
   align-self: flex-start;
   padding: 8px 24px;
   border-radius: 8px;
@@ -482,7 +483,8 @@ const fields = computed(() => {
     gap: 16px;
   }
 
-  .playground-left {
+  .playground-left,
+  .playground-right {
     flex: none;
     width: 100%;
   }
