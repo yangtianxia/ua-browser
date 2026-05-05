@@ -100,7 +100,16 @@ function deriveWindowsVersion(platformVersion: string | undefined): string | nul
 export async function getEnvContext(): Promise<EnvContext> {
   const base = getNavContext()
 
-  const ctx: EnvContext = { ...base }
+  const ctx: EnvContext = {
+    userAgent: base.userAgent,
+    platform: base.platform,
+    language: base.language,
+    maxTouchPoints: base.maxTouchPoints,
+  }
+  if (base.browserLanguage !== undefined) ctx.browserLanguage = base.browserLanguage
+  if (base.mimeTypes !== undefined) ctx.mimeTypes = base.mimeTypes
+  if (base.connection !== undefined) ctx.connection = base.connection
+  if (base.userAgentData !== undefined) ctx.userAgentData = base.userAgentData
 
   if (typeof navigator !== 'undefined') {
     ctx.hardwareConcurrency = navigator.hardwareConcurrency
