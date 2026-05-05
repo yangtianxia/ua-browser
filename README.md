@@ -5,13 +5,16 @@
 [![license](https://img.shields.io/npm/l/ua-browser)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6)](https://www.typescriptlang.org/)
 
-Detect browser, OS, device type, rendering engine, CPU architecture, bots, and headless browsers from User Agent strings. Zero dependencies. Works in both browser and Node.js environments.
+Detect browser, OS, device type, rendering engine, CPU architecture, bots, headless browsers, and Mini Programs from User Agent strings. Zero dependencies. Works in both browser and Node.js environments.
 
 **[📖 Documentation](https://yangtianxia.github.io/ua-browser/)** · **[🎮 Playground](https://yangtianxia.github.io/ua-browser/playground)** · **[中文](./README.zh-CN.md)**
 
 ## Features
 
-- **Comprehensive detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
+- **Comprehensive UA detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
+- **Mini Program detection** — WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou via runtime global variables
+- **Multi-signal arch detection** — `getEnvContext()` collects Client Hints, WebGL renderer, and font probes to accurately distinguish Apple Silicon from Intel Mac
+- **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH` for precise server-side detection (CPU arch, platform) in Chrome / Edge 90+
 - **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
 - **Zero dependencies** — no runtime dependencies, tiny bundle size after gzip
 - **Pure function** — `parseUA()` has no global state, works seamlessly with SSR / Node.js
@@ -67,15 +70,9 @@ const { browser, os, device } = uaBrowser()
 if (device === 'Mobile') {
   // redirect to mobile version
 }
-
-if (browser === 'Wechat') {
-  // WeChat in-app browser logic
-}
 ```
 
 ### Node.js / SSR
-
-Use the pure `parseUA` function with the UA string from the request header:
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -95,6 +92,58 @@ if (isBot) {
 <script>
   const { browser, os } = uaBrowser()
 </script>
+```
+
+### Mini Program Detection
+
+Detect which Mini Program platform the app is running in using runtime global variables:
+
+```typescript
+import {
+  isWechatMiniapp,
+  isAlipayMiniapp,
+  isBaiduMiniapp,
+  isDouyinMiniapp,
+  isQQMiniapp,
+  isKuaishouMiniapp,
+} from 'ua-browser'
+
+if (isWechatMiniapp()) {
+  wx.navigateTo({ url: '/pages/index/index' })
+} else if (isAlipayMiniapp()) {
+  my.navigateTo({ url: '/pages/index/index' })
+} else if (isDouyinMiniapp()) {
+  tt.navigateTo({ url: '/pages/index/index' })
+}
+// isBaiduMiniapp() / isQQMiniapp() / isKuaishouMiniapp() ...
+```
+
+### Multi-signal Architecture Detection
+
+`getEnvContext()` collects Client Hints, WebGL renderer, and other browser signals in one async call — enough to distinguish Apple Silicon from Intel Mac:
+
+```typescript
+import { getEnvContext, parseUA } from 'ua-browser'
+
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+
+console.log(result.arch) // 'arm64' or 'x86_64'
+```
+
+### SSR Client Hints
+
+Set the `ACCEPT_CH` response header so Chrome / Edge 90+ browsers send Client Hints on subsequent requests, then use `parseHeaders` for precise server-side detection:
+
+```typescript
+import { parseHeaders, ACCEPT_CH } from 'ua-browser'
+
+// First response — tell the browser to send Client Hints
+res.setHeader('Accept-CH', ACCEPT_CH)
+
+// Subsequent requests — accurate arch / OS detection
+const result = parseHeaders(req.headers)
+console.log(result.arch) // 'x86_64' (from Sec-CH-UA-Arch)
 ```
 
 ### Accurate Windows 10 / 11 Detection
@@ -118,8 +167,6 @@ console.log(result.osVersion) // '10' or '11'
 Automatically injects the `navigator` context (language, platform, MIME types, etc.) in browser environments.
 
 ```typescript
-import uaBrowser from 'ua-browser'
-
 uaBrowser()          // reads navigator.userAgent automatically
 uaBrowser(customUA)  // custom UA string, still injects browser context
 ```
@@ -132,7 +179,10 @@ import {
   getNavContext,        // read current browser navigator context
   getWindowsVersion,    // async: accurately distinguish Windows 10 / 11
   getLanguage,          // extract browser language from NavContext
-  isWebview,            // detect Android Webview (UA contains "; wv")
+  getEnvContext,        // collect all browser signals (Client Hints, WebGL, etc.)
+  parseHeaders,         // parse UA and Client Hints from HTTP headers (SSR)
+  ACCEPT_CH,            // response header constant to request Client Hints
+  isWebview,            // detect Android Webview / iOS WKWebView
   isWechatMiniapp,      // detect WeChat Mini Program environment
   isAlipayMiniapp,      // detect Alipay Mini Program environment
   isBaiduMiniapp,       // detect Baidu Smart Mini Program environment
@@ -157,7 +207,7 @@ import {
 | `osVersion` | `string` | OS version |
 | `device` | `DeviceName` | Device type: `Mobile` \| `Tablet` \| `TV` \| `PC` |
 | `arch` | `ArchName` | CPU architecture |
-| `isWebview` | `boolean` | Whether running in Android Webview |
+| `isWebview` | `boolean` | Whether running in Android Webview / iOS WKWebView |
 | `isHeadless` | `boolean` | Whether running in a headless / automated browser |
 | `isBot` | `boolean` | Whether the UA belongs to a bot / crawler |
 | `botName` | `BotName` | Bot name |
