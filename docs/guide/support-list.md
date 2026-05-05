@@ -75,21 +75,6 @@
 | 京东（拼购） | `JD` | 599 |
 | 美团 | `Meituan` | 600 |
 
-::: tip 小程序运行时检测
-辅助函数通过检测平台注入的全局变量，判断当前 JS 是否运行在对应小程序的 Webview 中，**普通浏览器中始终返回 `false`**。检测成功时，`parseUA()` 的 `browser` 字段会更新为对应 Miniapp 值：
-
-| 平台 | 辅助函数 | `browser` 返回值 | 全局变量 |
-| :-- | :-- | :-- | :-- |
-| 微信 | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
-| 支付宝 | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
-| 百度 | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
-| 抖音 | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
-| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
-| 快手 | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
-:::
-
-
-
 ---
 
 ## 操作系统

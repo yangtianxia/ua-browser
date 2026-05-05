@@ -12,7 +12,6 @@
 ## 特性
 
 - **全面 UA 检测** — 浏览器、OS、渲染内核、设备类型（Mobile / Tablet / TV / PC）、CPU 架构、爬虫、无头浏览器
-- **小程序运行时检测** — 判断当前 JS 运行环境是否在微信 / 支付宝 / 百度 / 抖音 / QQ / 快手小程序的 Webview 中（检测平台注入的全局变量，普通浏览器中始终返回 `false`）
 - **多信号架构检测** — `getEnvContext()` 采集 Client Hints、WebGL 渲染器、字体探针，精确区分 Apple Silicon 与 Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH`，在 Chrome / Edge 90+ 中实现服务端精准检测（CPU 架构、平台等）
 - **AI 爬虫识别** — 内置 GPTBot、ClaudeBot、PerplexityBot、CCBot 等主流 AI 抓取机器人
@@ -94,31 +93,6 @@ if (isBot) {
 </script>
 ```
 
-### 小程序检测
-
-这些函数通过检测平台注入的全局变量，判断**当前 JS 运行环境是否在对应小程序的 Webview 中**。在普通浏览器里调用始终返回 `false`。
-
-```typescript
-import uaBrowser, {
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isDouyinMiniapp,
-} from 'ua-browser'
-
-const { browser } = uaBrowser()
-
-// 常见场景：代码同时运行在微信浏览器和微信小程序中
-if (isWechatMiniapp()) {
-  // 当前在微信小程序 Webview 中
-  wx.navigateTo({ url: '/pages/index/index' })
-} else if (browser === 'Wechat') {
-  // 当前在微信内置浏览器（非小程序）
-  initWechatSDK()
-}
-
-// 其他平台：isBaiduMiniapp() / isQQMiniapp() / isKuaishouMiniapp() ...
-```
-
 ### 多信号架构检测
 
 `getEnvContext()` 一次性采集 Client Hints、WebGL 渲染器等多维信号，可区分 Apple Silicon 与 Intel Mac：
@@ -184,12 +158,6 @@ import {
   parseHeaders,         // 从 HTTP 请求头解析 UA 及 Client Hints（SSR）
   ACCEPT_CH,            // 响应头常量，告知浏览器上报 Client Hints
   isWebview,            // 检测 Android Webview / iOS WKWebView
-  isWechatMiniapp,      // 检测微信小程序运行环境
-  isAlipayMiniapp,      // 检测支付宝小程序运行环境
-  isBaiduMiniapp,       // 检测百度小程序运行环境
-  isDouyinMiniapp,      // 检测抖音小程序运行环境
-  isQQMiniapp,          // 检测 QQ 小程序运行环境
-  isKuaishouMiniapp,    // 检测快手小程序运行环境
   detectBot,            // 独立爬虫检测
   detectArch,           // 独立 CPU 架构检测
   detectHeadless,       // 独立无头浏览器检测
@@ -223,7 +191,6 @@ import {
 
 部分覆盖：
 - **浏览器** — Chrome、Safari、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书等
-- **小程序** — 微信、支付宝、百度、抖音、QQ、快手（运行时全局变量检测）
 - **操作系统** — Windows、macOS、Android、iOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
 - **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot 等
 - **设备** — Mobile、Tablet、TV（含三星 Smart TV、HbbTV 标准）、PC

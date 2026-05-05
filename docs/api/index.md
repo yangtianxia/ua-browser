@@ -22,12 +22,6 @@ uaBrowser(ua?: string): EnvOption
 
 ```typescript
 uaBrowser.isWebview(ua: string): boolean
-uaBrowser.isWechatMiniapp(): boolean
-uaBrowser.isAlipayMiniapp(): boolean
-uaBrowser.isBaiduMiniapp(): boolean
-uaBrowser.isDouyinMiniapp(): boolean
-uaBrowser.isQQMiniapp(): boolean
-uaBrowser.isKuaishouMiniapp(): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
 ```
@@ -63,42 +57,6 @@ interface ParseOptions {
 ```typescript
 isWebview(ua: string): boolean
 ```
-
----
-
-### `isWechatMiniapp()`
-
-检测当前 JS 运行环境是否在微信小程序的 Webview 中（依赖 `__wxjs_environment` 全局变量）。**仅在微信小程序 Webview 里返回 `true`，普通浏览器中始终返回 `false`。**
-
-```typescript
-isWechatMiniapp(): boolean
-```
-
----
-
-### 小程序检测函数
-
-这些函数通过检测各平台注入的全局变量，判断当前 JS 是否运行在对应小程序的 Webview 中。**普通浏览器中始终返回 `false`**，不依赖 UA 字符串。
-
-| 函数 | 平台 | 检测依据 |
-| :-- | :-- | :-- |
-| `isAlipayMiniapp()` | 支付宝 | `window.my.getSystemInfo` |
-| `isBaiduMiniapp()` | 百度 | `swan.getSystemInfo` |
-| `isDouyinMiniapp()` | 抖音 | `tt.getSystemInfo` |
-| `isQQMiniapp()` | QQ | `qq.getSystemInfo` |
-| `isKuaishouMiniapp()` | 快手 | `ks.getSystemInfo` |
-
-```typescript
-import {
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
-} from 'ua-browser'
-```
-
-当对应小程序全局 API 存在时，`parseUA()` 会自动将 `browser` 字段更新为对应的 Miniapp 值（如 `'Alipay Miniapp'`）。
 
 ---
 

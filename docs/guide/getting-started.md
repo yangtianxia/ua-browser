@@ -61,12 +61,6 @@ import {
   parseHeaders,         // 从 HTTP 请求头解析 UA 及 Client Hints（SSR）
   ACCEPT_CH,            // 响应头常量，告知浏览器上报 Client Hints
   isWebview,            // 检测 Android Webview / iOS WKWebView
-  isWechatMiniapp,      // 检测微信小程序
-  isAlipayMiniapp,      // 检测支付宝小程序
-  isBaiduMiniapp,       // 检测百度小程序
-  isDouyinMiniapp,      // 检测抖音小程序
-  isQQMiniapp,          // 检测 QQ 小程序
-  isKuaishouMiniapp,    // 检测快手小程序
   detectBot,            // 独立爬虫检测
   detectArch,           // 独立 CPU 架构检测
   detectHeadless,       // 独立无头浏览器检测

@@ -12,7 +12,6 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, headl
 ## Features
 
 - **Comprehensive UA detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
-- **Mini Program runtime detection** — detect whether the current JS runtime is inside a WeChat / Alipay / Baidu / Douyin / QQ / Kuaishou Mini Program webview (checks platform-injected globals; always `false` in regular browsers)
 - **Multi-signal arch detection** — `getEnvContext()` collects Client Hints, WebGL renderer, and font probes to accurately distinguish Apple Silicon from Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH` for precise server-side detection (CPU arch, platform) in Chrome / Edge 90+
 - **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
@@ -94,31 +93,6 @@ if (isBot) {
 </script>
 ```
 
-### Mini Program Detection
-
-These functions detect whether the **current JavaScript runtime is running inside a Mini Program webview** by checking for platform-injected global variables. They always return `false` in regular browsers.
-
-```typescript
-import uaBrowser, {
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isDouyinMiniapp,
-} from 'ua-browser'
-
-const { browser } = uaBrowser()
-
-// Common pattern: code shared across WeChat browser and WeChat Mini Program
-if (isWechatMiniapp()) {
-  // Running inside WeChat Mini Program webview
-  wx.navigateTo({ url: '/pages/index/index' })
-} else if (browser === 'Wechat') {
-  // Running inside WeChat in-app browser (not a Mini Program)
-  initWechatSDK()
-}
-
-// Other platforms: isBaiduMiniapp() / isQQMiniapp() / isKuaishouMiniapp() ...
-```
-
 ### Multi-signal Architecture Detection
 
 `getEnvContext()` collects Client Hints, WebGL renderer, and other browser signals in one async call — enough to distinguish Apple Silicon from Intel Mac:
@@ -184,12 +158,6 @@ import {
   parseHeaders,         // parse UA and Client Hints from HTTP headers (SSR)
   ACCEPT_CH,            // response header constant to request Client Hints
   isWebview,            // detect Android Webview / iOS WKWebView
-  isWechatMiniapp,      // detect WeChat Mini Program environment
-  isAlipayMiniapp,      // detect Alipay Mini Program environment
-  isBaiduMiniapp,       // detect Baidu Smart Mini Program environment
-  isDouyinMiniapp,      // detect Douyin Mini Program environment
-  isQQMiniapp,          // detect QQ Mini Program environment
-  isKuaishouMiniapp,    // detect Kuaishou Mini Program environment
   detectBot,            // standalone bot detection
   detectArch,           // standalone CPU architecture detection
   detectHeadless,       // standalone headless browser detection
@@ -208,7 +176,7 @@ import {
 | `osVersion` | `string` | OS version |
 | `device` | `DeviceName` | Device type: `Mobile` \| `Tablet` \| `TV` \| `PC` |
 | `arch` | `ArchName` | CPU architecture |
-| `isWebview` | `boolean` | Whether running in Android Webview / iOS WKWebView |
+| `isWebview` | `boolean` | Whether running in Android Webview or iOS WKWebView |
 | `isHeadless` | `boolean` | Whether running in a headless / automated browser |
 | `isBot` | `boolean` | Whether the UA belongs to a bot / crawler |
 | `botName` | `BotName` | Bot name |
@@ -223,7 +191,6 @@ Over 70 browsers, 17 operating systems, and 19 bot rules built in. See the **[fu
 
 Highlights:
 - **Browsers** — Chrome, Safari, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu and more
-- **Mini Programs** — WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou (runtime global detection)
 - **OS** — Windows, macOS, Android, iOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
 - **AI bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot and more
 - **Devices** — Mobile, Tablet, TV (Samsung Smart TV, HbbTV), PC

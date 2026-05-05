@@ -73,48 +73,6 @@ if (browser === 'IE') {
 
 ---
 
-## Mini Program Runtime Detection
-
-These functions detect whether the **current JavaScript runtime is running inside a Mini Program webview** by checking for platform-injected globals. They always return `false` in regular browsers. Use them in code shared across in-app browser and Mini Program environments:
-
-```typescript
-import uaBrowser, {
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
-} from 'ua-browser'
-
-const { browser } = uaBrowser()
-
-if (isWechatMiniapp()) {
-  // Running inside WeChat Mini Program webview
-  wx.navigateTo({ url: '/pages/index/index' })
-} else if (browser === 'Wechat') {
-  // Running inside WeChat in-app browser (not a Mini Program)
-  initWechatSDK()
-} else if (isAlipayMiniapp()) {
-  // Running inside Alipay Mini Program webview
-  my.navigateTo({ url: '/pages/index/index' })
-} else if (isBaiduMiniapp()) {
-  // Running inside Baidu Smart Mini Program webview
-  swan.navigateTo({ url: '/pages/index/index' })
-} else if (isDouyinMiniapp()) {
-  // Running inside Douyin Mini Program webview
-  tt.navigateTo({ url: '/pages/index/index' })
-} else if (isQQMiniapp()) {
-  // Running inside QQ Mini Program webview
-  qq.navigateTo({ url: '/pages/index/index' })
-} else if (isKuaishouMiniapp()) {
-  // Running inside Kuaishou Mini Program webview
-  ks.navigateTo({ url: '/pages/index/index' })
-}
-```
-
----
-
 ## SSR / Node.js — Parse Request UA
 
 Return differentiated content based on UA in server-side rendering:

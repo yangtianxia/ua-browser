@@ -22,12 +22,6 @@ The default export also exposes the following static methods:
 
 ```typescript
 uaBrowser.isWebview(ua: string): boolean
-uaBrowser.isWechatMiniapp(): boolean
-uaBrowser.isAlipayMiniapp(): boolean
-uaBrowser.isBaiduMiniapp(): boolean
-uaBrowser.isDouyinMiniapp(): boolean
-uaBrowser.isQQMiniapp(): boolean
-uaBrowser.isKuaishouMiniapp(): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
 ```
@@ -63,42 +57,6 @@ Detect whether the UA contains `; wv` (Android Webview marker) or iOS WKWebView 
 ```typescript
 isWebview(ua: string): boolean
 ```
-
----
-
-### `isWechatMiniapp()`
-
-Detect whether the current JS runtime is inside a WeChat Mini Program webview (relies on the `__wxjs_environment` global variable). **Returns `true` only inside a WeChat Mini Program webview — always `false` in regular browsers.**
-
-```typescript
-isWechatMiniapp(): boolean
-```
-
----
-
-### Mini Program Detection Functions
-
-These functions detect whether the current JS runtime is inside a Mini Program webview by checking for platform-injected globals. **They always return `false` in regular browsers** and do not rely on the UA string.
-
-| Function | Platform | Detection |
-| :-- | :-- | :-- |
-| `isAlipayMiniapp()` | Alipay | `window.my.getSystemInfo` |
-| `isBaiduMiniapp()` | Baidu | `swan.getSystemInfo` |
-| `isDouyinMiniapp()` | Douyin | `tt.getSystemInfo` |
-| `isQQMiniapp()` | QQ | `qq.getSystemInfo` |
-| `isKuaishouMiniapp()` | Kuaishou | `ks.getSystemInfo` |
-
-```typescript
-import {
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
-} from 'ua-browser'
-```
-
-When the corresponding Mini Program global API is present, `parseUA()` automatically updates the `browser` field to the corresponding Miniapp value (e.g. `'Alipay Miniapp'`).
 
 ---
 
