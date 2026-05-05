@@ -19,61 +19,6 @@ export { isWebview } from './detectors/webview.js'
 export { parseHeaders, ACCEPT_CH } from './parse-headers.js'
 export { VERSION }
 
-/** Check whether the current context is a WeChat mini-program. */
-export const isWechatMiniapp = (): boolean => {
-  try {
-    return typeof __wxjs_environment !== 'undefined' && __wxjs_environment === 'miniprogram'
-  } catch {
-    return false
-  }
-}
-
-/** Check whether the current context is an Alipay mini-program. */
-export const isAlipayMiniapp = (): boolean => {
-  try {
-    return typeof window !== 'undefined' &&
-      typeof (window as unknown as { my?: { getSystemInfo?: unknown } }).my?.getSystemInfo === 'function'
-  } catch {
-    return false
-  }
-}
-
-/** Check whether the current context is a Baidu Smart mini-program. */
-export const isBaiduMiniapp = (): boolean => {
-  try {
-    return typeof swan !== 'undefined' && typeof swan?.getSystemInfo === 'function'
-  } catch {
-    return false
-  }
-}
-
-/** Check whether the current context is a Douyin mini-program. */
-export const isDouyinMiniapp = (): boolean => {
-  try {
-    return typeof tt !== 'undefined' && typeof tt?.getSystemInfo === 'function'
-  } catch {
-    return false
-  }
-}
-
-/** Check whether the current context is a QQ mini-program. */
-export const isQQMiniapp = (): boolean => {
-  try {
-    return typeof qq !== 'undefined' && typeof qq?.getSystemInfo === 'function'
-  } catch {
-    return false
-  }
-}
-
-/** Check whether the current context is a Kuaishou mini-program. */
-export const isKuaishouMiniapp = (): boolean => {
-  try {
-    return typeof ks !== 'undefined' && typeof ks?.getSystemInfo === 'function'
-  } catch {
-    return false
-  }
-}
-
 // ── Default export — maintains v0.x call signature ──────────────────────────
 
 /**
@@ -87,12 +32,6 @@ function uaBrowser(ua?: string): EnvOption {
 }
 
 uaBrowser.isWebview = isWebview
-uaBrowser.isWechatMiniapp = isWechatMiniapp
-uaBrowser.isAlipayMiniapp = isAlipayMiniapp
-uaBrowser.isBaiduMiniapp = isBaiduMiniapp
-uaBrowser.isDouyinMiniapp = isDouyinMiniapp
-uaBrowser.isQQMiniapp = isQQMiniapp
-uaBrowser.isKuaishouMiniapp = isKuaishouMiniapp
 uaBrowser.getLanguage = (): string => getLanguage(getNavContext())
 uaBrowser.VERSION = VERSION
 

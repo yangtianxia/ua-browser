@@ -75,21 +75,6 @@ Detection priority runs from lowest to highest. When multiple rules match the sa
 | JD (Pingou) | `JD` | 599 |
 | Meituan | `Meituan` | 600 |
 
-::: tip Mini Program detection
-Each platform's mini programs are detected via runtime global variables. The `browser` field returns the corresponding Miniapp value:
-
-| Platform | Helper function | `browser` value | Runtime global |
-| :-- | :-- | :-- | :-- |
-| WeChat | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
-| Alipay | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
-| Baidu | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
-| Douyin | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
-| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
-| Kuaishou | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
-:::
-
-
-
 ---
 
 ## Operating Systems

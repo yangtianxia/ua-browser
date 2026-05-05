@@ -73,48 +73,6 @@ if (browser === 'IE') {
 
 ---
 
-## 小程序环境检测
-
-判断是否在各平台小程序或 App 内置浏览器中运行：
-
-```typescript
-import uaBrowser, {
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
-} from 'ua-browser'
-
-const { browser } = uaBrowser()
-
-if (isWechatMiniapp()) {
-  // 微信小程序
-  wx.navigateTo({ url: '/pages/index/index' })
-} else if (browser === 'Wechat') {
-  // 微信内置浏览器
-  initWechatSDK()
-} else if (isAlipayMiniapp()) {
-  // 支付宝小程序
-  my.navigateTo({ url: '/pages/index/index' })
-} else if (isBaiduMiniapp()) {
-  // 百度智能小程序
-  swan.navigateTo({ url: '/pages/index/index' })
-} else if (isDouyinMiniapp()) {
-  // 抖音小程序
-  tt.navigateTo({ url: '/pages/index/index' })
-} else if (isQQMiniapp()) {
-  // QQ 小程序
-  qq.navigateTo({ url: '/pages/index/index' })
-} else if (isKuaishouMiniapp()) {
-  // 快手小程序
-  ks.navigateTo({ url: '/pages/index/index' })
-}
-```
-
----
-
 ## SSR / Node.js 中解析请求 UA
 
 在服务端根据 UA 返回差异化内容：

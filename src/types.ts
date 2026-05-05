@@ -66,11 +66,6 @@ export type BrowserName =
   | 'Toutiao'
   | 'JD'
   | 'Meituan'
-  | 'Alipay Miniapp'
-  | 'Baidu Miniapp'
-  | 'Douyin Miniapp'
-  | 'QQ Miniapp'
-  | 'Kuaishou Miniapp'
   | 'unknown'
 
 export type OsName =
@@ -145,17 +140,6 @@ export interface EnvOption {
 // ---------------------------------------------------------------------------
 
 declare global {
-  const __wxjs_environment: string
-
-  // eslint-disable-next-line no-var
-  var swan: { getSystemInfo?: unknown } | undefined
-  // eslint-disable-next-line no-var
-  var tt: { getSystemInfo?: unknown } | undefined
-  // eslint-disable-next-line no-var
-  var qq: { getSystemInfo?: unknown } | undefined
-  // eslint-disable-next-line no-var
-  var ks: { getSystemInfo?: unknown } | undefined
-
   // eslint-disable-next-line no-var
   var chrome: {
     adblock2345?: unknown
@@ -167,10 +151,6 @@ declare global {
 
   // eslint-disable-next-line no-var
   var u2f: unknown
-
-  interface Window {
-    my?: { getSystemInfo?: unknown }
-  }
 
   interface Navigator {
     browserLanguage?: string

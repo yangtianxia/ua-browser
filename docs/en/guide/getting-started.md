@@ -61,12 +61,6 @@ import {
   parseHeaders,         // Parse UA and Client Hints from HTTP headers (SSR)
   ACCEPT_CH,            // Response header constant to request Client Hints from browsers
   isWebview,            // Detect Android Webview / iOS WKWebView
-  isWechatMiniapp,      // Detect WeChat Mini Program environment
-  isAlipayMiniapp,      // Detect Alipay Mini Program environment
-  isBaiduMiniapp,       // Detect Baidu Smart Mini Program environment
-  isDouyinMiniapp,      // Detect Douyin Mini Program environment
-  isQQMiniapp,          // Detect QQ Mini Program environment
-  isKuaishouMiniapp,    // Detect Kuaishou Mini Program environment
   detectBot,            // Standalone bot detection
   detectArch,           // Standalone CPU architecture detection
   detectHeadless,       // Standalone headless browser detection
