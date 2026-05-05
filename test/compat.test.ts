@@ -107,4 +107,17 @@ describe('API surface', () => {
     expect(isWebview(crios)).toBe(false)
   })
 
+  it('default export has .detect async method', () => {
+    expect(typeof uaBrowser.detect).toBe('function')
+  })
+
+  it('uaBrowser.detect() returns EnvOption shape', async () => {
+    const result = await uaBrowser.detect('Mozilla/5.0 (Windows NT 10.0) Chrome/124.0.0.0')
+    expect(result).toHaveProperty('browser')
+    expect(result).toHaveProperty('os')
+    expect(result).toHaveProperty('engine')
+    expect(result.browser).toBe('Chrome')
+    expect(result.os).toBe('Windows')
+  })
+
 })
