@@ -73,48 +73,6 @@ if (browser === 'IE') {
 
 ---
 
-## Mini Program Detection
-
-Detect whether the app is running inside a Mini Program or an in-app browser across platforms:
-
-```typescript
-import uaBrowser, {
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
-} from 'ua-browser'
-
-const { browser } = uaBrowser()
-
-if (isWechatMiniapp()) {
-  // WeChat Mini Program
-  wx.navigateTo({ url: '/pages/index/index' })
-} else if (browser === 'Wechat') {
-  // WeChat in-app browser
-  initWechatSDK()
-} else if (isAlipayMiniapp()) {
-  // Alipay Mini Program
-  my.navigateTo({ url: '/pages/index/index' })
-} else if (isBaiduMiniapp()) {
-  // Baidu Smart Mini Program
-  swan.navigateTo({ url: '/pages/index/index' })
-} else if (isDouyinMiniapp()) {
-  // Douyin Mini Program
-  tt.navigateTo({ url: '/pages/index/index' })
-} else if (isQQMiniapp()) {
-  // QQ Mini Program
-  qq.navigateTo({ url: '/pages/index/index' })
-} else if (isKuaishouMiniapp()) {
-  // Kuaishou Mini Program
-  ks.navigateTo({ url: '/pages/index/index' })
-}
-```
-
----
-
 ## SSR / Node.js — Parse Request UA
 
 Return differentiated content based on UA in server-side rendering:

@@ -2,12 +2,6 @@ import { describe, it, expect } from 'vitest'
 import uaBrowser, {
   parseUA,
   isWebview,
-  isWechatMiniapp,
-  isAlipayMiniapp,
-  isBaiduMiniapp,
-  isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
   getLanguage,
   getNavContext,
   getWindowsVersion,
@@ -29,10 +23,6 @@ describe('API surface', () => {
     expect(typeof uaBrowser.isWebview).toBe('function')
   })
 
-  it('default export has .isWechatMiniapp property', () => {
-    expect(typeof uaBrowser.isWechatMiniapp).toBe('function')
-  })
-
   it('default export has .getLanguage property', () => {
     expect(typeof uaBrowser.getLanguage).toBe('function')
   })
@@ -48,10 +38,6 @@ describe('API surface', () => {
 
   it('named export isWebview is a function', () => {
     expect(typeof isWebview).toBe('function')
-  })
-
-  it('named export isWechatMiniapp is a function', () => {
-    expect(typeof isWechatMiniapp).toBe('function')
   })
 
   it('named export getLanguage is a function', () => {
@@ -81,10 +67,6 @@ describe('API surface', () => {
   it('isWebview correctly identifies webview UA', () => {
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K); wv)')).toBe(true)
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K)')).toBe(false)
-  })
-
-  it('isWechatMiniapp returns boolean', () => {
-    expect(typeof isWechatMiniapp()).toBe('boolean')
   })
 
   it('parseUA result has platform (not platfrom)', () => {
@@ -125,15 +107,4 @@ describe('API surface', () => {
     expect(isWebview(crios)).toBe(false)
   })
 
-  it('isAlipayMiniapp is a function', () => { expect(typeof isAlipayMiniapp).toBe('function') })
-  it('isBaiduMiniapp is a function', () => { expect(typeof isBaiduMiniapp).toBe('function') })
-  it('isDouyinMiniapp is a function', () => { expect(typeof isDouyinMiniapp).toBe('function') })
-  it('isQQMiniapp is a function', () => { expect(typeof isQQMiniapp).toBe('function') })
-  it('isKuaishouMiniapp is a function', () => { expect(typeof isKuaishouMiniapp).toBe('function') })
-
-  it('uaBrowser.isAlipayMiniapp is a function', () => { expect(typeof uaBrowser.isAlipayMiniapp).toBe('function') })
-  it('uaBrowser.isBaiduMiniapp is a function', () => { expect(typeof uaBrowser.isBaiduMiniapp).toBe('function') })
-  it('uaBrowser.isDouyinMiniapp is a function', () => { expect(typeof uaBrowser.isDouyinMiniapp).toBe('function') })
-  it('uaBrowser.isQQMiniapp is a function', () => { expect(typeof uaBrowser.isQQMiniapp).toBe('function') })
-  it('uaBrowser.isKuaishouMiniapp is a function', () => { expect(typeof uaBrowser.isKuaishouMiniapp).toBe('function') })
 })

@@ -75,21 +75,6 @@
 | 京东（拼购） | `JD` | 599 |
 | 美团 | `Meituan` | 600 |
 
-::: tip 小程序检测
-各平台小程序通过运行时全局变量检测，`browser` 字段返回对应 Miniapp 值：
-
-| 平台 | 辅助函数 | `browser` 返回值 | 全局变量 |
-| :-- | :-- | :-- | :-- |
-| 微信 | `isWechatMiniapp()` | `'Wechat Miniapp'` | `__wxjs_environment` |
-| 支付宝 | `isAlipayMiniapp()` | `'Alipay Miniapp'` | `window.my.getSystemInfo` |
-| 百度 | `isBaiduMiniapp()` | `'Baidu Miniapp'` | `swan.getSystemInfo` |
-| 抖音 | `isDouyinMiniapp()` | `'Douyin Miniapp'` | `tt.getSystemInfo` |
-| QQ | `isQQMiniapp()` | `'QQ Miniapp'` | `qq.getSystemInfo` |
-| 快手 | `isKuaishouMiniapp()` | `'Kuaishou Miniapp'` | `ks.getSystemInfo` |
-:::
-
-
-
 ---
 
 ## 操作系统
