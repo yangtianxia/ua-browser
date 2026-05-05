@@ -1,5 +1,11 @@
 # ua-browser
 
+## 1.3.0
+
+### Minor Changes
+
+- 移除小程序运行时检测功能：`isWechatMiniapp`、`isAlipayMiniapp`、`isBaiduMiniapp`、`isDouyinMiniapp`、`isQQMiniapp`、`isKuaishouMiniapp` 及 `parse.ts` 中对应检测块。各平台在 web-view 组件中注入全局变量的方式各有差异，当前实现可靠性存在不确定性，待验证各平台官方文档后重新实现
+
 ## 1.2.0
 
 ### Minor Changes
