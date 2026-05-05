@@ -68,7 +68,7 @@ isWebview(ua: string): boolean
 
 ### `isWechatMiniapp()`
 
-Detect whether the current environment is a WeChat Mini Program (relies on the `__wxjs_environment` global variable).
+Detect whether the current JS runtime is inside a WeChat Mini Program webview (relies on the `__wxjs_environment` global variable). **Returns `true` only inside a WeChat Mini Program webview — always `false` in regular browsers.**
 
 ```typescript
 isWechatMiniapp(): boolean
@@ -78,7 +78,7 @@ isWechatMiniapp(): boolean
 
 ### Mini Program Detection Functions
 
-Each platform's Mini Program is detected via runtime global variables, returning `true` only in the corresponding Mini Program environment.
+These functions detect whether the current JS runtime is inside a Mini Program webview by checking for platform-injected globals. **They always return `false` in regular browsers** and do not rely on the UA string.
 
 | Function | Platform | Detection |
 | :-- | :-- | :-- |

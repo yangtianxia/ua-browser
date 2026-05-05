@@ -73,9 +73,9 @@ if (browser === 'IE') {
 
 ---
 
-## Mini Program Detection
+## Mini Program Runtime Detection
 
-Detect whether the app is running inside a Mini Program or an in-app browser across platforms:
+These functions detect whether the **current JavaScript runtime is running inside a Mini Program webview** by checking for platform-injected globals. They always return `false` in regular browsers. Use them in code shared across in-app browser and Mini Program environments:
 
 ```typescript
 import uaBrowser, {
@@ -90,25 +90,25 @@ import uaBrowser, {
 const { browser } = uaBrowser()
 
 if (isWechatMiniapp()) {
-  // WeChat Mini Program
+  // Running inside WeChat Mini Program webview
   wx.navigateTo({ url: '/pages/index/index' })
 } else if (browser === 'Wechat') {
-  // WeChat in-app browser
+  // Running inside WeChat in-app browser (not a Mini Program)
   initWechatSDK()
 } else if (isAlipayMiniapp()) {
-  // Alipay Mini Program
+  // Running inside Alipay Mini Program webview
   my.navigateTo({ url: '/pages/index/index' })
 } else if (isBaiduMiniapp()) {
-  // Baidu Smart Mini Program
+  // Running inside Baidu Smart Mini Program webview
   swan.navigateTo({ url: '/pages/index/index' })
 } else if (isDouyinMiniapp()) {
-  // Douyin Mini Program
+  // Running inside Douyin Mini Program webview
   tt.navigateTo({ url: '/pages/index/index' })
 } else if (isQQMiniapp()) {
-  // QQ Mini Program
+  // Running inside QQ Mini Program webview
   qq.navigateTo({ url: '/pages/index/index' })
 } else if (isKuaishouMiniapp()) {
-  // Kuaishou Mini Program
+  // Running inside Kuaishou Mini Program webview
   ks.navigateTo({ url: '/pages/index/index' })
 }
 ```

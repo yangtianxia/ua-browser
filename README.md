@@ -12,7 +12,7 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, headl
 ## Features
 
 - **Comprehensive UA detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
-- **Mini Program detection** — WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou via runtime global variables
+- **Mini Program runtime detection** — detect whether the current JS runtime is inside a WeChat / Alipay / Baidu / Douyin / QQ / Kuaishou Mini Program webview (checks platform-injected globals; always `false` in regular browsers)
 - **Multi-signal arch detection** — `getEnvContext()` collects Client Hints, WebGL renderer, and font probes to accurately distinguish Apple Silicon from Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH` for precise server-side detection (CPU arch, platform) in Chrome / Edge 90+
 - **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
@@ -96,26 +96,27 @@ if (isBot) {
 
 ### Mini Program Detection
 
-Detect which Mini Program platform the app is running in using runtime global variables:
+These functions detect whether the **current JavaScript runtime is running inside a Mini Program webview** by checking for platform-injected global variables. They always return `false` in regular browsers.
 
 ```typescript
-import {
+import uaBrowser, {
   isWechatMiniapp,
   isAlipayMiniapp,
-  isBaiduMiniapp,
   isDouyinMiniapp,
-  isQQMiniapp,
-  isKuaishouMiniapp,
 } from 'ua-browser'
 
+const { browser } = uaBrowser()
+
+// Common pattern: code shared across WeChat browser and WeChat Mini Program
 if (isWechatMiniapp()) {
+  // Running inside WeChat Mini Program webview
   wx.navigateTo({ url: '/pages/index/index' })
-} else if (isAlipayMiniapp()) {
-  my.navigateTo({ url: '/pages/index/index' })
-} else if (isDouyinMiniapp()) {
-  tt.navigateTo({ url: '/pages/index/index' })
+} else if (browser === 'Wechat') {
+  // Running inside WeChat in-app browser (not a Mini Program)
+  initWechatSDK()
 }
-// isBaiduMiniapp() / isQQMiniapp() / isKuaishouMiniapp() ...
+
+// Other platforms: isBaiduMiniapp() / isQQMiniapp() / isKuaishouMiniapp() ...
 ```
 
 ### Multi-signal Architecture Detection

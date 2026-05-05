@@ -68,7 +68,7 @@ isWebview(ua: string): boolean
 
 ### `isWechatMiniapp()`
 
-检测当前运行环境是否为微信小程序（依赖 `__wxjs_environment` 全局变量）。
+检测当前 JS 运行环境是否在微信小程序的 Webview 中（依赖 `__wxjs_environment` 全局变量）。**仅在微信小程序 Webview 里返回 `true`，普通浏览器中始终返回 `false`。**
 
 ```typescript
 isWechatMiniapp(): boolean
@@ -78,7 +78,7 @@ isWechatMiniapp(): boolean
 
 ### 小程序检测函数
 
-各平台小程序通过运行时全局变量检测，仅在对应小程序环境中返回 `true`。
+这些函数通过检测各平台注入的全局变量，判断当前 JS 是否运行在对应小程序的 Webview 中。**普通浏览器中始终返回 `false`**，不依赖 UA 字符串。
 
 | 函数 | 平台 | 检测依据 |
 | :-- | :-- | :-- |

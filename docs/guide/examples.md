@@ -73,9 +73,9 @@ if (browser === 'IE') {
 
 ---
 
-## 小程序环境检测
+## 小程序运行时检测
 
-判断是否在各平台小程序或 App 内置浏览器中运行：
+这些函数通过检测平台注入的全局变量，判断**当前 JS 是否运行在对应小程序的 Webview 中**。在普通浏览器里始终返回 `false`，适合跨环境共用的业务代码：
 
 ```typescript
 import uaBrowser, {
@@ -90,25 +90,25 @@ import uaBrowser, {
 const { browser } = uaBrowser()
 
 if (isWechatMiniapp()) {
-  // 微信小程序
+  // 当前在微信小程序 Webview 中
   wx.navigateTo({ url: '/pages/index/index' })
 } else if (browser === 'Wechat') {
-  // 微信内置浏览器
+  // 当前在微信内置浏览器（非小程序）
   initWechatSDK()
 } else if (isAlipayMiniapp()) {
-  // 支付宝小程序
+  // 当前在支付宝小程序 Webview 中
   my.navigateTo({ url: '/pages/index/index' })
 } else if (isBaiduMiniapp()) {
-  // 百度智能小程序
+  // 当前在百度智能小程序 Webview 中
   swan.navigateTo({ url: '/pages/index/index' })
 } else if (isDouyinMiniapp()) {
-  // 抖音小程序
+  // 当前在抖音小程序 Webview 中
   tt.navigateTo({ url: '/pages/index/index' })
 } else if (isQQMiniapp()) {
-  // QQ 小程序
+  // 当前在 QQ 小程序 Webview 中
   qq.navigateTo({ url: '/pages/index/index' })
 } else if (isKuaishouMiniapp()) {
-  // 快手小程序
+  // 当前在快手小程序 Webview 中
   ks.navigateTo({ url: '/pages/index/index' })
 }
 ```
