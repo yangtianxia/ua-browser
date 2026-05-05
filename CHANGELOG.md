@@ -1,5 +1,11 @@
 # ua-browser
 
+## 1.3.1
+
+### Patch Changes
+
+- 新增 uaBrowser.detect() 异步检测方法及 EnvContext 优化
+
 ## 1.3.0
 
 ### Minor Changes
