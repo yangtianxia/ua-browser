@@ -1,4 +1,4 @@
-import type { EnvOption, BrowserName } from './types.js'
+import type { EnvOption, BrowserName, OsName, DetectStrategy } from './types.js'
 import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
@@ -19,6 +19,15 @@ export interface ParseOptions {
   ctx?: EnvContext
   /** Additional bot definitions prepended before the GenericBot catch-all. */
   customBotDefs?: readonly BotDef[]
+  /**
+   * Signal arbitration strategy.
+   *
+   * - `'auto'` (default) — UA first, hardware fills gaps
+   * - `'ua-first'` — UA string is authoritative; hardware only supplements language/platform/arch
+   * - `'hardware-first'` — hardware signals (Client Hints, WebGL) take precedence over UA
+   * - `'strict'` — contradicting signals produce `'unknown'` and `confidence: 'conflict'`
+   */
+  strategy?: DetectStrategy
 }
 
 // Maps detected BrowserName to the expected brand strings in Sec-CH-UA-Full-Version-List.
@@ -32,6 +41,38 @@ const BRAND_MAP: Partial<Record<BrowserName, string[]>> = {
   Vivaldi:  ['Vivaldi'],
 }
 
+// All brand strings that identify a Chromium-based browser in fullVersionList.
+const ALL_CHROMIUM_BRANDS = new Set(Object.values(BRAND_MAP).flat())
+
+/**
+ * Infer the OS from hardware context (Client Hints platform or navigator.platform).
+ * Returns null when neither source provides enough information.
+ */
+function osFromHardware(ctx: EnvContext): OsName | null {
+  // Client Hints low-entropy platform (always available when CH is supported, not spoofed by DevTools)
+  const chPlatform = ctx.userAgentData?.platform
+  if (chPlatform) {
+    const map: Partial<Record<string, OsName>> = {
+      Windows: 'Windows',
+      macOS: 'MacOS',
+      Linux: 'Linux',
+      Android: 'Android',
+      iOS: 'iOS',
+      'Chrome OS': 'Chrome OS',
+    }
+    const mapped = map[chPlatform]
+    if (mapped) return mapped
+  }
+  // navigator.platform fallback
+  const p = (ctx.platform ?? '').toLowerCase()
+  if (p.startsWith('win')) return 'Windows'
+  if (p.startsWith('mac')) return 'MacOS'
+  if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
+  if (p.includes('android') || /linux arm/i.test(ctx.platform ?? '')) return 'Android'
+  if (p.includes('linux')) return 'Linux'
+  return null
+}
+
 /**
  * Parse a user agent string into a full browser/OS/engine/device description.
  *
@@ -39,13 +80,15 @@ const BRAND_MAP: Partial<Record<BrowserName, string[]>> = {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
+  const strategy: DetectStrategy = options.strategy ?? 'auto'
   const effectiveNav: EnvContext | NavContext | undefined = options.ctx ?? options.nav
   const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
-  let osVersion = rawOsVersion
-  const device = detectDevice(ua, effectiveNav)
+  const { os: rawOs, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
+  let os: OsName = rawOs
+  let osVersion: string = rawOsVersion
+  const device = detectDevice(ua, effectiveNav, strategy)
   const arch = detectArch(ua, options.ctx)
   const nav = effectiveNav
   const { isBot, botName } = detectBot(ua, options.customBotDefs)
@@ -119,9 +162,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   }
 
   // Firefox Nightly detection — only meaningful in a real browser environment.
-  // The heuristic checks for globals that exist in Chrome (clientInformation) but
-  // not in standard Firefox, or where u2f was removed in Nightly builds.
-  // Skip entirely in Node.js (no nav = not a browser).
   if (browser === 'Firefox' && nav) {
     try {
       if (typeof clientInformation !== 'undefined' || typeof u2f === 'undefined') {
@@ -134,7 +174,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
 
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
   // The Version/ token reliably reflects the real Safari/iOS version.
-  // When Version/ major > CPU iPhone OS major, use Version/ as the real osVersion.
   if (os === 'iOS' && browser === 'Safari') {
     const m = /Version\/([\d.]+)/.exec(ua)
     if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
@@ -142,30 +181,81 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
-  // UA freeze mitigation: prefer fullVersionList from Client Hints over frozen UA version.
+  // ── hardware-first: OS from hardware signals ────────────────────────────────
+  if (strategy === 'hardware-first' && options.ctx) {
+    const hwOs = osFromHardware(options.ctx)
+    if (hwOs !== null && hwOs !== rawOs) {
+      os = hwOs
+      // UA-derived osVersion belongs to a different OS; clear it
+      osVersion = 'unknown'
+    }
+  }
+
+  // ── Client Hints version override (skipped for ua-first) ───────────────────
   // Chrome/Edge/Opera/Vivaldi freeze their patch version in the UA string; fullVersionList
   // carries the real full version (e.g. "124.0.6367.201" vs "124.0.0.0").
   let usedClientHintsVersion = false
-  const fullVersionList = options.ctx?.highEntropyData?.fullVersionList
-  if (fullVersionList) {
-    const brands = BRAND_MAP[browser]
-    if (brands) {
-      for (const brandName of brands) {
-        const entry = fullVersionList.find(e => e.brand === brandName)
-        if (entry?.version) {
-          version = entry.version
-          usedClientHintsVersion = true
-          break
+  if (strategy !== 'ua-first') {
+    const fullVersionList = options.ctx?.highEntropyData?.fullVersionList
+    if (fullVersionList) {
+      const brands = BRAND_MAP[browser]
+      if (brands) {
+        for (const brandName of brands) {
+          const entry = fullVersionList.find(e => e.brand === brandName)
+          if (entry?.version) {
+            version = entry.version
+            usedClientHintsVersion = true
+            break
+          }
         }
       }
     }
   }
 
+  // ── strict: conflict detection ──────────────────────────────────────────────
+  let hasConflict = false
+  if (strategy === 'strict' && options.ctx) {
+    // OS conflict: hardware says different OS than UA
+    const hwOs = osFromHardware(options.ctx)
+    if (hwOs !== null && hwOs !== rawOs) {
+      os = 'unknown'
+      osVersion = 'unknown'
+      hasConflict = true
+    }
+
+    // Browser/version conflict: fullVersionList contradicts UA-detected browser
+    const fullVersionList = options.ctx.highEntropyData?.fullVersionList
+    if (fullVersionList && fullVersionList.length > 0) {
+      const brands = BRAND_MAP[browser]
+      if (brands) {
+        // UA says a Chromium browser — verify its brand appears in fullVersionList
+        const found = brands.some(b => fullVersionList.some(e => e.brand === b))
+        if (!found) {
+          browser = 'unknown'
+          version = 'unknown'
+          hasConflict = true
+        }
+      } else {
+        // UA says non-Chromium browser (Safari, Firefox, etc.) —
+        // if fullVersionList has a Chromium brand, the real browser is different
+        if (fullVersionList.some(e => ALL_CHROMIUM_BRANDS.has(e.brand))) {
+          browser = 'unknown'
+          version = 'unknown'
+          hasConflict = true
+        }
+      }
+    }
+
+    // Device conflict is signalled by detectDevice returning 'unknown'
+    if (device === 'unknown') hasConflict = true
+  }
+
   const engine = detectEngine(ua, browser, version)
 
-  const confidence: 'high' | 'medium' | 'low' =
-    usedClientHintsVersion ? 'high'
-    : options.ctx          ? 'medium'
+  const confidence: 'high' | 'medium' | 'low' | 'conflict' =
+    strategy === 'strict' && hasConflict ? 'conflict'
+    : usedClientHintsVersion             ? 'high'
+    : options.ctx                        ? 'medium'
     : 'low'
 
   return {

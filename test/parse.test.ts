@@ -292,6 +292,119 @@ describe('parseUA — confidence field', () => {
   })
 })
 
+describe('parseUA — strategy option', () => {
+  // Simulates a MacBook Chrome with DevTools Android emulation active.
+  // UA is spoofed to Android; platform/userAgentData/webglRenderer are real Mac values.
+  const androidSpoofedUA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
+
+  const macIntelCtx = {
+    userAgent: androidSpoofedUA,
+    platform: 'MacIntel',
+    language: 'en-US',
+    maxTouchPoints: 5,  // DevTools-spoofed
+    userAgentData: {
+      platform: 'macOS',
+      getHighEntropyValues: async (_: string[]) => ({} as Record<string, string>),
+    },
+    webglRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, unspecified version)',
+    screenWidth: 390,
+  }
+
+  it('ua-first: OS and device come from UA string, ignores hardware', () => {
+    const r = parseUA(androidSpoofedUA, { ctx: macIntelCtx, strategy: 'ua-first' })
+    expect(r.os).toBe('Android')
+    expect(r.device).toBe('Mobile')
+    expect(r.confidence).toBe('medium')  // ctx present but no CH version used
+  })
+
+  it('ua-first: version uses UA string, not fullVersionList', () => {
+    const ctx = {
+      ...macIntelCtx,
+      highEntropyData: {
+        fullVersionList: [
+          { brand: 'Google Chrome', version: '124.0.6367.201' },
+          { brand: 'Chromium', version: '124.0.6367.201' },
+        ],
+      },
+    }
+    const r = parseUA(androidSpoofedUA, { ctx, strategy: 'ua-first' })
+    expect(r.version).toBe('124.0.0.0')  // UA version, not CH version
+    expect(r.confidence).toBe('medium')
+  })
+
+  it('hardware-first: OS from Client Hints platform, device from ANGLE renderer', () => {
+    const r = parseUA(androidSpoofedUA, { ctx: macIntelCtx, strategy: 'hardware-first' })
+    expect(r.os).toBe('MacOS')
+    expect(r.device).toBe('PC')
+    expect(r.osVersion).toBe('unknown')  // UA osVersion was for Android, cleared on OS switch
+  })
+
+  it('hardware-first: version from fullVersionList when available', () => {
+    const ctx = {
+      ...macIntelCtx,
+      highEntropyData: {
+        fullVersionList: [
+          { brand: 'Google Chrome', version: '124.0.6367.201' },
+          { brand: 'Chromium', version: '124.0.6367.201' },
+        ],
+      },
+    }
+    const r = parseUA(androidSpoofedUA, { ctx, strategy: 'hardware-first' })
+    expect(r.version).toBe('124.0.6367.201')
+    expect(r.confidence).toBe('high')
+  })
+
+  it('strict: conflicting OS and device → unknown fields and confidence: conflict', () => {
+    const r = parseUA(androidSpoofedUA, { ctx: macIntelCtx, strategy: 'strict' })
+    expect(r.os).toBe('unknown')
+    expect(r.device).toBe('unknown')
+    expect(r.confidence).toBe('conflict')
+  })
+
+  it('strict: Safari UA + Chrome fullVersionList → browser/version conflict', () => {
+    const safariUA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+    const ctx = {
+      ...macIntelCtx,
+      userAgent: safariUA,
+      highEntropyData: {
+        fullVersionList: [
+          { brand: 'Not)A;Brand', version: '99.0.0.0' },
+          { brand: 'Google Chrome', version: '124.0.6367.201' },
+          { brand: 'Chromium', version: '124.0.6367.201' },
+        ],
+      },
+    }
+    const r = parseUA(safariUA, { ctx, strategy: 'strict' })
+    expect(r.browser).toBe('unknown')
+    expect(r.version).toBe('unknown')
+    expect(r.confidence).toBe('conflict')
+  })
+
+  it('strict: no conflict when signals agree (real Android Chrome)', () => {
+    const realAndroidUA = 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
+    const androidCtx = {
+      userAgent: realAndroidUA,
+      platform: 'Linux armv8l',
+      language: 'en-US',
+      maxTouchPoints: 5,
+      userAgentData: {
+        platform: 'Android',
+        getHighEntropyValues: async (_: string[]) => ({} as Record<string, string>),
+      },
+    }
+    const r = parseUA(realAndroidUA, { ctx: androidCtx, strategy: 'strict' })
+    expect(r.os).toBe('Android')
+    expect(r.device).toBe('Mobile')
+    expect(r.confidence).not.toBe('conflict')
+  })
+
+  it('auto (default): same as omitting strategy', () => {
+    const r1 = parseUA(UA.chrome.windows)
+    const r2 = parseUA(UA.chrome.windows, { strategy: 'auto' })
+    expect(r1).toEqual(r2)
+  })
+})
+
 describe('parseUA — customBotDefs', () => {
   it('detects custom bot via parseUA customBotDefs option', () => {
     const ua = 'MyCompanyBot/1.0'

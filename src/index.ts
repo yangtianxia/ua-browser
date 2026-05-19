@@ -3,10 +3,10 @@ import { parseUA } from './parse.js'
 import { getNavContext, getLanguage } from './utils/navigator.js'
 import { getEnvContext } from './utils/env-context.js'
 import { isWebview } from './detectors/webview.js'
-import type { EnvOption } from './types.js'
+import type { EnvOption, DetectStrategy } from './types.js'
 
 // ── Named exports (tree-shakeable) ──────────────────────────────────────────
-export type { EnvOption, BrowserName, OsName, EngineName, DeviceName, ArchName, BotName } from './types.js'
+export type { EnvOption, BrowserName, OsName, EngineName, DeviceName, ArchName, BotName, DetectStrategy } from './types.js'
 export { parseUA } from './parse.js'
 export { getLanguage, getNavContext } from './utils/navigator.js'
 export { getWindowsVersion } from './utils/windows-version.js'
@@ -26,16 +26,17 @@ export { VERSION }
 /**
  * Detect browser, OS, engine and device information.
  *
- * @param ua - Optional UA string override. Defaults to `navigator.userAgent`.
+ * @param ua      - Optional UA string override. Defaults to `navigator.userAgent`.
+ * @param options - Optional options including `strategy`.
  */
-function uaBrowser(ua?: string): EnvOption {
+function uaBrowser(ua?: string, options?: { strategy?: DetectStrategy }): EnvOption {
   const nav = getNavContext()
-  return parseUA(ua ?? nav.userAgent, { nav })
+  return parseUA(ua ?? nav.userAgent, { nav, strategy: options?.strategy })
 }
 
-uaBrowser.detect = async (ua?: string): Promise<EnvOption> => {
+uaBrowser.detect = async (ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption> => {
 	const ctx = await getEnvContext()
-  return parseUA(ua ?? ctx.userAgent, { ctx })
+  return parseUA(ua ?? ctx.userAgent, { ctx, strategy: options?.strategy })
 }
 
 uaBrowser.isWebview = isWebview

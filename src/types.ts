@@ -89,7 +89,9 @@ export type OsName =
   | 'KaiOS'
   | 'unknown'
 
-export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV'
+export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'unknown'
+
+export type DetectStrategy = 'ua-first' | 'hardware-first' | 'strict' | 'auto'
 
 export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
@@ -142,7 +144,7 @@ export interface EnvOption {
   botName: BotName
   language: string
   platform: string
-  confidence: 'high' | 'medium' | 'low'
+  confidence: 'high' | 'medium' | 'low' | 'conflict'
 }
 
 // ---------------------------------------------------------------------------
