@@ -1,5 +1,17 @@
 # ua-browser
 
+## 1.4.0
+
+### Minor Changes
+
+- 新增 AI Bot 检测扩展与 UA 冻结防御
+
+  - 新增 9 个 AI/LLM 爬虫检测：`Applebot-Extended`、`OAI-SearchBot`、`ChatGPT-User`、`Google-Extended`、`Meta-ExternalAgent`、`Amazonbot`、`Diffbot`、`cohere-ai`、`YouBot`
+  - 新增 `customBotDefs` 选项（`ParseOptions` 及 `detectBot()`），支持注入自定义 Bot 规则，无全局副作用
+  - 导出 `BotDef` 类型，方便构造自定义规则
+  - UA 冻结防御：当 `ctx.highEntropyData.fullVersionList` 可用时，优先使用 Client Hints 精确版本替代冻结的 UA 版本号（适用于 Chrome、Edge、Opera、Vivaldi）
+  - `EnvOption` 新增 `confidence` 字段（`'high' | 'medium' | 'low'`），反映检测结果的可信度
+
 ## 1.3.1
 
 ### Patch Changes

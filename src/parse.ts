@@ -3,7 +3,7 @@ import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
 import { detectDevice } from './detectors/device.js'
-import { detectBot } from './detectors/bot.js'
+import { detectBot, type BotDef } from './detectors/bot.js'
 import { detectArch } from './detectors/arch.js'
 import { detectHeadless } from './detectors/headless.js'
 import { isWebview } from './detectors/webview.js'
@@ -17,6 +17,19 @@ export interface ParseOptions {
   windowsVersion?: string | null
   /** Full env context from getEnvContext() — supersedes nav and windowsVersion when provided. */
   ctx?: EnvContext
+  /** Additional bot definitions prepended before the GenericBot catch-all. */
+  customBotDefs?: readonly BotDef[]
+}
+
+// Maps detected BrowserName to the expected brand strings in Sec-CH-UA-Full-Version-List.
+// Only Chromium-based browsers that actually send Client Hints are included.
+// Brave blocks Client Hints by default; Samsung Internet doesn't support them.
+const BRAND_MAP: Partial<Record<BrowserName, string[]>> = {
+  Chrome:   ['Google Chrome', 'Chromium'],
+  Edge:     ['Microsoft Edge'],
+  Chromium: ['Chromium'],
+  Opera:    ['Opera'],
+  Vivaldi:  ['Vivaldi'],
 }
 
 /**
@@ -35,7 +48,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   const device = detectDevice(ua, effectiveNav)
   const arch = detectArch(ua, options.ctx)
   const nav = effectiveNav
-  const { isBot, botName } = detectBot(ua)
+  const { isBot, botName } = detectBot(ua, options.customBotDefs)
   const isHeadless = detectHeadless(ua)
   const language = nav ? getLanguage(nav) : 'unknown'
   const platform = nav?.platform ?? 'unknown'
@@ -129,7 +142,31 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
+  // UA freeze mitigation: prefer fullVersionList from Client Hints over frozen UA version.
+  // Chrome/Edge/Opera/Vivaldi freeze their patch version in the UA string; fullVersionList
+  // carries the real full version (e.g. "124.0.6367.201" vs "124.0.0.0").
+  let usedClientHintsVersion = false
+  const fullVersionList = options.ctx?.highEntropyData?.fullVersionList
+  if (fullVersionList) {
+    const brands = BRAND_MAP[browser]
+    if (brands) {
+      for (const brandName of brands) {
+        const entry = fullVersionList.find(e => e.brand === brandName)
+        if (entry?.version) {
+          version = entry.version
+          usedClientHintsVersion = true
+          break
+        }
+      }
+    }
+  }
+
   const engine = detectEngine(ua, browser, version)
+
+  const confidence: 'high' | 'medium' | 'low' =
+    usedClientHintsVersion ? 'high'
+    : options.ctx          ? 'medium'
+    : 'low'
 
   return {
     browser,
@@ -144,6 +181,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     isBot,
     botName,
     language,
-    platform
+    platform,
+    confidence,
   }
 }

@@ -8,6 +8,7 @@ export type BotName =
   | 'Slurp'
   | 'Sogou'
   | '360Spider'
+  | 'Applebot-Extended'
   | 'Applebot'
   | 'Facebookbot'
   | 'Twitterbot'
@@ -17,10 +18,18 @@ export type BotName =
   | 'MJ12bot'
   | 'PetalBot'
   | 'GPTBot'
+  | 'OAI-SearchBot'
+  | 'ChatGPT-User'
   | 'ClaudeBot'
   | 'PerplexityBot'
   | 'CCBot'
   | 'AdsBot'
+  | 'Google-Extended'
+  | 'Meta-ExternalAgent'
+  | 'Amazonbot'
+  | 'Diffbot'
+  | 'cohere-ai'
+  | 'YouBot'
   | 'GenericBot'
   | 'unknown'
 
@@ -41,6 +50,7 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'Sogou',       detect: /(Sogou|sogou).*[Ss]pider/ },
   { name: '360Spider',   detect: /360Spider/ },
   { name: 'PetalBot',    detect: /PetalBot/ },
+  { name: 'Applebot-Extended', detect: /Applebot-Extended/ },
   { name: 'Applebot',    detect: /Applebot/ },
   // Social
   { name: 'Facebookbot', detect: /(facebookexternalhit|FacebookBot)/ },
@@ -51,11 +61,19 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'AhrefsBot',     detect: /AhrefsBot/ },
   { name: 'MJ12bot',       detect: /MJ12bot/ },
   // AI / LLM crawlers
-  { name: 'GPTBot',        detect: /GPTBot/ },
-  { name: 'ClaudeBot',     detect: /ClaudeBot/ },
-  { name: 'PerplexityBot', detect: /PerplexityBot/ },
-  { name: 'CCBot',         detect: /CCBot/ },
-  { name: 'AdsBot',        detect: /AdsBot-Google/ },
+  { name: 'GPTBot',            detect: /GPTBot/ },
+  { name: 'OAI-SearchBot',     detect: /OAI-SearchBot/ },
+  { name: 'ChatGPT-User',      detect: /ChatGPT-User/ },
+  { name: 'ClaudeBot',         detect: /ClaudeBot/ },
+  { name: 'PerplexityBot',     detect: /PerplexityBot/ },
+  { name: 'CCBot',             detect: /CCBot/ },
+  { name: 'AdsBot',            detect: /AdsBot-Google/ },
+  { name: 'Google-Extended',   detect: /Google-Extended/ },
+  { name: 'Meta-ExternalAgent', detect: /meta-externalagent/i },
+  { name: 'Amazonbot',         detect: /Amazonbot/ },
+  { name: 'Diffbot',           detect: /Diffbot/ },
+  { name: 'cohere-ai',         detect: /cohere-ai/ },
+  { name: 'YouBot',            detect: /YouBot/ },
   // Generic catch-all (must be last)
   { name: 'GenericBot',    detect: /(bot|crawler|spider|crawling|scraper)/i }
 ] as const

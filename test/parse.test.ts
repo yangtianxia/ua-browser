@@ -194,6 +194,68 @@ describe('parseUA — new fields (arch, isBot, isHeadless)', () => {
   })
 })
 
+describe('parseUA — confidence field', () => {
+  it('no ctx → confidence: low', () => {
+    const r = parseUA(UA.chrome.windows)
+    expect(r.confidence).toBe('low')
+  })
+
+  it('ctx without fullVersionList → confidence: medium', () => {
+    const ctx = { userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US', maxTouchPoints: 0 }
+    const r = parseUA(UA.chrome.windows, { ctx })
+    expect(r.confidence).toBe('medium')
+  })
+
+  it('ctx with fullVersionList for Chrome → confidence: high, precise version used', () => {
+    const ctx = {
+      userAgent: UA.chrome.windows, platform: 'Win32', language: 'en-US', maxTouchPoints: 0,
+      highEntropyData: {
+        fullVersionList: [
+          { brand: 'Not)A;Brand', version: '99.0.0.0' },
+          { brand: 'Chromium', version: '124.0.6367.201' },
+          { brand: 'Google Chrome', version: '124.0.6367.201' },
+        ]
+      }
+    }
+    const r = parseUA(UA.chrome.windows, { ctx })
+    expect(r.confidence).toBe('high')
+    expect(r.version).toBe('124.0.6367.201')
+  })
+
+  it('ctx with fullVersionList for Edge → confidence: high, brand version used', () => {
+    const edgeUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0'
+    const ctx = {
+      userAgent: edgeUA, platform: 'Win32', language: 'en-US', maxTouchPoints: 0,
+      highEntropyData: {
+        fullVersionList: [
+          { brand: 'Microsoft Edge', version: '124.0.2478.97' },
+          { brand: 'Chromium', version: '124.0.6367.201' },
+        ]
+      }
+    }
+    const r = parseUA(edgeUA, { ctx })
+    expect(r.confidence).toBe('high')
+    expect(r.version).toBe('124.0.2478.97')
+  })
+
+  it('ctx with fullVersionList for non-mapped browser (Firefox) → confidence: medium', () => {
+    const ctx = {
+      userAgent: UA.firefox.desktop, platform: 'Win32', language: 'en-US', maxTouchPoints: 0,
+      highEntropyData: { fullVersionList: [{ brand: 'Not)A;Brand', version: '99' }] }
+    }
+    const r = parseUA(UA.firefox.desktop, { ctx })
+    expect(r.confidence).toBe('medium')
+  })
+})
+
+describe('parseUA — customBotDefs', () => {
+  it('detects custom bot via parseUA customBotDefs option', () => {
+    const ua = 'MyCompanyBot/1.0'
+    const r = parseUA(ua, { customBotDefs: [{ name: 'GenericBot', detect: /MyCompanyBot/ }] })
+    expect(r.isBot).toBe(true)
+  })
+})
+
 describe('parseUA — edge cases', () => {
   it('empty UA → all unknowns', () => {
     const r = parseUA('')

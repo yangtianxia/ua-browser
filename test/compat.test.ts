@@ -120,4 +120,15 @@ describe('API surface', () => {
     expect(result.os).toBe('Windows')
   })
 
+  it('parseUA result has confidence field', () => {
+    const result = parseUA('Mozilla/5.0 (Windows NT 10.0) Chrome/124.0.0.0')
+    expect(result).toHaveProperty('confidence')
+    expect(['high', 'medium', 'low']).toContain(result.confidence)
+  })
+
+  it('named export BotDef type is available (BotDef import compiles)', async () => {
+    const mod = await import('../src/index.js')
+    expect(mod).toBeDefined()
+  })
+
 })

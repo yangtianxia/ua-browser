@@ -103,6 +103,7 @@ export type BotName =
   | 'Slurp'
   | 'Sogou'
   | '360Spider'
+  | 'Applebot-Extended'
   | 'Applebot'
   | 'Facebookbot'
   | 'Twitterbot'
@@ -112,10 +113,18 @@ export type BotName =
   | 'MJ12bot'
   | 'PetalBot'
   | 'GPTBot'
+  | 'OAI-SearchBot'
+  | 'ChatGPT-User'
   | 'ClaudeBot'
   | 'PerplexityBot'
   | 'CCBot'
   | 'AdsBot'
+  | 'Google-Extended'
+  | 'Meta-ExternalAgent'
+  | 'Amazonbot'
+  | 'Diffbot'
+  | 'cohere-ai'
+  | 'YouBot'
   | 'GenericBot'
   | 'unknown'
 
@@ -133,6 +142,7 @@ export interface EnvOption {
   botName: BotName
   language: string
   platform: string
+  confidence: 'high' | 'medium' | 'low'
 }
 
 // ---------------------------------------------------------------------------
