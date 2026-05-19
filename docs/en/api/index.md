@@ -9,12 +9,13 @@ Synchronously parse a UA string and return a full environment info object. In br
 ```typescript
 import uaBrowser from 'ua-browser'
 
-uaBrowser(ua?: string): EnvOption
+uaBrowser(ua?: string, options?: { strategy?: DetectStrategy }): EnvOption
 ```
 
 | Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | No | UA string to parse. Omit to read `navigator.userAgent` automatically. |
+| `options.strategy` | [`DetectStrategy`](/en/api/types#detectstrategy) | No | Signal arbitration strategy. Default `'auto'`. |
 
 **Returns:** [`EnvOption`](/en/api/types#envoption)
 
@@ -41,7 +42,7 @@ console.log(info2.device) // 'Mobile'
 The default export also exposes the following static members:
 
 ```typescript
-uaBrowser.detect(ua?: string): Promise<EnvOption>  // async, high-accuracy
+uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
@@ -56,12 +57,13 @@ Async, high-accuracy version of `uaBrowser()`. Internally calls [`getEnvContext(
 **This is the recommended entry point for browser-side code.**
 
 ```typescript
-uaBrowser.detect(ua?: string): Promise<EnvOption>
+uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
 ```
 
 | Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | No | UA string. Omit to read `navigator.userAgent`. |
+| `options.strategy` | [`DetectStrategy`](/en/api/types#detectstrategy) | No | Signal arbitration strategy. Default `'auto'`. |
 
 **Returns:** `Promise<`[`EnvOption`](/en/api/types#envoption)`>`
 
@@ -119,6 +121,7 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 | `windowsVersion` | `string \| null` | Pre-resolved Windows version string from `getWindowsVersion()`. Needed to distinguish Windows 10 vs. 11. |
 | `ctx` | [`EnvContext`](/en/api/types#envcontext) | Full multi-signal context from `getEnvContext()`. **Takes priority over `nav` and `windowsVersion`** when both are provided. |
 | `customBotDefs` | `readonly BotDef[]` | Custom bot detection rules inserted before the `GenericBot` catch-all. Does not affect global state. |
+| `strategy` | [`DetectStrategy`](/en/api/types#detectstrategy) | Signal arbitration strategy. Controls how conflicting signals are resolved. Default `'auto'`. |
 
 **Returns:** [`EnvOption`](/en/api/types#envoption)
 
@@ -146,6 +149,20 @@ import { parseUA } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 const myBots: BotDef[] = [{ name: 'GenericBot', detect: /MyInternalCrawler/ }]
 const result = parseUA(ua, { customBotDefs: myBots })
+
+// hardware-first: Client Hints / hardware wins over spoofed UA
+import { parseUA, getEnvContext } from 'ua-browser'
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx, strategy: 'hardware-first' })
+// e.g. in DevTools Android emulation on a Mac:
+// result.os     → 'MacOS'  (from Client Hints, not spoofed UA)
+// result.device → 'PC'     (from ANGLE renderer, not UA)
+// result.confidence → 'high'
+
+// strict: 'unknown' for every field where signals disagree
+const result = parseUA(navigator.userAgent, { ctx, strategy: 'strict' })
+// result.os         → 'unknown'   (UA says Android, platform says MacOS)
+// result.confidence → 'conflict'
 ```
 
 ---

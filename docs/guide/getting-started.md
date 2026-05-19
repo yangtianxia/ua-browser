@@ -68,6 +68,36 @@ console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
 | `uaBrowser()` | 否（同步） | `confidence: 'low'` | SSR / 简单 UA 查询 |
 | `uaBrowser.detect()` | 是（异步） | `confidence: 'medium'–'high'` | 浏览器端功能检测 |
 
+## 信号策略（strategy）
+
+当硬件信号与 UA 字符串相互矛盾时（例如 Chrome DevTools 设备模拟只改变 UA，不改变 Client Hints 或 `navigator.platform`），默认的 `'auto'` 模式可能返回难以置信的结果。通过 `strategy` 选项声明哪个来源优先：
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// hardware-first：Client Hints / 硬件优先，忽略伪造的 UA
+// 推荐在 DevTools 设备模拟下使用
+const result = await uaBrowser.detect({ strategy: 'hardware-first' })
+// Mac Chrome 开启 Android 模拟时：
+// result.os     → 'MacOS'   （真实平台，而非伪造的 UA）
+// result.device → 'PC'      （真实硬件，而非 UA）
+// result.confidence → 'high'
+
+// strict：信号矛盾的字段设为 'unknown'
+const result = await uaBrowser.detect({ strategy: 'strict' })
+// result.os         → 'unknown'   （UA 说 Android，platform 说 MacOS）
+// result.confidence → 'conflict'
+```
+
+| 策略 | 行为 |
+| :-- | :-- |
+| `'auto'` | 库内部自行决定优先级（默认） |
+| `'ua-first'` | UA 字符串优先；硬件仅补充缺失字段（`arch`、`language`、`platform`） |
+| `'hardware-first'` | Client Hints / 硬件优先；UA 填补其余字段 |
+| `'strict'` | 矛盾字段 → `'unknown'`；`confidence: 'conflict'` |
+
+详见 [`DetectStrategy`](/api/types#detectstrategy)。
+
 ## 命名导出（Tree-shakeable）
 
 按需引入单个功能，Vite / Rollup / webpack 5+ 会自动移除未使用的代码：

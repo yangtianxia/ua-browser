@@ -9,12 +9,13 @@
 ```typescript
 import uaBrowser from 'ua-browser'
 
-uaBrowser(ua?: string): EnvOption
+uaBrowser(ua?: string, options?: { strategy?: DetectStrategy }): EnvOption
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 否 | 要解析的 UA 字符串，省略时自动读取 `navigator.userAgent` |
+| `options.strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 否 | 信号裁决策略，默认 `'auto'` |
 
 **返回值：** [`EnvOption`](/api/types#envoption)
 
@@ -41,7 +42,7 @@ console.log(info2.device) // 'Mobile'
 默认导出对象同时挂载了以下静态成员：
 
 ```typescript
-uaBrowser.detect(ua?: string): Promise<EnvOption>  // 异步高精度版本
+uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
@@ -56,12 +57,13 @@ uaBrowser.VERSION: string
 **这是浏览器端代码的推荐入口。**
 
 ```typescript
-uaBrowser.detect(ua?: string): Promise<EnvOption>
+uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 否 | UA 字符串，省略时自动读取 `navigator.userAgent` |
+| `options.strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 否 | 信号裁决策略，默认 `'auto'` |
 
 **返回值：** `Promise<`[`EnvOption`](/api/types#envoption)`>`
 
@@ -119,6 +121,7 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 | `windowsVersion` | `string \| null` | 由 `getWindowsVersion()` 预先获取的 Windows 版本，用于区分 Windows 10 / 11。 |
 | `ctx` | [`EnvContext`](/api/types#envcontext) | `getEnvContext()` 的返回值，包含完整多信号上下文。**同时传入时优先级高于 `nav` 和 `windowsVersion`**。 |
 | `customBotDefs` | `readonly BotDef[]` | 自定义 Bot 检测规则，插在 `GenericBot` 兜底之前，不影响全局状态。 |
+| `strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 信号裁决策略，控制信号冲突时的处理方式。默认 `'auto'`。 |
 
 **返回值：** [`EnvOption`](/api/types#envoption)
 
@@ -146,6 +149,20 @@ import { parseUA } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 const myBots: BotDef[] = [{ name: 'GenericBot', detect: /MyInternalCrawler/ }]
 const result = parseUA(ua, { customBotDefs: myBots })
+
+// hardware-first：Client Hints / 硬件信号优先，忽略被篡改的 UA
+import { parseUA, getEnvContext } from 'ua-browser'
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx, strategy: 'hardware-first' })
+// 例：Mac Chrome DevTools 开启 Android 模拟时：
+// result.os     → 'MacOS'  （来自 Client Hints，而非伪造的 UA）
+// result.device → 'PC'     （来自 ANGLE 渲染器，而非 UA）
+// result.confidence → 'high'
+
+// strict：信号矛盾的字段返回 'unknown'
+const result = parseUA(navigator.userAgent, { ctx, strategy: 'strict' })
+// result.os         → 'unknown'   （UA 说 Android，platform 说 MacOS）
+// result.confidence → 'conflict'
 ```
 
 ---

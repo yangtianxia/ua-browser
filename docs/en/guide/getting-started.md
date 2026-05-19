@@ -68,6 +68,36 @@ console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
 | `uaBrowser()` | Yes | `confidence: 'low'` | SSR / simple UA lookups |
 | `uaBrowser.detect()` | No (async) | `confidence: 'medium'–'high'` | Browser-side feature detection |
 
+## Signal Strategy
+
+When hardware signals and the UA string contradict each other (e.g. Chrome DevTools device emulation changes the UA but not Client Hints or `navigator.platform`), the default `'auto'` mode may return results that are hard to trust. Use the `strategy` option to declare which source wins:
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// hardware-first: Client Hints / hardware takes priority over the UA string
+// Recommended when you want accurate results even under DevTools emulation
+const result = await uaBrowser.detect({ strategy: 'hardware-first' })
+// On a Mac with Android DevTools emulation:
+// result.os     → 'MacOS'   (real platform, not spoofed UA)
+// result.device → 'PC'      (real hardware, not UA)
+// result.confidence → 'high'
+
+// strict: any field where signals disagree is set to 'unknown'
+const result = await uaBrowser.detect({ strategy: 'strict' })
+// result.os         → 'unknown'   (UA says Android, platform says MacOS)
+// result.confidence → 'conflict'
+```
+
+| Strategy | Behaviour |
+| :-- | :-- |
+| `'auto'` | Library decides internally (default) |
+| `'ua-first'` | UA string wins; hardware only fills gaps (`arch`, `language`, `platform`) |
+| `'hardware-first'` | Client Hints / hardware wins; UA fills the rest |
+| `'strict'` | Conflicting fields → `'unknown'`; `confidence: 'conflict'` |
+
+See [`DetectStrategy`](/en/api/types#detectstrategy) for full details.
+
 ## Named Exports (Tree-shakeable)
 
 Import specific functions — Vite / Rollup / webpack 5+ will eliminate unused code automatically:

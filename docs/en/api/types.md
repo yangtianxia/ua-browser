@@ -19,7 +19,7 @@ interface EnvOption {
   botName:    BotName
   language:   string
   platform:   string
-  confidence: 'high' | 'medium' | 'low'
+  confidence: 'high' | 'medium' | 'low' | 'conflict'
 }
 ```
 
@@ -27,6 +27,7 @@ interface EnvOption {
 - `'high'`: Client Hints `fullVersionList` provided the exact version (Chrome/Edge/Opera/Vivaldi)
 - `'medium'`: `ctx` was provided — multi-signal detection (WebGL, platform info, etc.)
 - `'low'`: UA string only; least accurate after UA freezing
+- `'conflict'`: `strategy: 'strict'` was used and contradictory signals were detected; conflicting fields are set to `'unknown'`
 
 ---
 
@@ -178,15 +179,33 @@ interface EnvContext extends NavContext {
 
 ---
 
+## DetectStrategy
+
+Controls how `parseUA()` arbitrates when hardware signals and the UA string disagree.
+
+```typescript
+type DetectStrategy = 'auto' | 'ua-first' | 'hardware-first' | 'strict'
+```
+
+| Value | Behaviour | `confidence` |
+| :-- | :-- | :-- |
+| `'auto'` | Default. Library decides signal priority internally (current behaviour). | Unchanged |
+| `'ua-first'` | UA string is the primary source. Hardware signals only fill fields the UA cannot provide (`arch`, `language`, `platform`). | `'medium'` or `'low'` |
+| `'hardware-first'` | Client Hints and hardware signals take priority. UA fills fields hardware cannot detect (e.g. `browser`, `engine`). Recommended for browser-side code when DevTools device emulation is in use. | `'high'` or `'medium'` |
+| `'strict'` | Both UA and hardware are evaluated independently. Any field where they disagree is set to `'unknown'`. | `'conflict'` when contradictions exist |
+
+---
+
 ## ParseOptions
 
 The second argument to `parseUA()`.
 
 ```typescript
 interface ParseOptions {
-  nav?:            NavContext          // inject browser environment context
-  windowsVersion?: string | null      // pre-resolved result of getWindowsVersion()
-  ctx?:            EnvContext         // return value of getEnvContext(); takes priority over nav and windowsVersion
-  customBotDefs?:  readonly BotDef[]  // custom bot rules, inserted before the GenericBot catch-all
+  nav?:            NavContext           // inject browser environment context
+  windowsVersion?: string | null       // pre-resolved result of getWindowsVersion()
+  ctx?:            EnvContext          // return value of getEnvContext(); takes priority over nav and windowsVersion
+  customBotDefs?:  readonly BotDef[]   // custom bot rules, inserted before the GenericBot catch-all
+  strategy?:       DetectStrategy      // signal arbitration strategy; default 'auto'
 }
 ```

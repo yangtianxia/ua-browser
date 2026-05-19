@@ -19,7 +19,7 @@ interface EnvOption {
   botName:    BotName
   language:   string
   platform:   string
-  confidence: 'high' | 'medium' | 'low'
+  confidence: 'high' | 'medium' | 'low' | 'conflict'
 }
 ```
 
@@ -27,6 +27,7 @@ interface EnvOption {
 - `'high'`：Client Hints `fullVersionList` 提供了精确版本（Chrome/Edge/Opera/Vivaldi）
 - `'medium'`：传入了 `ctx`，多信号辅助检测（WebGL、平台信息等）
 - `'low'`：纯 UA 字符串解析，UA 冻结后精度最低
+- `'conflict'`：使用了 `strategy: 'strict'` 且检测到相互矛盾的信号；冲突字段被设为 `'unknown'`
 
 ---
 
@@ -178,15 +179,33 @@ interface EnvContext extends NavContext {
 
 ---
 
+## DetectStrategy
+
+控制 `parseUA()` 在硬件信号与 UA 字符串不一致时的裁决方式。
+
+```typescript
+type DetectStrategy = 'auto' | 'ua-first' | 'hardware-first' | 'strict'
+```
+
+| 值 | 行为 | `confidence` |
+| :-- | :-- | :-- |
+| `'auto'` | 默认。库内部自行决定信号优先级（当前行为）。 | 不变 |
+| `'ua-first'` | UA 字符串为主要来源。硬件信号仅补充 UA 无法提供的字段（`arch`、`language`、`platform`）。 | `'medium'` 或 `'low'` |
+| `'hardware-first'` | Client Hints 及硬件信号优先。UA 仅填补硬件无法感知的字段（如 `browser`、`engine`）。DevTools 设备模拟场景下的浏览器端推荐策略。 | `'high'` 或 `'medium'` |
+| `'strict'` | 独立运行 UA 和硬件两套检测逻辑。任何字段如两者结论不一致，该字段设为 `'unknown'`。 | 存在矛盾时为 `'conflict'` |
+
+---
+
 ## ParseOptions
 
 `parseUA()` 的第二个参数。
 
 ```typescript
 interface ParseOptions {
-  nav?:            NavContext          // 注入浏览器环境上下文（浏览器端按需传入）
-  windowsVersion?: string | null      // 预先 await getWindowsVersion() 的结果
-  ctx?:            EnvContext         // getEnvContext() 的返回值，优先级高于 nav 和 windowsVersion
-  customBotDefs?:  readonly BotDef[]  // 自定义 Bot 规则，插在 GenericBot 兜底之前
+  nav?:            NavContext           // 注入浏览器环境上下文（浏览器端按需传入）
+  windowsVersion?: string | null       // 预先 await getWindowsVersion() 的结果
+  ctx?:            EnvContext          // getEnvContext() 的返回值，优先级高于 nav 和 windowsVersion
+  customBotDefs?:  readonly BotDef[]   // 自定义 Bot 规则，插在 GenericBot 兜底之前
+  strategy?:       DetectStrategy      // 信号裁决策略，默认 'auto'
 }
 ```
