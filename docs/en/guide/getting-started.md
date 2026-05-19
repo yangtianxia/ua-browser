@@ -43,9 +43,30 @@ console.log(info)
 //   isBot:      false,
 //   botName:    'unknown',
 //   language:   'en-US',
-//   platform:   'Win32'
+//   platform:   'Win32',
+//   confidence: 'low'    // UA string only
 // }
 ```
+
+## High-Accuracy Detection (`detect`)
+
+`uaBrowser.detect()` is the recommended entry point for browser-side code. It internally calls `getEnvContext()` to collect hardware signals (GPU renderer, CSS safe-area-inset, device pixel ratio, vibration/motion APIs, network type, etc.), then parses with all signals at once.
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// Collects hardware signals, then parses — recommended for browsers
+const result = await uaBrowser.detect()
+
+console.log(result.device)     // 'Mobile' — correct even in desktop mode
+console.log(result.arch)       // 'arm64' or 'x86_64'
+console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+```
+
+| API | Sync | Accuracy | Recommended for |
+| :-- | :-- | :-- | :-- |
+| `uaBrowser()` | Yes | `confidence: 'low'` | SSR / simple UA lookups |
+| `uaBrowser.detect()` | No (async) | `confidence: 'medium'–'high'` | Browser-side feature detection |
 
 ## Named Exports (Tree-shakeable)
 
@@ -97,9 +118,9 @@ const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 console.log(result.osVersion) // '11' or '10'
 ```
 
-## High-Accuracy Architecture Detection (getEnvContext)
+## High-Accuracy Detection (getEnvContext)
 
-`getEnvContext()` collects Client Hints, WebGL renderer, font probes, and other signals in one async call, enabling precise arch detection (e.g. Apple Silicon vs. Intel Mac):
+When you need to reuse the context object or compose it with other options, use `getEnvContext()` directly. It collects Client Hints, WebGL renderer, font probes, and other signals in one async call:
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -107,8 +128,10 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.arch)     // 'arm64' (Apple Silicon) or 'x86_64'
-console.log(result.language) // 'en-US'
+console.log(result.device)     // 'Mobile' — correct even in desktop mode
+console.log(result.arch)       // 'arm64' (Apple Silicon) or 'x86_64'
+console.log(result.language)   // 'en-US'
+console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
 ```
 
 ## SSR Client Hints (parseHeaders)

@@ -12,6 +12,7 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, headl
 ## Features
 
 - **Comprehensive UA detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
+- **Robust device detection** — hardware signals (WebGL GPU renderer, CSS safe-area-inset, DPR, vibration/motion APIs) correctly identify mobile devices even when desktop mode is enabled
 - **Multi-signal arch detection** — `getEnvContext()` collects Client Hints, WebGL renderer, and font probes to accurately distinguish Apple Silicon from Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH` for precise server-side detection (CPU arch, platform) in Chrome / Edge 90+
 - **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
@@ -51,7 +52,8 @@ console.log(info)
 //   isBot:      false,
 //   botName:    'unknown',
 //   language:   'en-US',
-//   platform:   'Win32'
+//   platform:   'Win32',
+//   confidence: 'low'    // UA string only
 // }
 ```
 
@@ -59,7 +61,24 @@ console.log(info)
 
 ## Usage
 
-### Browser
+### Browser (recommended: `detect`)
+
+Use `detect()` for accurate device and arch detection — it collects hardware signals in addition to parsing the UA string:
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+const result = await uaBrowser.detect()
+console.log(result.device)     // 'Mobile' — correct even in desktop mode
+console.log(result.arch)       // 'arm64' or 'x86_64'
+console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+
+if (result.device === 'Mobile') {
+  // redirect to mobile version
+}
+```
+
+### Browser (sync: `uaBrowser`)
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -93,9 +112,9 @@ if (isBot) {
 </script>
 ```
 
-### Multi-signal Architecture Detection
+### Multi-signal Detection
 
-`getEnvContext()` collects Client Hints, WebGL renderer, and other browser signals in one async call — enough to distinguish Apple Silicon from Intel Mac:
+`getEnvContext()` collects Client Hints, WebGL renderer, and other browser signals in one async call. Use it when you need to reuse the context object or compose it with other options:
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -103,7 +122,9 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.arch) // 'arm64' or 'x86_64'
+console.log(result.device)     // 'Mobile' — correct even in desktop mode
+console.log(result.arch)       // 'arm64' or 'x86_64'
+console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
 ```
 
 ### SSR Client Hints
@@ -182,6 +203,7 @@ import {
 | `botName` | `BotName` | Bot name |
 | `language` | `string` | Browser language, e.g. `en-US` |
 | `platform` | `string` | Platform identifier, e.g. `Win32` |
+| `confidence` | `'high' \| 'medium' \| 'low'` | Detection reliability: `high` = Client Hints used; `medium` = `ctx` provided; `low` = UA string only |
 
 > All fields return `'unknown'` when undetected — never an empty string or `null`.
 

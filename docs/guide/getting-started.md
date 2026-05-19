@@ -43,9 +43,30 @@ console.log(info)
 //   isBot:      false,
 //   botName:    'unknown',
 //   language:   'zh-CN',
-//   platform:   'Win32'
+//   platform:   'Win32',
+//   confidence: 'low'    // 纯 UA 字符串
 // }
 ```
+
+## 高精度检测（detect）
+
+`uaBrowser.detect()` 是浏览器端代码的推荐入口。内部调用 `getEnvContext()` 采集硬件信号（GPU 渲染器、CSS safe-area-inset、设备像素比、振动/运动 API、网络类型等），再一次性完成解析。
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// 采集硬件信号后解析——浏览器端推荐写法
+const result = await uaBrowser.detect()
+
+console.log(result.device)     // 'Mobile' — 即便开了桌面模式也能正确识别
+console.log(result.arch)       // 'arm64' 或 'x86_64'
+console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
+```
+
+| API | 是否异步 | 精度 | 适用场景 |
+| :-- | :-- | :-- | :-- |
+| `uaBrowser()` | 否（同步） | `confidence: 'low'` | SSR / 简单 UA 查询 |
+| `uaBrowser.detect()` | 是（异步） | `confidence: 'medium'–'high'` | 浏览器端功能检测 |
 
 ## 命名导出（Tree-shakeable）
 
@@ -97,9 +118,9 @@ const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 console.log(result.osVersion) // '11' 或 '10'
 ```
 
-## 高精度架构检测（getEnvContext）
+## 高精度检测（getEnvContext）
 
-`getEnvContext()` 一次性采集 Client Hints、WebGL 渲染器、字体探针等多维信号，可区分 Apple Silicon 与 Intel Mac：
+需要复用上下文对象或与其他选项组合时，直接使用 `getEnvContext()`。它一次性采集 Client Hints、WebGL 渲染器、字体探针等多维信号：
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -107,8 +128,10 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.arch)     // 'arm64'（Apple Silicon）或 'x86_64'
-console.log(result.language) // 'zh-CN'
+console.log(result.device)     // 'Mobile' — 开了桌面模式也能正确识别
+console.log(result.arch)       // 'arm64'（Apple Silicon）或 'x86_64'
+console.log(result.language)   // 'zh-CN'
+console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
 ```
 
 ## SSR Client Hints（parseHeaders）

@@ -8,7 +8,7 @@ const isEn = computed(() => lang.value === 'en-US')
 const i18n = computed(() => isEn.value
   ? {
       presetsLabel: 'Presets:',
-      currentBrowser: 'Current Browser - Detect Mode',
+      currentBrowser: 'Current Browser',
       placeholder: 'Enter a User Agent string...',
       parse: 'Parse',
       loading: 'Loading...',
@@ -16,6 +16,9 @@ const i18n = computed(() => isEn.value
       no: 'No',
       rawJson: 'Raw JSON',
       empty: 'Parse result will appear here',
+      uaMode: 'UA Mode',
+      detectMode: 'Detect Mode',
+      noDiff: 'All fields match between modes',
       fields: {
         browser: 'Browser',
         version: 'Version',
@@ -28,11 +31,12 @@ const i18n = computed(() => isEn.value
         bot: 'Bot',
         headless: 'Headless',
         webview: 'Webview',
+        confidence: 'Confidence',
       },
     }
   : {
       presetsLabel: '预设：',
-      currentBrowser: '当前浏览器（检测模式）',
+      currentBrowser: '当前浏览器',
       placeholder: '输入 User Agent 字符串...',
       parse: '解析',
       loading: '加载中...',
@@ -40,6 +44,9 @@ const i18n = computed(() => isEn.value
       no: '否',
       rawJson: '原始 JSON',
       empty: '解析结果将显示在此处',
+      uaMode: 'UA 模式',
+      detectMode: '检测模式',
+      noDiff: '两种模式结果完全一致',
       fields: {
         browser: '浏览器',
         version: '版本',
@@ -52,6 +59,7 @@ const i18n = computed(() => isEn.value
         bot: '爬虫',
         headless: 'Headless',
         webview: 'Webview',
+        confidence: '可信度',
       },
     }
 )
@@ -70,6 +78,12 @@ interface ParseResult {
   botName: string
   language: string
   platform: string
+  confidence: 'high' | 'medium' | 'low'
+}
+
+interface ComparisonResult {
+  ua: ParseResult
+  detect: ParseResult
 }
 
 const PRESET_UAS = [
@@ -141,10 +155,11 @@ const PRESET_UAS = [
 
 const uaInput = ref('')
 const result = ref<ParseResult | null>(null)
+const comparisonResult = ref<ComparisonResult | null>(null)
 const selectedKey = ref<string | null>(null)
 const loaded = ref(false)
 
-let _uaBrowser: ((ua?: string) => Promise<ParseResult>) | null = null
+let _uaBrowser: (() => Promise<ParseResult>) | null = null
 let _parseUA: ((ua: string) => ParseResult) | null = null
 
 onMounted(async () => {
@@ -155,10 +170,40 @@ onMounted(async () => {
   useCurrentUA()
 })
 
+const isCompareMode = computed(() => selectedKey.value === 'current' && comparisonResult.value !== null)
+
+function buildTags(r: ParseResult) {
+  const t = i18n.value
+  const list: { label: string; value: string; type: string }[] = []
+  if (r.isBot) list.push({ label: 'Bot', value: r.botName, type: 'danger' })
+  if (r.isHeadless) list.push({ label: 'Headless', value: t.yes, type: 'warning' })
+  if (r.isWebview) list.push({ label: 'Webview', value: t.yes, type: 'warning' })
+  return list
+}
+
+function buildFields(r: ParseResult) {
+  const f = i18n.value.fields
+  const t = i18n.value
+  return [
+    { key: 'browser', label: f.browser, value: r.browser },
+    { key: 'version', label: f.version, value: r.version },
+    { key: 'engine', label: f.engine, value: r.engine },
+    { key: 'os', label: f.os, value: `${r.os} ${r.osVersion}`.trim() },
+    { key: 'device', label: f.device, value: r.device },
+    { key: 'arch', label: f.arch, value: r.arch },
+    { key: 'language', label: f.language, value: r.language },
+    { key: 'platform', label: f.platform, value: r.platform },
+    { key: 'bot', label: f.bot, value: r.isBot ? r.botName : t.no },
+    { key: 'headless', label: f.headless, value: r.isHeadless ? t.yes : t.no },
+    { key: 'webview', label: f.webview, value: r.isWebview ? t.yes : t.no },
+    { key: 'confidence', label: f.confidence, value: r.confidence },
+  ]
+}
+
 function parse() {
   if (!_parseUA || !uaInput.value.trim()) return
-  // 手动输入时清除预设选中
   selectedKey.value = null
+  comparisonResult.value = null
   result.value = _parseUA(uaInput.value.trim())
 }
 
@@ -166,47 +211,38 @@ function usePreset(ua: string) {
   if (!_parseUA) return
   uaInput.value = ua
   selectedKey.value = ua
-  // 预设 UA 不注入 nav，language/platform 返回 unknown
+  comparisonResult.value = null
   result.value = _parseUA(ua)
 }
 
 async function useCurrentUA() {
-  if (!_uaBrowser || typeof navigator === 'undefined') return
+  if (!_uaBrowser || !_parseUA || typeof navigator === 'undefined') return
   uaInput.value = navigator.userAgent
   selectedKey.value = 'current'
-  // 当前浏览器使用默认导出，注入真实 nav 上下文
-  result.value = await _uaBrowser()
+  result.value = null
+  comparisonResult.value = null
+  const ua = navigator.userAgent
+  const [uaResult, detectResult] = await Promise.all([
+    Promise.resolve(_parseUA(ua)),
+    _uaBrowser(),
+  ])
+  comparisonResult.value = { ua: uaResult, detect: detectResult }
 }
 
-const tags = computed(() => {
-  if (!result.value) return []
-  const r = result.value
-  const t = i18n.value
-  const list: { label: string; value: string; type: string }[] = []
-  if (r.isBot) list.push({ label: 'Bot', value: r.botName, type: 'danger' })
-  if (r.isHeadless) list.push({ label: 'Headless', value: t.yes, type: 'warning' })
-  if (r.isWebview) list.push({ label: 'Webview', value: t.yes, type: 'warning' })
-  return list
-})
+const tags = computed(() => result.value ? buildTags(result.value) : [])
+const fields = computed(() => result.value ? buildFields(result.value) : [])
 
-const fields = computed(() => {
-  if (!result.value) return []
-  const r = result.value
-  const f = i18n.value.fields
-  const t = i18n.value
-  return [
-    { label: f.browser, value: r.browser },
-    { label: f.version, value: r.version },
-    { label: f.engine, value: r.engine },
-    { label: f.os, value: `${r.os} ${r.osVersion}`.trim() },
-    { label: f.device, value: r.device },
-    { label: f.arch, value: r.arch },
-    { label: f.language, value: r.language },
-    { label: f.platform, value: r.platform },
-    { label: f.bot, value: r.isBot ? r.botName : t.no },
-    { label: f.headless, value: r.isHeadless ? t.yes : t.no },
-    { label: f.webview, value: r.isWebview ? t.yes : t.no },
-  ]
+const uaTags = computed(() => comparisonResult.value ? buildTags(comparisonResult.value.ua) : [])
+const detectTags = computed(() => comparisonResult.value ? buildTags(comparisonResult.value.detect) : [])
+const uaFields = computed(() => comparisonResult.value ? buildFields(comparisonResult.value.ua) : [])
+const detectFields = computed(() => comparisonResult.value ? buildFields(comparisonResult.value.detect) : [])
+
+const diffKeys = computed(() => {
+  const diffs = new Set<string>()
+  uaFields.value.forEach((field, i) => {
+    if (field.value !== detectFields.value[i]?.value) diffs.add(field.key)
+  })
+  return diffs
 })
 </script>
 
@@ -248,29 +284,100 @@ const fields = computed(() => {
     </div>
 
     <div class="playground-right">
-      <template v-if="result">
+      <!-- Compare mode: Current Browser shows both UA Mode and Detect Mode side by side -->
+      <template v-if="isCompareMode && comparisonResult">
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col__head">
+              <span class="mode-badge mode-badge--ua">{{ i18n.uaMode }}</span>
+            </div>
+            <div v-if="uaTags.length" class="result-tags">
+              <span
+                v-for="tag in uaTags"
+                :key="tag.label"
+                :class="['result-tag', `result-tag--${tag.type}`]"
+              >{{ tag.label }}: {{ tag.value }}</span>
+            </div>
+            <div class="result-grid">
+              <div
+                v-for="field in uaFields"
+                :key="field.key"
+                :class="['result-item', { 'result-item--diff': diffKeys.has(field.key) }]"
+              >
+                <span class="result-label">{{ field.label }}</span>
+                <span :class="['result-value', field.key === 'confidence' ? `confidence--${field.value}` : '']">
+                  {{ field.value || '—' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="compare-col">
+            <div class="compare-col__head">
+              <span class="mode-badge mode-badge--detect">{{ i18n.detectMode }}</span>
+            </div>
+            <div v-if="detectTags.length" class="result-tags">
+              <span
+                v-for="tag in detectTags"
+                :key="tag.label"
+                :class="['result-tag', `result-tag--${tag.type}`]"
+              >{{ tag.label }}: {{ tag.value }}</span>
+            </div>
+            <div class="result-grid">
+              <div
+                v-for="field in detectFields"
+                :key="field.key"
+                :class="['result-item', { 'result-item--diff': diffKeys.has(field.key) }]"
+              >
+                <span class="result-label">{{ field.label }}</span>
+                <span :class="['result-value', field.key === 'confidence' ? `confidence--${field.value}` : '']">
+                  {{ field.value || '—' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="diffKeys.size === 0" class="no-diff-notice">
+          {{ i18n.noDiff }}
+        </div>
+
+        <details class="result-raw">
+          <summary>{{ i18n.rawJson }}</summary>
+          <pre>// {{ i18n.uaMode }}
+{{ JSON.stringify(comparisonResult.ua, null, 2) }}
+
+// {{ i18n.detectMode }}
+{{ JSON.stringify(comparisonResult.detect, null, 2) }}</pre>
+        </details>
+      </template>
+
+      <!-- Single mode: presets or manual UA input -->
+      <template v-else-if="result">
+        <div class="result-mode-bar">
+          <span class="mode-badge mode-badge--ua">{{ i18n.uaMode }}</span>
+        </div>
         <div v-if="tags.length" class="result-tags">
           <span
             v-for="tag in tags"
             :key="tag.label"
             :class="['result-tag', `result-tag--${tag.type}`]"
-          >
-            {{ tag.label }}: {{ tag.value }}
-          </span>
+          >{{ tag.label }}: {{ tag.value }}</span>
         </div>
-
         <div class="result-grid">
-          <div v-for="field in fields" :key="field.label" class="result-item">
+          <div v-for="field in fields" :key="field.key" class="result-item">
             <span class="result-label">{{ field.label }}</span>
-            <span class="result-value">{{ field.value || '—' }}</span>
+            <span :class="['result-value', field.key === 'confidence' ? `confidence--${field.value}` : '']">
+              {{ field.value || '—' }}
+            </span>
           </div>
         </div>
-
         <details class="result-raw">
           <summary>{{ i18n.rawJson }}</summary>
           <pre>{{ JSON.stringify(result, null, 2) }}</pre>
         </details>
       </template>
+
       <div v-else class="result-empty">{{ i18n.empty }}</div>
     </div>
   </div>
@@ -336,6 +443,15 @@ const fields = computed(() => {
   color: #fff;
 }
 
+.preset-btn--current {
+  border-style: dashed;
+  font-weight: 500;
+}
+
+.preset-btn--current.preset-btn--active {
+  border-style: solid;
+}
+
 .playground-input {
   display: flex;
   flex-direction: column;
@@ -385,6 +501,64 @@ const fields = computed(() => {
   opacity: 0.85;
 }
 
+/* Mode badges */
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mode-badge--ua {
+  background: var(--vp-c-bg-mute);
+  color: var(--vp-c-text-2);
+  border: 1px solid var(--vp-c-divider);
+}
+
+.mode-badge--detect {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  border: 1px solid var(--vp-c-brand-2);
+}
+
+/* Single mode result header */
+.result-mode-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Compare layout */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.compare-col {
+  min-width: 0;
+}
+
+.compare-col__head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.no-diff-notice {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+/* Result components */
 .result-empty {
   display: flex;
   align-items: center;
@@ -400,7 +574,7 @@ const fields = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .result-tag {
@@ -422,7 +596,7 @@ const fields = computed(() => {
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 1px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -436,6 +610,12 @@ const fields = computed(() => {
   gap: 2px;
   padding: 10px 12px;
   background: var(--vp-c-bg);
+  transition: background 0.15s;
+}
+
+/* Highlighted when value differs between UA and Detect mode */
+.result-item--diff {
+  background: rgba(245, 158, 11, 0.1) !important;
 }
 
 .result-label {
@@ -451,6 +631,15 @@ const fields = computed(() => {
   color: var(--vp-c-text-1);
   font-family: var(--vp-font-family-mono);
   word-break: break-all;
+}
+
+/* Confidence level colors */
+.confidence--high {
+  color: #16a34a;
+}
+
+.confidence--medium {
+  color: #d97706;
 }
 
 .result-raw {
@@ -474,6 +663,12 @@ const fields = computed(() => {
   font-size: 13px;
   line-height: 1.6;
   overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {

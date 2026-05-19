@@ -111,19 +111,68 @@ type BotName =
 
 ```typescript
 interface NavContext {
-  userAgent:       string
-  platform:        string
-  language:        string
+  userAgent:        string
+  platform:         string
+  language:         string
   browserLanguage?: string
-  maxTouchPoints:  number
-  mimeTypes?:      MimeTypeArray
+  maxTouchPoints:   number
+  mimeTypes?:       MimeTypeArray
   connection?: {
-    saveData?: boolean
+    saveData?:      boolean
+    effectiveType?: '4g' | '3g' | '2g' | 'slow-2g'  // Network Information API
+    rtt?:           number   // 往返时延（毫秒）
+    downlink?:      number   // 有效带宽（Mbps）
   }
   userAgentData?: {
     platform: string
     getHighEntropyValues(hints: string[]): Promise<Record<string, string>>
   }
+}
+```
+
+---
+
+## EnvContext
+
+继承自 `NavContext`，附加 `getEnvContext()` 采集的硬件与浏览器信号。传给 `parseUA({ ctx })` 以启用多信号检测。
+
+```typescript
+interface EnvContext extends NavContext {
+  // WebGL GPU
+  webglRenderer?:           string   // 如 'Adreno (TM) 730'、'Apple GPU'、'ANGLE (Intel...)'
+  webglVendor?:             string   // 如 'Qualcomm'、'Apple'、'Google Inc. (Intel)'
+  webglMaxTextureSize?:     number   // 移动端 ≤8192；桌面端 ≥16384
+  webglFragPrecision?:      number   // 片元着色器浮点精度
+  webglCompressedFormats?: {
+    s3tc:  boolean   // DXT/BC 格式——桌面 GPU（DirectX 系）
+    pvrtc: boolean   // PowerVR——仅 iOS
+    etc2:  boolean   // GLES 3.0+——Android（Adreno/Mali/PowerVR）
+    astc:  boolean   // Adreno 4xx+ / Mali Txx+ / Apple A8+
+  }
+
+  // 屏幕与显示
+  devicePixelRatio?:   number   // 手机 ≥3，MacBook 2，外接显示器 1–2
+  screenWidth?:        number
+  screenHeight?:       number
+  safeAreaInsetTop?:   number   // >0 表示 iOS 刘海 / 灵动岛设备
+
+  // 硬件 API
+  hardwareConcurrency?: number   // 逻辑 CPU 核心数
+  deviceMemory?:        number   // 内存 GB（取整值，如 4、8）
+  audioSampleRate?:     number   // 通常为 44100 或 48000
+  hasVibration?:        boolean  // navigator.vibrate 存在——仅移动端浏览器
+  hasDeviceMotion?:     boolean  // DeviceMotionEvent 可用——移动端传感器
+
+  // 输入
+  pointerType?:      'coarse' | 'fine' | 'none'  // 主指针精度
+  hoverCapability?:  boolean                       // 主输入设备是否支持 hover
+
+  // Client Hints（高熵值）
+  highEntropyData?: UAHighEntropyValues  // getHighEntropyValues() 的返回值
+  windowsVersion?:  string | null        // getWindowsVersion() 的解析结果
+
+  // 字体探针
+  fontProbes?: Record<string, boolean>  // 操作系统特有字体可用性
 }
 ```
 

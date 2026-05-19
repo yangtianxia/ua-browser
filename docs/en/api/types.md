@@ -111,19 +111,68 @@ An injectable subset of the browser environment, used to isolate side effects an
 
 ```typescript
 interface NavContext {
-  userAgent:       string
-  platform:        string
-  language:        string
+  userAgent:        string
+  platform:         string
+  language:         string
   browserLanguage?: string
-  maxTouchPoints:  number
-  mimeTypes?:      MimeTypeArray
+  maxTouchPoints:   number
+  mimeTypes?:       MimeTypeArray
   connection?: {
-    saveData?: boolean
+    saveData?:       boolean
+    effectiveType?:  '4g' | '3g' | '2g' | 'slow-2g'  // Network Information API
+    rtt?:            number   // round-trip time in milliseconds
+    downlink?:       number   // effective bandwidth in Mbps
   }
   userAgentData?: {
     platform: string
     getHighEntropyValues(hints: string[]): Promise<Record<string, string>>
   }
+}
+```
+
+---
+
+## EnvContext
+
+Extends `NavContext` with additional hardware and browser signals collected by `getEnvContext()`. Pass to `parseUA({ ctx })` for multi-signal detection.
+
+```typescript
+interface EnvContext extends NavContext {
+  // WebGL GPU
+  webglRenderer?:           string   // e.g. 'Adreno (TM) 730', 'Apple GPU', 'ANGLE (Intel...)'
+  webglVendor?:             string   // e.g. 'Qualcomm', 'Apple', 'Google Inc. (Intel)'
+  webglMaxTextureSize?:     number   // mobile ≤8192; desktop ≥16384
+  webglFragPrecision?:      number   // fragment shader float precision
+  webglCompressedFormats?: {
+    s3tc:  boolean   // DXT/BC formats — desktop GPU (DirectX lineage)
+    pvrtc: boolean   // PowerVR — iOS only
+    etc2:  boolean   // GLES 3.0+ — Android (Adreno/Mali/PowerVR)
+    astc:  boolean   // Adreno 4xx+ / Mali Txx+ / Apple A8+
+  }
+
+  // Screen & display
+  devicePixelRatio?:   number   // phone ≥3, MacBook 2, external monitor 1–2
+  screenWidth?:        number
+  screenHeight?:       number
+  safeAreaInsetTop?:   number   // >0 on iOS with notch / Dynamic Island
+
+  // Hardware APIs
+  hardwareConcurrency?: number   // logical CPU cores
+  deviceMemory?:        number   // RAM in GB (rounded, e.g. 4, 8)
+  audioSampleRate?:     number   // typically 44100 or 48000
+  hasVibration?:        boolean  // navigator.vibrate present — mobile browsers only
+  hasDeviceMotion?:     boolean  // DeviceMotionEvent available — mobile sensor
+
+  // Input
+  pointerType?:      'coarse' | 'fine' | 'none'  // primary pointer precision
+  hoverCapability?:  boolean                       // primary input supports hover
+
+  // Client Hints (high entropy)
+  highEntropyData?: UAHighEntropyValues  // result of getHighEntropyValues()
+  windowsVersion?:  string | null        // resolved by getWindowsVersion()
+
+  // Font probes
+  fontProbes?: Record<string, boolean>  // OS-specific font availability
 }
 ```
 
