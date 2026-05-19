@@ -47,4 +47,46 @@ describe('detectDevice', () => {
   it('empty UA → PC', () => {
     expect(detectDevice('')).toBe('PC')
   })
+
+  describe('desktop mode override (env signals)', () => {
+    // iPhone requesting desktop site: UA looks like Mac, but env reveals touch-only phone
+    const desktopModeIphoneUA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/604.1'
+    // Android requesting desktop site: UA looks like Linux x86_64
+    const desktopModeAndroidUA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+
+    it('iPhone in desktop mode (coarse+no-hover, screen<768) → Mobile', () => {
+      expect(detectDevice(desktopModeIphoneUA, {
+        platform: 'MacIntel', maxTouchPoints: 5,
+        pointerType: 'coarse', hoverCapability: false, screenWidth: 390
+      })).toBe('Mobile')
+    })
+
+    it('iPad in desktop mode (coarse+no-hover, screen≥768) → Tablet', () => {
+      expect(detectDevice(desktopModeIphoneUA, {
+        platform: 'MacIntel', maxTouchPoints: 5,
+        pointerType: 'coarse', hoverCapability: false, screenWidth: 820
+      })).toBe('Tablet')
+    })
+
+    it('Android phone in desktop mode (coarse+no-hover, screen<768) → Mobile', () => {
+      expect(detectDevice(desktopModeAndroidUA, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        pointerType: 'coarse', hoverCapability: false, screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('touch laptop (coarse+hover=true) → PC, not overridden', () => {
+      // Surface-style: primary pointer is touch but mouse/touchpad provides hover
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 10,
+        pointerType: 'coarse', hoverCapability: true, screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    it('desktop with no env signals → PC', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0
+      })).toBe('PC')
+    })
+  })
 })

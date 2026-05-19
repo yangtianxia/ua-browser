@@ -15,6 +15,8 @@ export interface EnvContext extends NavContext {
   hardwareConcurrency?: number
   deviceMemory?: number
   devicePixelRatio?: number
+  screenWidth?: number
+  screenHeight?: number
   pointerType?: 'coarse' | 'fine' | 'none'
   hoverCapability?: boolean
   fontProbes?: Record<string, boolean>
@@ -118,6 +120,8 @@ export async function getEnvContext(): Promise<EnvContext> {
 
   if (typeof window !== 'undefined') {
     ctx.devicePixelRatio = window.devicePixelRatio
+    ctx.screenWidth  = window.screen?.width
+    ctx.screenHeight = window.screen?.height
     ctx.pointerType = getPointerType()
     ctx.hoverCapability = getHoverCapability()
     ctx.fontProbes = probeFonts()
