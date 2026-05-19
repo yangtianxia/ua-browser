@@ -116,6 +116,14 @@ describe('parseUA — full pipeline', () => {
     expect(r.engine).toBe('WebKit')
   })
 
+  it('DuckDuckGo v26+ on iOS (Ddg/ token) — not mis-detected as Safari', () => {
+    const r = parseUA(UA.duckduckgo.iosDdg)
+    expect(r.browser).toBe('DuckDuckGo')
+    expect(r.version).toBe('26.4')
+    expect(r.os).toBe('iOS')
+    expect(r.engine).toBe('WebKit')
+  })
+
   it('DuckDuckGo on Android — not mis-detected as Chrome despite Chrome/ in UA', () => {
     const r = parseUA(UA.duckduckgo.android)
     expect(r.browser).toBe('DuckDuckGo')

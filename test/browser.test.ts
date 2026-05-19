@@ -358,6 +358,12 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('5')
     })
 
+    it('detects DuckDuckGo v26+ on iOS (Ddg/ token)', () => {
+      const r = detectBrowser(UA.duckduckgo.iosDdg)
+      expect(r.browser).toBe('DuckDuckGo')
+      expect(r.version).toBe('26.4')
+    })
+
     it('detects Puffin', () => {
       const r = detectBrowser(UA.puffin.android)
       expect(r.browser).toBe('Puffin')

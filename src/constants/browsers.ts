@@ -31,7 +31,7 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   { name: 'Vivaldi',       priority: 80,  detect: /Vivaldi/,             versionPattern: /Vivaldi\/([\d.]+)/ },
   { name: 'Yandex',           priority: 90,  detect: /YaBrowser/,           versionPattern: /YaBrowser\/([\d.]+)/ },
   { name: 'Samsung Internet', priority: 92,  detect: /SamsungBrowser/,      versionPattern: /SamsungBrowser\/([\d.]+)/ },
-  { name: 'DuckDuckGo',       priority: 94,  detect: /DuckDuckGo\//,        versionPattern: /DuckDuckGo\/([\d.]+)/ },
+  { name: 'DuckDuckGo',       priority: 94,  detect: /(DuckDuckGo|Ddg)\//,  versionPattern: [/DuckDuckGo\/([\d.]+)/, /Ddg\/([\d.]+)/] },
   { name: 'Puffin',           priority: 96,  detect: /Puffin\//,            versionPattern: /Puffin\/([\d.]+)/ },
   { name: 'Coc Coc',       priority: 130, detect: /coc_coc_browser/,     versionPattern: /coc_coc_browser\/([\d.]+)/ },
   { name: 'Kindle',        priority: 140, detect: /(Kindle|Silk\/)/,     versionPattern: /Version\/([\d.]+)/ },
