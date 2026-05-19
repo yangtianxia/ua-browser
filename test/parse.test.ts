@@ -108,6 +108,21 @@ describe('parseUA — full pipeline', () => {
     expect(r.os).toBe('Android')
   })
 
+  it('DuckDuckGo on iOS — not mis-detected as Safari despite Version/ and Safari/ in UA', () => {
+    const r = parseUA(UA.duckduckgo.ios)
+    expect(r.browser).toBe('DuckDuckGo')
+    expect(r.version).toBe('7')
+    expect(r.os).toBe('iOS')
+    expect(r.engine).toBe('WebKit')
+  })
+
+  it('DuckDuckGo on Android — not mis-detected as Chrome despite Chrome/ in UA', () => {
+    const r = parseUA(UA.duckduckgo.android)
+    expect(r.browser).toBe('DuckDuckGo')
+    expect(r.version).toBe('5')
+    expect(r.os).toBe('Android')
+  })
+
   it('DingTalk mobile', () => {
     const r = parseUA(UA.dingtalk.mobile)
     expect(r.browser).toBe('DingTalk')
