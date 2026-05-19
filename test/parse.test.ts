@@ -113,6 +113,27 @@ describe('parseUA — full pipeline', () => {
     expect(r.browser).toBe('DingTalk')
     expect(r.os).toBe('Android')
   })
+
+  it('HarmonyOS legacy — Huawei browser on HarmonyOS', () => {
+    const r = parseUA(UA.harmonyOs.legacy)
+    expect(r.browser).toBe('Huawei')
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.engine).toBe('Blink')
+  })
+
+  it('HarmonyOS Next — Chrome on HarmonyOS (no HuaweiBrowser token)', () => {
+    const r = parseUA(UA.harmonyOs.next)
+    expect(r.browser).toBe('Chrome')
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.engine).toBe('Blink')
+  })
+
+  it('HarmonyOS ArkWeb — Chrome on HarmonyOS with ArkWeb engine', () => {
+    const r = parseUA(UA.harmonyOs.arkWeb)
+    expect(r.browser).toBe('Chrome')
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.engine).toBe('ArkWeb')
+  })
 })
 
 describe('parseUA — webview detection', () => {

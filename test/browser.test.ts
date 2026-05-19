@@ -209,6 +209,134 @@ describe('detectBrowser', () => {
       expect(r.browser).toBe('Meituan')
       expect(r.version).toBe('1.0')
     })
+
+    it('detects QQ app', () => {
+      const r = detectBrowser(UA.qq.qq)
+      expect(r.browser).toBe('QQ')
+      expect(r.version).toBe('8.9.28.635')
+    })
+
+    it('detects 360 (QihooBrowser shell)', () => {
+      const r = detectBrowser(UA['360'].desktop)
+      expect(r.browser).toBe('360')
+      expect(r.version).toBe('12.0')
+    })
+
+    it('detects Sogou desktop', () => {
+      const r = detectBrowser(UA.sogou.desktop)
+      expect(r.browser).toBe('Sogou')
+      expect(r.version).toBe('2.X')
+    })
+
+    it('detects Sogou mobile', () => {
+      const r = detectBrowser(UA.sogou.mobile)
+      expect(r.browser).toBe('Sogou')
+      expect(r.version).toBe('6.14.3')
+    })
+
+    it('detects Maxthon', () => {
+      const r = detectBrowser(UA.maxthon.desktop)
+      expect(r.browser).toBe('Maxthon')
+      expect(r.version).toBe('6.1.3.1000')
+    })
+
+    it('detects Liebao via Chrome lookup (LBBROWSER)', () => {
+      const r = detectBrowser(UA.liebao.desktop)
+      expect(r.browser).toBe('Liebao')
+      expect(r.version).toBe('6.5') // Chrome 57 → 6.5
+    })
+
+    it('detects 2345Explorer via Chrome lookup', () => {
+      const r = detectBrowser(UA['2345explorer'].desktop)
+      expect(r.browser).toBe('2345Explorer')
+      expect(r.version).toBe('10.0') // Chrome 69 → 10.0
+    })
+
+    it('detects 115Browser', () => {
+      const r = detectBrowser(UA['115browser'].desktop)
+      expect(r.browser).toBe('115Browser')
+      expect(r.version).toBe('23.9.3.1')
+    })
+
+    it('detects TheWorld', () => {
+      const r = detectBrowser(UA.theWorld.desktop)
+      expect(r.browser).toBe('TheWorld')
+      expect(r.version).toBe('7.0.0.1')
+    })
+
+    it('detects XiaoMi (MiuiBrowser)', () => {
+      const r = detectBrowser(UA.xiaomi.mobile)
+      expect(r.browser).toBe('XiaoMi')
+      expect(r.version).toBe('14.0.9')
+    })
+
+    it('detects Vivo browser', () => {
+      const r = detectBrowser(UA.vivo.mobile)
+      expect(r.browser).toBe('Vivo')
+      expect(r.version).toBe('17.0.0.0')
+    })
+
+    it('detects Huawei browser', () => {
+      const r = detectBrowser(UA.huawei.mobile)
+      expect(r.browser).toBe('Huawei')
+      expect(r.version).toBe('12.0.0.303')
+    })
+
+    it('detects Huawei browser (old format — Version/ fallback)', () => {
+      const r = detectBrowser(UA.huawei.old)
+      expect(r.browser).toBe('Huawei')
+      expect(r.version).toBe('4.0') // HuaweiBrowser has no /version → falls back to Version/4.0
+    })
+
+    it('HarmonyOS Next UA (no HuaweiBrowser token) is detected as Chrome', () => {
+      expect(detectBrowser(UA.harmonyOs.next).browser).toBe('Chrome')
+    })
+
+    it('HarmonyOS ArkWeb UA (no HuaweiBrowser token) is detected as Chrome', () => {
+      expect(detectBrowser(UA.harmonyOs.arkWeb).browser).toBe('Chrome')
+    })
+
+    it('detects OPPO browser (HeyTap)', () => {
+      const r = detectBrowser(UA.oppo.mobile)
+      expect(r.browser).toBe('OPPO')
+      expect(r.version).toBe('40.8.32.1')
+    })
+
+    it('detects Quark', () => {
+      const r = detectBrowser(UA.quark.mobile)
+      expect(r.browser).toBe('Quark')
+      expect(r.version).toBe('6.8.0.560')
+    })
+
+    it('detects Qiyu', () => {
+      const r = detectBrowser(UA.qiyu.mobile)
+      expect(r.browser).toBe('Qiyu')
+      expect(r.version).toBe('3.9.1')
+    })
+
+    it('detects Weibo', () => {
+      const r = detectBrowser(UA.weibo.mobile)
+      expect(r.browser).toBe('Weibo')
+      expect(r.version).toBe('13.4.0')
+    })
+
+    it('detects Douban', () => {
+      const r = detectBrowser(UA.douban.mobile)
+      expect(r.browser).toBe('Douban')
+      expect(r.version).toBe('7.54.0')
+    })
+
+    it('detects Suning', () => {
+      const r = detectBrowser(UA.suning.mobile)
+      expect(r.browser).toBe('Suning')
+      expect(r.version).toBe('9.3.0')
+    })
+
+    it('detects iQiYi', () => {
+      const r = detectBrowser(UA.iqiyi.mobile)
+      expect(r.browser).toBe('iQiYi')
+      expect(r.version).toBe('13.4.0')
+    })
   })
 
   describe('international browsers', () => {
@@ -244,6 +372,14 @@ describe('detectBrowser', () => {
 
     it('WeChat UA is detected as Wechat, not Chrome', () => {
       expect(detectBrowser(UA.wechat.mobile).browser).toBe('Wechat')
+    })
+
+    it('360 QihooBrowser UA is detected as 360, not Chrome', () => {
+      expect(detectBrowser(UA['360'].desktop).browser).toBe('360')
+    })
+
+    it('Quark UA is detected as Quark, not Chrome', () => {
+      expect(detectBrowser(UA.quark.mobile).browser).toBe('Quark')
     })
   })
 

@@ -69,6 +69,63 @@ export const UA = {
   douyin: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 aweme/20.6.0 app_version/20.6.0'
   },
+  // Desktop domestic browsers
+  '360': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 QihooBrowser/12.0'
+  },
+  sogou: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 SE 2.X MetaSr 1.0',
+    mobile:  'Mozilla/5.0 (Linux; Android 9; SM-G965F) AppleWebKit/537.36 (KHTML, like Gecko) SogouMobileBrowser/6.14.3 Chrome/87.0.4280.141 Mobile Safari/537.36'
+  },
+  maxthon: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 Maxthon/6.1.3.1000'
+  },
+  liebao: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36 LBBROWSER'
+  },
+  '2345explorer': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 2345Explorer/10.0.0.16835'
+  },
+  '115browser': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 115Browser/23.9.3.1'
+  },
+  theWorld: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 TheWorld 7.0.0.1'
+  },
+  // Mobile brand browsers
+  xiaomi: {
+    mobile: 'Mozilla/5.0 (Linux; Android 13; M2012K11AC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36 XiaoMi/MiuiBrowser/14.0.9'
+  },
+  vivo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 13; V2209A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36 VivoBrowser/17.0.0.0'
+  },
+  huawei: {
+    mobile: 'Mozilla/5.0 (Linux; Android 11; ELS-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.127 HuaweiBrowser/12.0.0.303 Mobile Safari/537.36',
+    // Old format: HuaweiBrowser token without /version — falls back to Version/ pattern
+    old:    'Mozilla/5.0 (Linux; Android 6.0; PLK-AL10 Build/HuaweiPLK-AL10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 HuaweiBrowser Mobile Safari/537.36'
+  },
+  oppo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; CPH2399) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.74 Mobile Safari/537.36 HeyTapBrowser/40.8.32.1'
+  },
+  quark: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/98.0.4758.101 Mobile Safari/537.36 Quark/6.8.0.560'
+  },
+  qiyu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 9; vivo X23) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Mobile Safari/537.36 Qiyu/3.9.1'
+  },
+  // App WebViews (previously missing)
+  weibo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Weibo weibo__13.4.0'
+  },
+  douban: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 com.douban.frodo/7.54.0'
+  },
+  suning: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 SNEBUY-APP9.3.0'
+  },
+  iqiyi: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 IqiyiApp IqiyiVersion/13.4.0'
+  },
   // International browsers
   samsungInternet: {
     mobile: 'Mozilla/5.0 (Linux; Android 14; SAMSUNG SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/24.0 Chrome/117.0.0.0 Mobile Safari/537.36'
