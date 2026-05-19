@@ -39,7 +39,7 @@ const BRAND_MAP: Partial<Record<BrowserName, string[]>> = {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
-  const effectiveNav: NavContext | undefined = options.ctx ?? options.nav
+  const effectiveNav: EnvContext | NavContext | undefined = options.ctx ?? options.nav
   const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
