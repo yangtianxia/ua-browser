@@ -1,116 +1,115 @@
 # ua-browser
 
-## 1.4.0
-
-### Minor Changes
-
-- 新增 AI Bot 检测扩展与 UA 冻结防御
-
-  - 新增 9 个 AI/LLM 爬虫检测：`Applebot-Extended`、`OAI-SearchBot`、`ChatGPT-User`、`Google-Extended`、`Meta-ExternalAgent`、`Amazonbot`、`Diffbot`、`cohere-ai`、`YouBot`
-  - 新增 `customBotDefs` 选项（`ParseOptions` 及 `detectBot()`），支持注入自定义 Bot 规则，无全局副作用
-  - 导出 `BotDef` 类型，方便构造自定义规则
-  - UA 冻结防御：当 `ctx.highEntropyData.fullVersionList` 可用时，优先使用 Client Hints 精确版本替代冻结的 UA 版本号（适用于 Chrome、Edge、Opera、Vivaldi）
-  - `EnvOption` 新增 `confidence` 字段（`'high' | 'medium' | 'low'`），反映检测结果的可信度
-
 ## 1.3.1
 
 ### Patch Changes
 
-- Added `uaBrowser.detect()` async API with optimized `EnvContext` construction
+- 新增 uaBrowser.detect() 异步检测方法及 EnvContext 优化
 
 ## 1.3.0
 
 ### Minor Changes
 
-- Removed miniapp runtime detection (`isWechatMiniapp` etc.) due to inconsistent web-view injection behavior across platforms; to be re-implemented after further validation
+- 移除小程序运行时检测功能：`isWechatMiniapp`、`isAlipayMiniapp`、`isBaiduMiniapp`、`isDouyinMiniapp`、`isQQMiniapp`、`isKuaishouMiniapp` 及 `parse.ts` 中对应检测块。各平台在 web-view 组件中注入全局变量的方式各有差异，当前实现可靠性存在不确定性，待验证各平台官方文档后重新实现
 
 ## 1.2.0
 
 ### Minor Changes
 
-- Added detection for 7 mainstream app WebViews (Bilibili, Kuaishou, Xiaohongshu, Feishu, Toutiao, JD, Meituan). Added miniapp runtime detection across 6 platforms (WeChat, Alipay, Baidu, Douyin, QQ, Kuaishou). Added TV device type and Android tablet rules. Added Tizen/KaiOS OS detection. Added Samsung Internet/DuckDuckGo/Puffin browser detection. Added AI crawler detection (GPTBot, ClaudeBot, etc.). Removed 5 discontinued browsers.
+- 新增七款主流 App 内嵌 Webview 检测：哔哩哔哩、快手、小红书、飞书/Lark、今日头条、京东、美团
+
+- 新增六平台小程序运行时检测及辅助函数：
+
+  - 微信：`isWechatMiniapp()`（原有）→ `browser: 'Wechat Miniapp'`
+  - 支付宝：`isAlipayMiniapp()` → `browser: 'Alipay Miniapp'`
+  - 百度：`isBaiduMiniapp()` → `browser: 'Baidu Miniapp'`
+  - 抖音：`isDouyinMiniapp()` → `browser: 'Douyin Miniapp'`
+  - QQ：`isQQMiniapp()` → `browser: 'QQ Miniapp'`
+  - 快手：`isKuaishouMiniapp()` → `browser: 'Kuaishou Miniapp'`
+
+- 移除 5 个已停更浏览器：Arora、Lunascape、QupZilla、Iceweasel、Iceape
 
 ## 1.1.0
 
 ### Minor Changes
 
-- Introduced multi-signal fusion detection architecture (v1.1.0):
+- 新增多信号融合检测架构：
 
-  - `getEnvContext()` collects all browser environment signals in one pass (WebGL, Client Hints, font probing, CSS media features)
-  - `ParseOptions.ctx` feeds EnvContext into `parseUA()` for multi-signal detection
-  - `parseHeaders()` + `ACCEPT_CH` constant for server-side HTTP Client Hints detection (SSR scenarios)
-  - `detectArch()` upgraded to a 4-tier priority chain (Client Hints → WebGL → platform → UA string)
-  - `isWebview()` now detects iOS WKWebView (complementing existing Android `;wv` logic)
-  - HarmonyOS Next (5.0+) version extracted directly, no longer dependent on Android compatibility layer version
-  - Added HarmonyOS version mapping (Android 11→3, 12→3, 13→4)
-  - Added OpenHarmony OS detection (independent OsName)
-  - Added ArkWeb engine detection
+  - `getEnvContext()` 一次性采集所有浏览器环境信号（WebGL、Client Hints、字体探针、CSS media features）
+  - `ParseOptions.ctx` 新选项，将 EnvContext 传入 `parseUA()` 以启用多信号检测
+  - `parseHeaders()` + `ACCEPT_CH` 常量：服务端通过 HTTP Client Hints 头部实现精准检测（SSR 场景）
+  - `detectArch()` 升级为四层优先级链（Client Hints → WebGL → platform → UA 字符串）
+  - `isWebview()` 新增 iOS WKWebView 检测（补充 Android `;wv` 现有逻辑）
+  - HarmonyOS Next（5.0+）版本直接提取，无需依赖 Android 兼容层版本号
+  - 新增 HarmonyOS 版本映射（Android 11→3、12→3、13→4）
+  - 新增 OpenHarmony OS 检测（独立 OsName）
+  - 新增 ArkWeb 引擎检测
 
 ## 1.0.2
 
 ### Patch Changes
 
-- Fix OS detection order bugs and iOS Safari version parsing
+- 修复 OS 检测顺序及 iOS Safari 版本误判
 
-  - Fix Chrome OS misidentified as Linux (Chrome OS UA contains X11)
-  - Fix HarmonyOS misidentified as Android (HarmonyOS UA contains Android)
-  - Fix Windows Phone misidentified as Windows (Windows Phone UA contains Windows)
-  - Fix iOS 26+ Safari osVersion showing frozen value (18.7) instead of real version from Version/ token
-  - Fix Playground mobile layout: reduce padding for two-column result grid on small screens
+  - 修复 Chrome OS 被误识别为 Linux（Chrome OS UA 含 X11）
+  - 修复 HarmonyOS 被误识别为 Android（HarmonyOS UA 含 Android）
+  - 修复 Windows Phone 被误识别为 Windows（Windows Phone UA 含 Windows）
+  - 修复 iOS 26+ Safari osVersion 显示冻结值（18.7）而非 Version/ 真实版本
+  - 修复 Playground 手机端边距过大导致结果只显示一列的问题
 
 ## 1.0.1
 
 ### Patch Changes
 
-- Added browser, bot, and OS detection support; improved docs and i18n
+- 新增浏览器、爬虫、操作系统检测支持，完善文档与国际化
 
-  - Added browser detection: Samsung Internet, DuckDuckGo, Puffin
-  - Added AI bot detection: GPTBot, ClaudeBot, PerplexityBot, CCBot, AdsBot
-  - Added OS detection: Tizen, KaiOS
-  - Added device type: TV (Smart TV); fixed Android tablet misidentification
-  - Added headless detection markers: jsdom, Selenium, Playwright
-  - Playground supports Chinese / English UI switching
-  - Added full English VitePress documentation site (i18n)
+  - 新增浏览器检测：Samsung Internet、DuckDuckGo、Puffin
+  - 新增 AI 爬虫检测：GPTBot、ClaudeBot、PerplexityBot、CCBot、AdsBot
+  - 新增操作系统检测：Tizen、KaiOS
+  - 新增设备类型：TV（智能电视），修复 Android 平板识别缺失
+  - 无头浏览器检测补充 jsdom、Selenium、Playwright 标记
+  - Playground 支持中英文界面切换
+  - 新增完整英文 VitePress 文档站（i18n 双语）
 
 ## 1.0.0
 
 ### Major Changes
 
-**Full architecture rewrite — modular pure-function design.**
+**架构重写，全面升级为模块化纯函数设计。**
 
-#### Breaking Changes
+#### 破坏性变更
 
-- `result.platfrom` (typo) renamed to `result.platform`
-- Removed `EnvPart` type — use `EnvOption` directly
-- Removed singleton class — replaced by pure function `parseUA(ua, options?)`
+- \`result.platfrom\`（拼写错误）已更正为 \`result.platform\`
+- 移除 \`EnvPart\` 类型，统一使用 \`EnvOption\`
+- 移除单例模式，改为纯函数 \`parseUA(ua, options?)\`
 
-#### New Features
+#### 新增功能
 
-- **`parseUA(ua, options?)`** — pure function, ideal for SSR / Node.js
-- **`getNavContext()`** — reads real `navigator`, safely degrades in Node.js
-- **`getWindowsVersion(nav)`** — async accurate Windows 10 / 11 detection
-- **`detectBot(ua)`** — standalone bot detector, returns `{ isBot, botName }`
-- **`detectArch(ua)`** — standalone CPU architecture detector
-- **`detectHeadless(ua)`** — standalone headless browser detector
-- **`getLanguage(nav)`** — extracts normalized language code from `NavContext`
-- **`VERSION`** — exports current library version
-- Named exports with tree-shaking support
-- `NavContext` injection eliminates global side effects; all detectors testable in Node.js
+- **\`parseUA(ua, options?)\`** — 纯函数版本，适用于 SSR / Node.js 环境
+- **\`getNavContext()\`** — 读取真实 \`navigator\` 并返回 \`NavContext\`，Node.js 下安全降级
+- **\`getWindowsVersion(nav)\`** — 异步精确区分 Windows 10 / 11
+- **\`detectBot(ua)\`** — 独立爬虫检测器，返回 \`{ isBot, botName }\`
+- **\`detectArch(ua)\`** — 独立 CPU 架构检测器
+- **\`detectHeadless(ua)\`** — 独立无头浏览器检测器
+- **\`getLanguage(nav)\`** — 从 \`NavContext\` 提取标准化语言代码
+- **\`VERSION\`** — 导出当前库版本号
+- 新增命名导出，支持 Tree-shaking
+- 新增 \`NavContext\` 注入机制，消除全局副作用，所有检测器可在 Node.js 测试
 
-#### Detection Enhancements
+#### 检测能力扩展
 
-- Added browsers: Samsung Internet, DuckDuckGo, Puffin
-- Added OS: Tizen, KaiOS
-- Added device type: `TV` (Smart TV)
-- Android without `Mobile` marker now correctly identified as Tablet
-- Added AI bot detection: GPTBot, ClaudeBot, PerplexityBot, CCBot, AdsBot
-- Added headless markers: jsdom, Selenium, Playwright
+- 新增浏览器：Samsung Internet、DuckDuckGo、Puffin
+- 新增操作系统：Tizen、KaiOS
+- 新增设备类型：\`TV\`（智能电视）
+- 新增 Android 无 \`Mobile\` 标记时自动识别为平板
+- 新增 AI 爬虫检测：GPTBot、ClaudeBot、PerplexityBot、CCBot、AdsBot
+- 新增无头浏览器标记：jsdom、Selenium、Playwright
 
-#### Build System
+#### 构建系统
 
-- Migrated from Rollup + Babel + shelljs to **tsup + TypeScript 5**
-- Output formats: ESM (`.mjs`), CommonJS (`.cjs`), IIFE (`.min.js`), type declarations (`.d.ts` / `.d.cts`)
-- Added **Vitest** test suite
+- 从 Rollup + Babel + shelljs 迁移至 **tsup + TypeScript 5**
+- 产物格式：ESM（\`.mjs\`）、CommonJS（\`.cjs\`）、IIFE（\`.min.js\`）、类型声明（\`.d.ts\` / \`.d.cts\`）
+- 新增 **Vitest** 测试套件
 
 ---
 
@@ -118,4 +117,4 @@
 
 ### Patch Changes
 
-- Fixed version parsing edge cases
+- 修复版本解析边界问题
