@@ -181,13 +181,27 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
-  // ── hardware-first: OS from hardware signals ────────────────────────────────
+  // ── hardware-first: OS + osVersion from hardware signals ───────────────────
   if (strategy === 'hardware-first' && options.ctx) {
     const hwOs = osFromHardware(options.ctx)
-    if (hwOs !== null && hwOs !== rawOs) {
-      os = hwOs
-      // UA-derived osVersion belongs to a different OS; clear it
-      osVersion = 'unknown'
+    if (hwOs !== null) {
+      if (hwOs !== rawOs) {
+        os = hwOs
+        osVersion = 'unknown'
+      }
+      // Use Client Hints platformVersion as the authoritative OS version.
+      // UA freezes macOS at 10.15.7 and Android version is often stale;
+      // platformVersion carries the real value (e.g. "14.5.0" for macOS Sonoma).
+      // Skip Windows — its version is already resolved via getWindowsVersion().
+      if (os !== 'Windows') {
+        const pv = options.ctx.highEntropyData?.platformVersion
+        if (pv && pv !== '0.0.0') {
+          const [major, minor] = pv.split('.')
+          if (major && major !== '0') {
+            osVersion = minor && minor !== '0' ? `${major}.${minor}` : major
+          }
+        }
+      }
     }
   }
 

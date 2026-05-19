@@ -336,7 +336,22 @@ describe('parseUA — strategy option', () => {
     const r = parseUA(androidSpoofedUA, { ctx: macIntelCtx, strategy: 'hardware-first' })
     expect(r.os).toBe('MacOS')
     expect(r.device).toBe('PC')
-    expect(r.osVersion).toBe('unknown')  // UA osVersion was for Android, cleared on OS switch
+    expect(r.osVersion).toBe('unknown')  // UA osVersion was for Android, cleared on OS switch; no platformVersion
+  })
+
+  it('hardware-first: osVersion from platformVersion even when OS agrees', () => {
+    const macUA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    const ctx = {
+      ...macIntelCtx,
+      userAgentData: { platform: 'macOS', getHighEntropyValues: async () => ({}) },
+      highEntropyData: {
+        platformVersion: '14.5.0',
+        fullVersionList: [],
+      },
+    }
+    const r = parseUA(macUA, { ctx, strategy: 'hardware-first' })
+    expect(r.os).toBe('MacOS')
+    expect(r.osVersion).toBe('14.5')  // from Client Hints, not frozen UA '10.15.7'
   })
 
   it('hardware-first: version from fullVersionList when available', () => {
