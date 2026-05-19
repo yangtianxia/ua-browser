@@ -51,27 +51,29 @@ const ALL_CHROMIUM_BRANDS = new Set(Object.values(BRAND_MAP).flat())
  * Priority rationale:
  * - navigator.platform is NOT spoofed by Chrome DevTools device emulation.
  * - userAgentData.platform IS spoofed (DevTools sets it to 'Android' etc.).
- * - So for Mac/Win/iOS we trust navigator.platform first; for ambiguous Linux-based
- *   platforms (Android, Chrome OS) we fall back to userAgentData.platform to
- *   distinguish them on real devices.
+ * - So for Mac/Win/iOS we trust navigator.platform first; for Android/ChromeOS we
+ *   use userAgentData.platform to distinguish them from generic Linux.
+ * - Generic 'Linux' is intentionally NOT returned — it is too ambiguous (could be
+ *   a Node.js server process running on Linux, not a real browser hardware signal).
  */
 function osFromHardware(ctx: EnvContext): OsName | null {
-  // navigator.platform is never spoofed by DevTools — use it for unambiguous platforms.
+  // navigator.platform — NOT spoofed by DevTools, unambiguous for Mac/Win/iOS.
   const p = (ctx.platform ?? '').toLowerCase()
   if (p.startsWith('mac')) return 'MacOS'
   if (p.startsWith('win')) return 'Windows'
   if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
 
-  // For ambiguous Linux-based platforms (Android, Chrome OS, generic Linux),
-  // userAgentData.platform can distinguish them on real devices.
-  // On a real Mac/Win/iOS we already returned above, so reaching here means
-  // either we're on a Linux-based platform or the old API was unavailable.
+  // userAgentData.platform — distinguishes Android/ChromeOS from generic Linux on real devices.
+  // At this point we have already returned for Mac/Win/iOS above, so if userAgentData
+  // says 'Android' here we are on a real Android device (or DevTools Linux emulation,
+  // which we can't distinguish — acceptable trade-off).
+  // 'Linux' is intentionally excluded: a Node.js server on Linux should not
+  // be treated as a browser hardware signal.
   const chPlatform = ctx.userAgentData?.platform
   if (chPlatform) {
     const map: Partial<Record<string, OsName>> = {
       Windows: 'Windows',
       macOS: 'MacOS',
-      Linux: 'Linux',
       Android: 'Android',
       iOS: 'iOS',
       'Chrome OS': 'Chrome OS',
@@ -80,9 +82,11 @@ function osFromHardware(ctx: EnvContext): OsName | null {
     if (mapped) return mapped
   }
 
-  // Final navigator.platform patterns for Linux/Android as last resort
-  if (p.includes('android') || /linux arm/i.test(ctx.platform ?? '')) return 'Android'
-  if (p.includes('linux')) return 'Linux'
+  // Specific Android navigator.platform patterns (older Android Chrome before UA-CH).
+  // '/^linux arm/' targets 'Linux armv8l', 'Linux aarch64', etc. which are real mobile
+  // ARM cores and cannot appear on an x86 server without cross-compilation.
+  if (p.includes('android') || /^linux arm/i.test(ctx.platform ?? '')) return 'Android'
+
   return null
 }
 
