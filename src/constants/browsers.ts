@@ -49,7 +49,7 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
     chromeLookup: { '86': '13.0', '78': '12.0', '69': '11.0', '63': '9.5',
                     '55': '9.0', '50': '8.7', '30': '7.5' } },
   { name: 'UC',            priority: 330, detect: /(UCBrowser|UBrowser|UCWEB)/, versionPattern: /UC?Browser\/([\d.]+)/ },
-  { name: 'QQBrowser',     priority: 340, detect: /QQBrowser/,           versionPattern: /QQBrowser\/([\d.]+)/ },
+  { name: 'QQBrowser',     priority: 340, detect: /(MQQBrowser|QQBrowser)/,  versionPattern: [/MQQBrowser\/([\d.]+)/, /QQBrowser\/([\d.]+)/] },
   { name: 'QQ',            priority: 345, detect: /QQ\//,                versionPattern: /QQ\/([\d.]+)/ },
   { name: 'Baidu',         priority: 350, detect: /(Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD)/, versionPattern: [/BIDUBrowser[\s/]([\d.]+)/, /baiduboxapp\/([\d.]+)/] },
   { name: 'Sogou',         priority: 360, detect: /(MetaSr|Sogou)/,      versionPattern: [/SE ([\d.X]+)/, /SogouMobileBrowser\/([\d.]+)/] },

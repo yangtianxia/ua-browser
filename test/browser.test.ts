@@ -114,10 +114,16 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('4.1.2')
     })
 
-    it('detects QQBrowser', () => {
+    it('detects QQBrowser (Android)', () => {
       const r = detectBrowser(UA.qq.mobile)
       expect(r.browser).toBe('QQBrowser')
       expect(r.version).toBe('13.4.5.5055')
+    })
+
+    it('detects QQBrowser on iOS (MQQBrowser/ token)', () => {
+      const r = detectBrowser(UA.qq.ios)
+      expect(r.browser).toBe('QQBrowser')
+      expect(r.version).toBe('16.3.2')
     })
 
     it('detects UC Browser', () => {

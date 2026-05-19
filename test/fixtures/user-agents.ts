@@ -43,7 +43,9 @@ export const UA = {
   },
   qq: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.0.0 Mobile Safari/537.36 QQBrowser/13.4.5.5055',
-    qq: 'Mozilla/5.0 (Linux; Android 12; SM-G991B Build/SP1A.210812.016) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36 QQ/8.9.28.635'
+    qq: 'Mozilla/5.0 (Linux; Android 12; SM-G991B Build/SP1A.210812.016) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36 QQ/8.9.28.635',
+    // iOS uses MQQBrowser/ token instead of QQBrowser/
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 MQQBrowser/16.3.2 Mobile/15E148 Safari/604.1'
   },
   uc: {
     mobile: 'Mozilla/5.0 (Linux; U; Android 9; zh-CN; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 UCBrowser/13.4.2.1306 Mobile Safari/537.36'
