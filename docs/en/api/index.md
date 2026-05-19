@@ -24,7 +24,10 @@ The default export also exposes the following static methods:
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
+uaBrowser.detect(ua?: string): Promise<EnvOption>
 ```
+
+`uaBrowser.detect()` is the async high-precision version of `uaBrowser()`. It calls `getEnvContext()` internally to gather multi-signal context before parsing, so the returned `confidence` is typically `'high'` or `'medium'`.
 
 ---
 
@@ -42,9 +45,10 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 
 ```typescript
 interface ParseOptions {
-  nav?: NavContext              // inject browser environment context (language, platform, etc.)
-  windowsVersion?: string | null  // pre-resolved Windows version
-  ctx?: EnvContext              // multi-signal context from getEnvContext(); takes priority over nav and windowsVersion
+  nav?:            NavContext          // inject browser environment context (language, platform, etc.)
+  windowsVersion?: string | null      // pre-resolved Windows version
+  ctx?:            EnvContext         // multi-signal context from getEnvContext(); takes priority over nav and windowsVersion
+  customBotDefs?:  readonly BotDef[]  // custom bot rules, inserted before the GenericBot catch-all
 }
 ```
 
@@ -122,12 +126,29 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 ---
 
-### `detectBot(ua)`
+### `detectBot(ua, customDefs?)`
 
 Standalone bot detector.
 
 ```typescript
-detectBot(ua: string): { isBot: boolean; botName: BotName }
+detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName }
+```
+
+`customDefs` are inserted after the built-in rules and before the `GenericBot` catch-all, without affecting global state:
+
+```typescript
+import { detectBot, parseUA } from 'ua-browser'
+import type { BotDef } from 'ua-browser'
+
+const myDefs: BotDef[] = [
+  { name: 'GenericBot', detect: /MyInternalBot/ }
+]
+
+// standalone call
+detectBot(ua, myDefs)
+
+// passed through parseUA
+parseUA(ua, { customBotDefs: myDefs })
 ```
 
 ---

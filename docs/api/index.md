@@ -24,7 +24,10 @@ uaBrowser(ua?: string): EnvOption
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
+uaBrowser.detect(ua?: string): Promise<EnvOption>
 ```
+
+`uaBrowser.detect()` 是 `uaBrowser()` 的异步高精度版本，内部先调用 `getEnvContext()` 采集多信号上下文，再执行解析，返回的 `confidence` 通常为 `'high'` 或 `'medium'`。
 
 ---
 
@@ -42,9 +45,10 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 
 ```typescript
 interface ParseOptions {
-  nav?: NavContext              // 注入浏览器环境上下文（语言、平台等）
-  windowsVersion?: string | null  // 预先获取的 Windows 版本
-  ctx?: EnvContext              // 多信号上下文，由 getEnvContext() 返回；传入后优先级高于 nav 和 windowsVersion
+  nav?:            NavContext          // 注入浏览器环境上下文（语言、平台等）
+  windowsVersion?: string | null      // 预先获取的 Windows 版本
+  ctx?:            EnvContext         // 多信号上下文，由 getEnvContext() 返回；优先级高于 nav 和 windowsVersion
+  customBotDefs?:  readonly BotDef[]  // 自定义 Bot 规则，插在 GenericBot 兜底之前
 }
 ```
 
@@ -122,12 +126,29 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 ---
 
-### `detectBot(ua)`
+### `detectBot(ua, customDefs?)`
 
 独立爬虫检测器。
 
 ```typescript
-detectBot(ua: string): { isBot: boolean; botName: BotName }
+detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName }
+```
+
+`customDefs` 追加在内置规则之后、`GenericBot` 兜底之前，不影响全局状态：
+
+```typescript
+import { detectBot, parseUA } from 'ua-browser'
+import type { BotDef } from 'ua-browser'
+
+const myDefs: BotDef[] = [
+  { name: 'GenericBot', detect: /MyInternalBot/ }
+]
+
+// 独立调用
+detectBot(ua, myDefs)
+
+// 通过 parseUA 透传
+parseUA(ua, { customBotDefs: myDefs })
 ```
 
 ---

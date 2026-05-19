@@ -19,8 +19,14 @@ interface EnvOption {
   botName:    BotName
   language:   string
   platform:   string
+  confidence: 'high' | 'medium' | 'low'
 }
 ```
+
+`confidence` 反映检测结果的可信度：
+- `'high'`：Client Hints `fullVersionList` 提供了精确版本（Chrome/Edge/Opera/Vivaldi）
+- `'medium'`：传入了 `ctx`，多信号辅助检测（WebGL、平台信息等）
+- `'low'`：纯 UA 字符串解析，UA 冻结后精度最低
 
 ---
 
@@ -30,14 +36,15 @@ interface EnvOption {
 type BrowserName =
   | 'Safari' | 'Chrome' | 'IE' | 'Edge' | 'Firefox' | 'Firefox Focus'
   | 'Firefox Nightly' | 'Chromium' | 'Opera' | 'Vivaldi' | 'Yandex'
-  | 'Arora' | 'Lunascape' | 'QupZilla' | 'Coc Coc' | 'Kindle'
-  | 'Iceweasel' | 'Konqueror' | 'Iceape' | 'SeaMonkey' | 'Epiphany'
+  | 'Samsung Internet' | 'DuckDuckGo' | 'Puffin' | 'Coc Coc' | 'Kindle'
+  | 'Konqueror' | 'SeaMonkey' | 'Epiphany'
   | '360' | '360EE' | '360SE' | 'UC' | 'QQBrowser' | 'QQ' | 'Baidu'
   | 'Maxthon' | 'Sogou' | 'Liebao' | '2345Explorer' | '115Browser'
   | 'TheWorld' | 'XiaoMi' | 'Vivo' | 'Huawei' | 'OPPO' | 'Quark'
   | 'Qiyu' | 'Wechat' | 'Wechat Miniapp' | 'WechatWork' | 'Taobao'
   | 'Alipay' | 'Weibo' | 'Douban' | 'Suning' | 'iQiYi' | 'DingTalk'
-  | 'Douyin' | 'unknown'
+  | 'Douyin' | 'Bilibili' | 'Kuaishou' | 'Xiaohongshu' | 'Feishu'
+  | 'Toutiao' | 'JD' | 'Meituan' | 'unknown'
 ```
 
 ---
@@ -47,7 +54,7 @@ type BrowserName =
 ```typescript
 type EngineName =
   | 'Trident' | 'Presto' | 'WebKit' | 'Gecko'
-  | 'KHTML' | 'Blink' | 'EdgeHTML' | 'unknown'
+  | 'KHTML' | 'Blink' | 'EdgeHTML' | 'ArkWeb' | 'unknown'
 ```
 
 ---
@@ -56,10 +63,10 @@ type EngineName =
 
 ```typescript
 type OsName =
-  | 'Windows' | 'Linux' | 'MacOS' | 'Android' | 'HarmonyOS'
+  | 'Windows' | 'Linux' | 'MacOS' | 'Android' | 'HarmonyOS' | 'OpenHarmony'
   | 'Ubuntu' | 'FreeBSD' | 'Debian' | 'Windows Phone'
   | 'BlackBerry' | 'MeeGo' | 'Symbian' | 'iOS' | 'Chrome OS'
-  | 'WebOS' | 'unknown'
+  | 'WebOS' | 'Tizen' | 'KaiOS' | 'unknown'
 ```
 
 ---
@@ -67,7 +74,7 @@ type OsName =
 ## DeviceName
 
 ```typescript
-type DeviceName = 'Mobile' | 'Tablet' | 'PC'
+type DeviceName = 'Mobile' | 'Tablet' | 'TV' | 'PC'
 ```
 
 ---
@@ -86,8 +93,13 @@ type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 type BotName =
   | 'Googlebot' | 'Bingbot' | 'Baiduspider' | 'Bytespider'
   | 'YandexBot' | 'DuckDuckBot' | 'Slurp' | 'Sogou' | '360Spider'
-  | 'Applebot' | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot'
+  | 'Applebot-Extended' | 'Applebot'
+  | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot'
   | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'PetalBot'
+  | 'GPTBot' | 'OAI-SearchBot' | 'ChatGPT-User'
+  | 'ClaudeBot' | 'PerplexityBot' | 'CCBot' | 'AdsBot'
+  | 'Google-Extended' | 'Meta-ExternalAgent' | 'Amazonbot'
+  | 'Diffbot' | 'cohere-ai' | 'YouBot'
   | 'GenericBot' | 'unknown'
 ```
 
@@ -123,7 +135,9 @@ interface NavContext {
 
 ```typescript
 interface ParseOptions {
-  nav?:            NavContext       // 注入浏览器环境上下文（浏览器端按需传入）
-  windowsVersion?: string | null   // 预先 await getWindowsVersion() 的结果
+  nav?:            NavContext          // 注入浏览器环境上下文（浏览器端按需传入）
+  windowsVersion?: string | null      // 预先 await getWindowsVersion() 的结果
+  ctx?:            EnvContext         // getEnvContext() 的返回值，优先级高于 nav 和 windowsVersion
+  customBotDefs?:  readonly BotDef[]  // 自定义 Bot 规则，插在 GenericBot 兜底之前
 }
 ```

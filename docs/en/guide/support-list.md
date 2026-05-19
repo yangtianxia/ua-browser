@@ -201,6 +201,7 @@ As of v1.1.0, a four-layer priority chain is used. Earlier layers take precedenc
 | Sogou Spider | `Sogou` | Sogou |
 | 360Spider | `360Spider` | 360 |
 | PetalBot | `PetalBot` | Huawei |
+| Applebot-Extended | `Applebot-Extended` | Apple (AI training; UA also contains Applebot, matched first) |
 | Applebot | `Applebot` | Apple |
 
 ### AI / LLM Crawlers
@@ -208,10 +209,18 @@ As of v1.1.0, a four-layer priority chain is used. Earlier layers take precedenc
 | Bot | `BotName` | Owner |
 | :-- | :-- | :-- |
 | GPTBot | `GPTBot` | OpenAI |
+| OAI-SearchBot | `OAI-SearchBot` | OpenAI (real-time search) |
+| ChatGPT-User | `ChatGPT-User` | OpenAI (ChatGPT browsing plugin) |
 | ClaudeBot | `ClaudeBot` | Anthropic |
 | PerplexityBot | `PerplexityBot` | Perplexity AI |
 | CCBot | `CCBot` | Common Crawl |
 | AdsBot-Google | `AdsBot` | Google Ads |
+| Google-Extended | `Google-Extended` | Google (AI training; blockable via robots.txt) |
+| meta-externalagent | `Meta-ExternalAgent` | Meta AI |
+| Amazonbot | `Amazonbot` | Amazon (Alexa AI) |
+| Diffbot | `Diffbot` | Diffbot |
+| cohere-ai | `cohere-ai` | Cohere |
+| YouBot | `YouBot` | You.com |
 
 ### Social Media Crawlers
 
