@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useData } from 'vitepress'
 
 const { lang } = useData()
@@ -19,6 +19,13 @@ const i18n = computed(() => isEn.value
       uaMode: 'UA Mode',
       detectMode: 'Detect Mode',
       noDiff: 'All fields match between modes',
+      strategyLabel: 'Strategy:',
+      strategies: {
+        auto: 'auto',
+        'ua-first': 'ua-first',
+        'hardware-first': 'hardware-first',
+        strict: 'strict',
+      },
       fields: {
         browser: 'Browser',
         version: 'Version',
@@ -47,6 +54,13 @@ const i18n = computed(() => isEn.value
       uaMode: 'UA 模式',
       detectMode: '检测模式',
       noDiff: '两种模式结果完全一致',
+      strategyLabel: '策略：',
+      strategies: {
+        auto: 'auto',
+        'ua-first': 'ua-first',
+        'hardware-first': 'hardware-first',
+        strict: 'strict',
+      },
       fields: {
         browser: '浏览器',
         version: '版本',
@@ -64,6 +78,8 @@ const i18n = computed(() => isEn.value
     }
 )
 
+type DetectStrategy = 'auto' | 'ua-first' | 'hardware-first' | 'strict'
+
 interface ParseResult {
   browser: string
   version: string
@@ -78,7 +94,7 @@ interface ParseResult {
   botName: string
   language: string
   platform: string
-  confidence: 'high' | 'medium' | 'low'
+  confidence: 'high' | 'medium' | 'low' | 'conflict'
 }
 
 interface ComparisonResult {
@@ -158,8 +174,9 @@ const result = ref<ParseResult | null>(null)
 const comparisonResult = ref<ComparisonResult | null>(null)
 const selectedKey = ref<string | null>(null)
 const loaded = ref(false)
+const strategy = ref<DetectStrategy>('auto')
 
-let _uaBrowser: (() => Promise<ParseResult>) | null = null
+let _uaBrowser: ((options?: { strategy?: DetectStrategy }) => Promise<ParseResult>) | null = null
 let _parseUA: ((ua: string) => ParseResult) | null = null
 
 onMounted(async () => {
@@ -224,7 +241,7 @@ async function useCurrentUA() {
   const ua = navigator.userAgent
   const [uaResult, detectResult] = await Promise.all([
     Promise.resolve(_parseUA(ua)),
-    _uaBrowser(),
+    _uaBrowser({ strategy: strategy.value }),
   ])
   comparisonResult.value = { ua: uaResult, detect: detectResult }
 }
@@ -243,6 +260,10 @@ const diffKeys = computed(() => {
     if (field.value !== detectFields.value[i]?.value) diffs.add(field.key)
   })
   return diffs
+})
+
+watch(strategy, () => {
+  if (selectedKey.value === 'current') useCurrentUA()
 })
 </script>
 
@@ -286,6 +307,16 @@ const diffKeys = computed(() => {
     <div class="playground-right">
       <!-- Compare mode: Current Browser shows both UA Mode and Detect Mode side by side -->
       <template v-if="isCompareMode && comparisonResult">
+        <div class="strategy-bar">
+          <span class="strategy-label">{{ i18n.strategyLabel }}</span>
+          <button
+            v-for="s in (['auto', 'ua-first', 'hardware-first', 'strict'] as DetectStrategy[])"
+            :key="s"
+            :class="['strategy-btn', { 'strategy-btn--active': strategy === s }]"
+            @click="strategy = s"
+          >{{ i18n.strategies[s] }}</button>
+        </div>
+
         <div class="compare-grid">
           <div class="compare-col">
             <div class="compare-col__head">
@@ -633,6 +664,45 @@ const diffKeys = computed(() => {
   word-break: break-all;
 }
 
+/* Strategy selector */
+.strategy-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.strategy-label {
+  font-size: 12px;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+}
+
+.strategy-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  font-family: var(--vp-font-family-mono);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.strategy-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.strategy-btn--active {
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-2);
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
 /* Confidence level colors */
 .confidence--high {
   color: #16a34a;
@@ -640,6 +710,10 @@ const diffKeys = computed(() => {
 
 .confidence--medium {
   color: #d97706;
+}
+
+.confidence--conflict {
+  color: #dc2626;
 }
 
 .result-raw {
