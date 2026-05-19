@@ -67,11 +67,12 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
     }
   }
 
-  // WebGL hardware limits: mobile GPUs cap at MAX_TEXTURE_SIZE ≤ 8192 and
-  // HIGH_FLOAT rangeMax < 2^14 (GLES vs desktop OpenGL precision tiers).
-  // Only use as a secondary signal when screenWidth is also in the mobile range.
+  // WebGL MAX_TEXTURE_SIZE: mobile GPUs cap at ≤8192; desktop GPUs report ≥16384.
+  // Used only when all three conditions align — no single condition is mobile-exclusive,
+  // but the intersection reliably excludes touch laptops (strong GPU) and desktops (no touch).
   if (
     nav?.webglMaxTextureSize !== undefined && nav.webglMaxTextureSize <= 8192 &&
+    nav.maxTouchPoints > 1 &&
     (nav.screenWidth ?? 9999) < 1367
   ) {
     return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'

@@ -189,14 +189,14 @@ describe('detectDevice', () => {
 
     // ── WebGL hardware limits ─────────────────────────────────────────────────
 
-    it('MAX_TEXTURE_SIZE=4096 (mobile GPU), screen<768 → Mobile', () => {
+    it('MAX_TEXTURE_SIZE=4096 + touch + screen<768 (Android mobile GPU) → Mobile', () => {
       expect(detectDevice(UA.chrome.windows, {
         platform: 'Linux armv8l', maxTouchPoints: 5,
         webglMaxTextureSize: 4096, screenWidth: 412
       })).toBe('Mobile')
     })
 
-    it('MAX_TEXTURE_SIZE=8192, screen≥768 → Tablet', () => {
+    it('MAX_TEXTURE_SIZE=8192 + touch + screen≥768 → Tablet', () => {
       expect(detectDevice(UA.chrome.windows, {
         platform: 'Linux armv8l', maxTouchPoints: 5,
         webglMaxTextureSize: 8192, screenWidth: 820
@@ -207,6 +207,14 @@ describe('detectDevice', () => {
       expect(detectDevice(UA.chrome.windows, {
         platform: 'Win32', maxTouchPoints: 0,
         webglMaxTextureSize: 16384, screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    it('MAX_TEXTURE_SIZE=8192 but no touch (maxTouchPoints=0) → PC, not overridden', () => {
+      // e.g. a non-touch PC with a very old/weak GPU
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        webglMaxTextureSize: 8192, screenWidth: 1280
       })).toBe('PC')
     })
   })
