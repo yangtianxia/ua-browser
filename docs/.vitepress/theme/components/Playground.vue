@@ -176,7 +176,7 @@ const selectedKey = ref<string | null>(null)
 const loaded = ref(false)
 const strategy = ref<DetectStrategy>('auto')
 
-let _uaBrowser: ((options?: { strategy?: DetectStrategy }) => Promise<ParseResult>) | null = null
+let _uaBrowser: ((ua?: string, options?: { strategy?: DetectStrategy }) => Promise<ParseResult>) | null = null
 let _parseUA: ((ua: string) => ParseResult) | null = null
 
 onMounted(async () => {
@@ -241,7 +241,7 @@ async function useCurrentUA() {
   const ua = navigator.userAgent
   const [uaResult, detectResult] = await Promise.all([
     Promise.resolve(_parseUA(ua)),
-    _uaBrowser({ strategy: strategy.value }),
+    _uaBrowser(ua, { strategy: strategy.value }),
   ])
   comparisonResult.value = { ua: uaResult, detect: detectResult }
 }
