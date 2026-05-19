@@ -9,7 +9,12 @@ export interface NavContext {
   browserLanguage?: string
   maxTouchPoints: number
   mimeTypes?: MimeTypeArray
-  connection?: { saveData?: boolean }
+  connection?: {
+    saveData?: boolean
+    effectiveType?: '4g' | '3g' | '2g' | 'slow-2g'
+    rtt?: number
+    downlink?: number
+  }
   userAgentData?: {
     platform: string
     getHighEntropyValues(hints: string[]): Promise<Record<string, string>>

@@ -6,6 +6,11 @@ type DeviceNav = Pick<NavContext, 'platform' | 'maxTouchPoints'> & {
   pointerType?: 'coarse' | 'fine' | 'none'
   hoverCapability?: boolean
   screenWidth?: number
+  webglRenderer?: string
+  webglCompressedFormats?: { s3tc: boolean; pvrtc: boolean; etc2: boolean; astc: boolean }
+  hasVibration?: boolean
+  hasDeviceMotion?: boolean
+  connection?: { effectiveType?: string }
 }
 
 /**
@@ -42,12 +47,39 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
     }
   }
 
-  // Desktop-mode override: UA looks like PC, but environment signals reveal a touch-only device.
-  // pointerType=coarse (touch primary) + hoverCapability=false (no hover at all) is a strong
-  // indicator of a phone/tablet impersonating desktop — touch laptops still have hoverCapability=true.
+  // ── Hard-to-fake hardware signal overrides ────────────────────────────────
+  // Only fire when UA detection above did not already identify a mobile device.
+
+  // GPU renderer: Adreno = Qualcomm (Android), Mali = ARM (Android).
+  // These are hardware-bound strings that cannot be spoofed at the JS layer.
+  if (nav?.webglRenderer) {
+    if (/Adreno/i.test(nav.webglRenderer) || /Mali[-\s]/i.test(nav.webglRenderer)) {
+      return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+    }
+  }
+
+  // Compressed texture formats: pvrtc is PowerVR (iOS-only GPU family).
+  if (nav?.webglCompressedFormats?.pvrtc && !nav.webglCompressedFormats.s3tc) {
+    return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+  }
+
+  // Mobile-exclusive browser APIs: vibration and device-motion are not
+  // implemented in any desktop browser, making them reliable mobile indicators.
+  if (nav?.hasVibration || nav?.hasDeviceMotion) {
+    return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+  }
+
+  // Mobile network type: 2G/3G connections are virtually absent on desktop.
+  // 4G is excluded — it also appears on mobile hotspots used by laptops.
+  if (nav?.connection?.effectiveType &&
+      ['2g', '3g', 'slow-2g'].includes(nav.connection.effectiveType)) {
+    return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+  }
+
+  // Soft signal: touch-primary pointer with no hover capability.
+  // Placed last because touch laptops (Surface etc.) also have pointerType=coarse
+  // but keep hoverCapability=true via their trackpad/mouse.
   if (nav?.pointerType === 'coarse' && nav.hoverCapability === false) {
-    // screen.width is reliable even in desktop mode (always reports physical CSS pixels).
-    // ≥768px → tablet footprint; <768px → phone footprint.
     return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
   }
 

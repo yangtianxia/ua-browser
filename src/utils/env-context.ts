@@ -12,11 +12,22 @@ export interface UAHighEntropyValues {
 export interface EnvContext extends NavContext {
   webglRenderer?: string
   webglVendor?: string
+  webglMaxTextureSize?: number
+  webglFragPrecision?: number
+  webglCompressedFormats?: {
+    s3tc: boolean   // DXT/BC — desktop GPU
+    pvrtc: boolean  // PowerVR — iOS only
+    etc2: boolean   // GLES 3.0+ — Android mainstream
+    astc: boolean   // Adreno 4xx+ / Mali Txx+ — modern mobile
+  }
   hardwareConcurrency?: number
   deviceMemory?: number
   devicePixelRatio?: number
   screenWidth?: number
   screenHeight?: number
+  audioSampleRate?: number
+  hasVibration?: boolean
+  hasDeviceMotion?: boolean
   pointerType?: 'coarse' | 'fine' | 'none'
   hoverCapability?: boolean
   fontProbes?: Record<string, boolean>
@@ -53,19 +64,48 @@ function probeFonts(): Record<string, boolean> {
   }
 }
 
-function getWebGLInfo(): { renderer?: string; vendor?: string } {
+function getWebGLInfo(): {
+  renderer?: string
+  vendor?: string
+  maxTextureSize?: number
+  fragPrecision?: number
+  compressedFormats?: { s3tc: boolean; pvrtc: boolean; etc2: boolean; astc: boolean }
+} {
   try {
     const canvas = document.createElement('canvas')
     const gl = (canvas.getContext('webgl') ?? canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
     if (!gl) return {}
     const ext = gl.getExtension('WEBGL_debug_renderer_info')
-    if (!ext) return {}
-    return {
-      renderer: gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) as string,
-      vendor: gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) as string,
+    const result: ReturnType<typeof getWebGLInfo> = {
+      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+      fragPrecision:  gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT)?.rangeMax,
+      compressedFormats: {
+        s3tc:  !!gl.getExtension('WEBGL_compressed_texture_s3tc'),
+        pvrtc: !!gl.getExtension('WEBGL_compressed_texture_pvrtc'),
+        etc2:  !!gl.getExtension('WEBGL_compressed_texture_etc'),
+        astc:  !!gl.getExtension('WEBGL_compressed_texture_astc_ldr'),
+      },
     }
+    if (ext) {
+      result.renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) as string
+      result.vendor   = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) as string
+    }
+    return result
   } catch {
     return {}
+  }
+}
+
+function getAudioSampleRate(): number | undefined {
+  try {
+    const AC = window.AudioContext ?? (window as any).webkitAudioContext
+    if (!AC) return undefined
+    const ac = new AC() as AudioContext
+    const rate = ac.sampleRate
+    void ac.close()
+    return rate
+  } catch {
+    return undefined
   }
 }
 
@@ -122,12 +162,18 @@ export async function getEnvContext(): Promise<EnvContext> {
     ctx.devicePixelRatio = window.devicePixelRatio
     ctx.screenWidth  = window.screen?.width
     ctx.screenHeight = window.screen?.height
-    ctx.pointerType = getPointerType()
+    ctx.pointerType     = getPointerType()
     ctx.hoverCapability = getHoverCapability()
-    ctx.fontProbes = probeFonts()
-    const { renderer, vendor } = getWebGLInfo()
-    if (renderer !== undefined) ctx.webglRenderer = renderer
-    if (vendor !== undefined) ctx.webglVendor = vendor
+    ctx.fontProbes      = probeFonts()
+    ctx.audioSampleRate = getAudioSampleRate()
+    ctx.hasVibration    = 'vibrate' in navigator
+    ctx.hasDeviceMotion = 'DeviceMotionEvent' in window
+    const { renderer, vendor, maxTextureSize, fragPrecision, compressedFormats } = getWebGLInfo()
+    if (renderer !== undefined)          ctx.webglRenderer = renderer
+    if (vendor !== undefined)            ctx.webglVendor = vendor
+    if (maxTextureSize !== undefined)    ctx.webglMaxTextureSize = maxTextureSize
+    if (fragPrecision !== undefined)     ctx.webglFragPrecision = fragPrecision
+    if (compressedFormats !== undefined) ctx.webglCompressedFormats = compressedFormats
   }
 
   if (base.userAgentData) {

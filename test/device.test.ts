@@ -88,5 +88,80 @@ describe('detectDevice', () => {
         platform: 'Win32', maxTouchPoints: 0
       })).toBe('PC')
     })
+
+    // ── Hard-to-fake hardware signals ─────────────────────────────────────────
+
+    it('Adreno GPU (Qualcomm/Android), screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        webglRenderer: 'Adreno (TM) 730', screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('Adreno GPU, screen≥768 → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        webglRenderer: 'Adreno (TM) 730', screenWidth: 820
+      })).toBe('Tablet')
+    })
+
+    it('Mali GPU (ARM/Android), screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        webglRenderer: 'Mali-G710 MC10', screenWidth: 390
+      })).toBe('Mobile')
+    })
+
+    it('pvrtc only (iOS GPU), no s3tc → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'iPhone', maxTouchPoints: 5,
+        webglCompressedFormats: { s3tc: false, pvrtc: true, etc2: false, astc: false },
+        screenWidth: 390
+      })).toBe('Mobile')
+    })
+
+    it('pvrtc + s3tc (desktop with PowerVR driver) → not overridden → PC', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        webglCompressedFormats: { s3tc: true, pvrtc: true, etc2: false, astc: false },
+        screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    it('vibration API present, screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        hasVibration: true, screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('DeviceMotion present, screen≥768 → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        hasDeviceMotion: true, screenWidth: 810
+      })).toBe('Tablet')
+    })
+
+    it('3G network, screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        connection: { effectiveType: '3g' }, screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('4G network alone → PC (4G also used by laptops on hotspot)', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        connection: { effectiveType: '4g' }, screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    it('ANGLE/Intel GPU (desktop) → PC, not overridden', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        webglRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)',
+        screenWidth: 1920
+      })).toBe('PC')
+    })
   })
 })
