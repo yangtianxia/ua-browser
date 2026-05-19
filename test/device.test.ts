@@ -156,11 +156,64 @@ describe('detectDevice', () => {
       })).toBe('PC')
     })
 
-    it('ANGLE/Intel GPU (desktop) → PC, not overridden', () => {
+    it('ANGLE/Intel GPU (desktop) → explicit PC return', () => {
       expect(detectDevice(UA.chrome.windows, {
         platform: 'Win32', maxTouchPoints: 0,
         webglRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)',
         screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    // ── CSS safe-area-inset-top ───────────────────────────────────────────────
+
+    it('safeAreaInsetTop=47 (iPhone with notch), screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'iPhone', maxTouchPoints: 5,
+        safeAreaInsetTop: 47, screenWidth: 390
+      })).toBe('Mobile')
+    })
+
+    it('safeAreaInsetTop=24 (iPad with notch), screen≥768 → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'iPad', maxTouchPoints: 5,
+        safeAreaInsetTop: 24, screenWidth: 1024
+      })).toBe('Tablet')
+    })
+
+    it('safeAreaInsetTop=0 (desktop / older device without notch) → not overridden', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        safeAreaInsetTop: 0, screenWidth: 1920
+      })).toBe('PC')
+    })
+
+    // ── devicePixelRatio compound ─────────────────────────────────────────────
+
+    it('DPR=3 + touch + screen<768 (Android flagship) → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        devicePixelRatio: 3, screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('DPR=3 + touch + screen≥768 (Android tablet) → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        devicePixelRatio: 3, screenWidth: 834
+      })).toBe('Tablet')
+    })
+
+    it('DPR=2 + no touch (MacBook Retina) → PC, not overridden', () => {
+      expect(detectDevice(UA.safari.desktop, {
+        platform: 'MacIntel', maxTouchPoints: 0,
+        devicePixelRatio: 2, screenWidth: 1440
+      })).toBe('PC')
+    })
+
+    it('DPR=3 + no touch (4K monitor, no touchscreen) → PC, not overridden', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        devicePixelRatio: 3, screenWidth: 1920
       })).toBe('PC')
     })
 

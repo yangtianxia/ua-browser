@@ -10,6 +10,8 @@ type DeviceNav = Pick<NavContext, 'platform' | 'maxTouchPoints'> & {
   webglMaxTextureSize?: number
   webglFragPrecision?: number
   webglCompressedFormats?: { s3tc: boolean; pvrtc: boolean; etc2: boolean; astc: boolean }
+  safeAreaInsetTop?: number
+  devicePixelRatio?: number
   hasVibration?: boolean
   hasDeviceMotion?: boolean
   connection?: { effectiveType?: string }
@@ -52,9 +54,12 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
   // ── Hard-to-fake hardware signal overrides ────────────────────────────────
   // Only fire when UA detection above did not already identify a mobile device.
 
-  // GPU renderer: Adreno = Qualcomm (Android), Mali = ARM (Android).
-  // These are hardware-bound strings that cannot be spoofed at the JS layer.
+  // GPU renderer signals — hardware-bound, cannot be spoofed at the JS layer.
   if (nav?.webglRenderer) {
+    // ANGLE prefix = desktop Chrome/Firefox translating WebGL via D3D or Metal.
+    // Mobile devices use native GLES/Metal directly — ANGLE never appears there.
+    if (/^ANGLE\b/.test(nav.webglRenderer)) return 'PC'
+    // Adreno = Qualcomm (Android), Mali = ARM (Android)
     if (/Adreno/i.test(nav.webglRenderer) || /Mali[-\s]/i.test(nav.webglRenderer)) {
       return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
     }
@@ -83,6 +88,12 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
     return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
   }
 
+  // CSS env(safe-area-inset-top) > 0 means iOS with notch / Dynamic Island.
+  // This value is written by the OS rendering pipeline; JS cannot override it.
+  if (nav?.safeAreaInsetTop !== undefined && nav.safeAreaInsetTop > 0) {
+    return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+  }
+
   // Mobile-exclusive browser APIs: vibration and device-motion are not
   // implemented in any desktop browser, making them reliable mobile indicators.
   if (nav?.hasVibration || nav?.hasDeviceMotion) {
@@ -94,6 +105,12 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
   if (nav?.connection?.effectiveType &&
       ['2g', '3g', 'slow-2g'].includes(nav.connection.effectiveType)) {
     return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
+  }
+
+  // High DPR (>2) + touch: desktop Retina (MacBook) tops at DPR=2; phones/tablets
+  // start at DPR=3. Combined with maxTouchPoints this is a reliable mobile marker.
+  if ((nav?.devicePixelRatio ?? 0) > 2 && (nav?.maxTouchPoints ?? 0) > 1) {
+    return (nav?.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
   }
 
   // Soft signal: touch-primary pointer with no hover capability.

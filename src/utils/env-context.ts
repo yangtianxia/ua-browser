@@ -25,6 +25,7 @@ export interface EnvContext extends NavContext {
   devicePixelRatio?: number
   screenWidth?: number
   screenHeight?: number
+  safeAreaInsetTop?: number
   audioSampleRate?: number
   hasVibration?: boolean
   hasDeviceMotion?: boolean
@@ -96,6 +97,22 @@ function getWebGLInfo(): {
   }
 }
 
+// Probe CSS env(safe-area-inset-top). On iOS devices with notch / Dynamic Island
+// this returns a hardware-defined pixel value (47–59px). Desktop always returns 0.
+// The value originates from the OS rendering pipeline — it cannot be overridden via JS.
+function getSafeAreaInsetTop(): number {
+  try {
+    const el = document.createElement('div')
+    el.style.cssText = 'position:fixed;top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none'
+    document.body.appendChild(el)
+    const top = parseFloat(getComputedStyle(el).top)
+    document.body.removeChild(el)
+    return isNaN(top) ? 0 : top
+  } catch {
+    return 0
+  }
+}
+
 function getAudioSampleRate(): number | undefined {
   try {
     const AC = window.AudioContext ?? (window as any).webkitAudioContext
@@ -159,10 +176,11 @@ export async function getEnvContext(): Promise<EnvContext> {
   }
 
   if (typeof window !== 'undefined') {
-    ctx.devicePixelRatio = window.devicePixelRatio
-    ctx.screenWidth  = window.screen?.width
-    ctx.screenHeight = window.screen?.height
-    ctx.pointerType     = getPointerType()
+    ctx.devicePixelRatio  = window.devicePixelRatio
+    ctx.screenWidth       = window.screen?.width
+    ctx.screenHeight      = window.screen?.height
+    ctx.safeAreaInsetTop  = getSafeAreaInsetTop()
+    ctx.pointerType       = getPointerType()
     ctx.hoverCapability = getHoverCapability()
     ctx.fontProbes      = probeFonts()
     ctx.audioSampleRate = getAudioSampleRate()
