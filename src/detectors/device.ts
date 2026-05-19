@@ -7,6 +7,8 @@ type DeviceNav = Pick<NavContext, 'platform' | 'maxTouchPoints'> & {
   hoverCapability?: boolean
   screenWidth?: number
   webglRenderer?: string
+  webglMaxTextureSize?: number
+  webglFragPrecision?: number
   webglCompressedFormats?: { s3tc: boolean; pvrtc: boolean; etc2: boolean; astc: boolean }
   hasVibration?: boolean
   hasDeviceMotion?: boolean
@@ -56,6 +58,23 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
     if (/Adreno/i.test(nav.webglRenderer) || /Mali[-\s]/i.test(nav.webglRenderer)) {
       return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
     }
+    // Apple GPU appears on iPhone, iPad, and Apple Silicon Macs.
+    // Use screenWidth to separate them: ≤1366 = iPhone/iPad footprint, >1366 = Mac display.
+    if (/Apple GPU/i.test(nav.webglRenderer)) {
+      const w = nav.screenWidth ?? 0
+      if (w <= 1366) return w >= 768 ? 'Tablet' : 'Mobile'
+      // w > 1366: Mac — fall through to PC
+    }
+  }
+
+  // WebGL hardware limits: mobile GPUs cap at MAX_TEXTURE_SIZE ≤ 8192 and
+  // HIGH_FLOAT rangeMax < 2^14 (GLES vs desktop OpenGL precision tiers).
+  // Only use as a secondary signal when screenWidth is also in the mobile range.
+  if (
+    nav?.webglMaxTextureSize !== undefined && nav.webglMaxTextureSize <= 8192 &&
+    (nav.screenWidth ?? 9999) < 1367
+  ) {
+    return (nav.screenWidth ?? 0) >= 768 ? 'Tablet' : 'Mobile'
   }
 
   // Compressed texture formats: pvrtc is PowerVR (iOS-only GPU family).

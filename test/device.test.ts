@@ -163,5 +163,51 @@ describe('detectDevice', () => {
         screenWidth: 1920
       })).toBe('PC')
     })
+
+    // ── Apple GPU disambiguation ──────────────────────────────────────────────
+
+    it('Apple GPU, screen<768 (iPhone) → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'iPhone', maxTouchPoints: 5,
+        webglRenderer: 'Apple GPU', screenWidth: 390
+      })).toBe('Mobile')
+    })
+
+    it('Apple GPU, 768≤screen≤1366 (iPad) → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'MacIntel', maxTouchPoints: 5,
+        webglRenderer: 'Apple GPU', screenWidth: 1024
+      })).toBe('Tablet')
+    })
+
+    it('Apple GPU, screen>1366 (Mac) → PC, not overridden', () => {
+      expect(detectDevice(UA.safari.desktop, {
+        platform: 'MacIntel', maxTouchPoints: 0,
+        webglRenderer: 'Apple GPU', screenWidth: 1440
+      })).toBe('PC')
+    })
+
+    // ── WebGL hardware limits ─────────────────────────────────────────────────
+
+    it('MAX_TEXTURE_SIZE=4096 (mobile GPU), screen<768 → Mobile', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        webglMaxTextureSize: 4096, screenWidth: 412
+      })).toBe('Mobile')
+    })
+
+    it('MAX_TEXTURE_SIZE=8192, screen≥768 → Tablet', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Linux armv8l', maxTouchPoints: 5,
+        webglMaxTextureSize: 8192, screenWidth: 820
+      })).toBe('Tablet')
+    })
+
+    it('MAX_TEXTURE_SIZE=16384 (desktop GPU) → PC, not overridden', () => {
+      expect(detectDevice(UA.chrome.windows, {
+        platform: 'Win32', maxTouchPoints: 0,
+        webglMaxTextureSize: 16384, screenWidth: 1920
+      })).toBe('PC')
+    })
   })
 })
