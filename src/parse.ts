@@ -47,9 +47,25 @@ const ALL_CHROMIUM_BRANDS = new Set(Object.values(BRAND_MAP).flat())
 /**
  * Infer the OS from hardware context (Client Hints platform or navigator.platform).
  * Returns null when neither source provides enough information.
+ *
+ * Priority rationale:
+ * - navigator.platform is NOT spoofed by Chrome DevTools device emulation.
+ * - userAgentData.platform IS spoofed (DevTools sets it to 'Android' etc.).
+ * - So for Mac/Win/iOS we trust navigator.platform first; for ambiguous Linux-based
+ *   platforms (Android, Chrome OS) we fall back to userAgentData.platform to
+ *   distinguish them on real devices.
  */
 function osFromHardware(ctx: EnvContext): OsName | null {
-  // Client Hints low-entropy platform (always available when CH is supported, not spoofed by DevTools)
+  // navigator.platform is never spoofed by DevTools — use it for unambiguous platforms.
+  const p = (ctx.platform ?? '').toLowerCase()
+  if (p.startsWith('mac')) return 'MacOS'
+  if (p.startsWith('win')) return 'Windows'
+  if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
+
+  // For ambiguous Linux-based platforms (Android, Chrome OS, generic Linux),
+  // userAgentData.platform can distinguish them on real devices.
+  // On a real Mac/Win/iOS we already returned above, so reaching here means
+  // either we're on a Linux-based platform or the old API was unavailable.
   const chPlatform = ctx.userAgentData?.platform
   if (chPlatform) {
     const map: Partial<Record<string, OsName>> = {
@@ -63,11 +79,8 @@ function osFromHardware(ctx: EnvContext): OsName | null {
     const mapped = map[chPlatform]
     if (mapped) return mapped
   }
-  // navigator.platform fallback
-  const p = (ctx.platform ?? '').toLowerCase()
-  if (p.startsWith('win')) return 'Windows'
-  if (p.startsWith('mac')) return 'MacOS'
-  if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
+
+  // Final navigator.platform patterns for Linux/Android as last resort
   if (p.includes('android') || /linux arm/i.test(ctx.platform ?? '')) return 'Android'
   if (p.includes('linux')) return 'Linux'
   return null

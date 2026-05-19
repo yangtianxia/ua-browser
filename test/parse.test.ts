@@ -294,16 +294,17 @@ describe('parseUA — confidence field', () => {
 
 describe('parseUA — strategy option', () => {
   // Simulates a MacBook Chrome with DevTools Android emulation active.
-  // UA is spoofed to Android; platform/userAgentData/webglRenderer are real Mac values.
+  // DevTools spoofs: navigator.userAgent, userAgentData.platform, maxTouchPoints.
+  // DevTools does NOT spoof: navigator.platform (stays 'MacIntel'), WebGL renderer.
   const androidSpoofedUA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
 
   const macIntelCtx = {
     userAgent: androidSpoofedUA,
-    platform: 'MacIntel',
+    platform: 'MacIntel',           // navigator.platform — NOT spoofed by DevTools
     language: 'en-US',
-    maxTouchPoints: 5,  // DevTools-spoofed
+    maxTouchPoints: 5,              // spoofed by DevTools
     userAgentData: {
-      platform: 'macOS',
+      platform: 'Android',          // spoofed by DevTools (real value would be 'macOS')
       getHighEntropyValues: async (_: string[]) => ({} as Record<string, string>),
     },
     webglRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, unspecified version)',
