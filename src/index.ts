@@ -40,13 +40,8 @@ function uaBrowser(): EnvOption {
  * Hardware signals (Client Hints, WebGL, platform) take precedence over the UA string.
  * Async because Client Hints high-entropy values require a browser API call.
  */
-uaBrowser.detect = async (): Promise<EnvOption> => {
-  const ctx = await getEnvContext()
-  return parseUA(ctx.userAgent, { ctx })
-}
-
 uaBrowser.detect = async (ua?: string): Promise<EnvOption> => {
-	const ctx = await getEnvContext()
+  const ctx = await getEnvContext()
   return parseUA(ua ?? ctx.userAgent, { ctx })
 }
 
