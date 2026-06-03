@@ -1,6 +1,6 @@
 # ua-browser
 
-## 1.5.0-beta.0
+## 1.4.0-beta.0
 
 ### Minor Changes
 
