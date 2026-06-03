@@ -5,6 +5,7 @@
     "ua-browser": "1.4.0"
   },
   "changesets": [
+    "fix-detectors-language",
     "release-1-4-0"
   ]
 }
