@@ -1,9 +1,9 @@
-import type { EnvOption, BrowserName } from './types.js'
+import type { EnvOption, BrowserName, OsName } from './types.js'
 import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
 import { detectDevice } from './detectors/device.js'
-import { detectBot } from './detectors/bot.js'
+import { detectBot, type BotDef } from './detectors/bot.js'
 import { detectArch } from './detectors/arch.js'
 import { detectHeadless } from './detectors/headless.js'
 import { isWebview } from './detectors/webview.js'
@@ -17,6 +17,135 @@ export interface ParseOptions {
   windowsVersion?: string | null
   /** Full env context from getEnvContext() — supersedes nav and windowsVersion when provided. */
   ctx?: EnvContext
+  /** Additional bot definitions prepended before the GenericBot catch-all. */
+  customBotDefs?: readonly BotDef[]
+  /**
+   * Explicit language override (BCP47, e.g. "zh-CN"). Useful for server-side parsing
+   * where the Accept-Language header is available but no browser context exists.
+   * Takes precedence over language derived from ctx/nav or UA string.
+   */
+  language?: string
+}
+
+// Priority-ordered brand → browser, derived from Client Hints fullVersionList.
+// More specific brands (Edge, Opera, Vivaldi) listed before the generic Chrome/Chromium
+// so that e.g. an Edge UA with both 'Microsoft Edge' and 'Chromium' resolves to Edge.
+const BRAND_TO_BROWSER: ReadonlyArray<[string, BrowserName]> = [
+  ['Microsoft Edge', 'Edge'],
+  ['Opera',          'Opera'],
+  ['Vivaldi',        'Vivaldi'],
+  ['Google Chrome',  'Chrome'],
+  ['Chromium',       'Chromium'],
+]
+
+/**
+ * Infer the OS from hardware context using a tiered trust model.
+ *
+ * Tier 1 — WebGL (unspoofable by DevTools):
+ *   pvrtc = PowerVR GPU → iOS only; ANGLE → desktop (blocks DevTools mobile emulation);
+ *   Adreno/Mali → Android.
+ * Tier 2 — Client Hints with platformVersion (getHighEntropyValues call, harder to fake consistently).
+ * Tier 3 — navigator.platform (reliable for Mac/Win/iOS; DevTools rarely changes this).
+ * Tier 4 — Additional hardware signals: CSS safe-area-inset (iOS notch/Dynamic Island).
+ * Tier 5 — chPlatform alone with Linux ARM corroboration (last-resort Android fallback).
+ *
+ * Generic 'Linux' is intentionally not returned — too ambiguous for server vs. desktop.
+ */
+function osFromHardware(ctx: EnvContext): OsName | null {
+  const p = (ctx.platform ?? '').toLowerCase()
+  const chPlatform = ctx.userAgentData?.platform
+  const platformVersion = ctx.highEntropyData?.platformVersion
+  const hasPlatformVersion = !!(platformVersion && platformVersion !== '0.0.0')
+
+  // Tier 1: WebGL — cannot be spoofed by DevTools device emulation
+  // pvrtc = PowerVR GPU, exclusive to iOS; never present on Android or any desktop GPU
+  if (ctx.webglCompressedFormats?.pvrtc && !ctx.webglCompressedFormats.s3tc) return 'iOS'
+  // ANGLE = desktop Chromium translating WebGL via D3D/Metal — definitively not mobile.
+  // Returning null when Mac/Win/ChromeOS can't be confirmed prevents DevTools iOS/Android
+  // platform signals from leaking through when the real GPU exposes a desktop renderer.
+  if (ctx.webglRenderer && /^ANGLE\b/.test(ctx.webglRenderer)) {
+    if (p.startsWith('mac') || chPlatform === 'macOS') return 'MacOS'
+    if (p.startsWith('win') || chPlatform === 'Windows') return 'Windows'
+    if (chPlatform === 'Chrome OS') return 'Chrome OS'
+    // Cannot confirm which desktop OS — null blocks DevTools-spoofed os/osVersion from
+    // leaking through. Note: if platformVersion were available, Tier 2 would already
+    // have returned a specific OS before reaching this point, so null is safe here.
+    return null
+  }
+  // Adreno (Qualcomm) and Mali (ARM) are Android-exclusive mobile GPU families
+  if (ctx.webglRenderer && (/Adreno/i.test(ctx.webglRenderer) || /Mali[-\s]/i.test(ctx.webglRenderer))) {
+    return 'Android'
+  }
+
+  // Tier 2: Client Hints platform + platformVersion — requires getHighEntropyValues(),
+  // harder to fake consistently across both fields simultaneously
+  if (chPlatform && hasPlatformVersion) {
+    const chMap: Partial<Record<string, OsName>> = {
+      Windows: 'Windows', macOS: 'MacOS', Android: 'Android',
+      iOS: 'iOS', 'Chrome OS': 'Chrome OS',
+    }
+    const mapped = chMap[chPlatform]
+    if (mapped) return mapped
+  }
+
+  // Tier 3: navigator.platform — reliable for Mac/Win/iOS; DevTools rarely spoofs this
+  if (p.startsWith('mac')) return 'MacOS'
+  if (p.startsWith('win')) return 'Windows'
+  if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
+
+  // Tier 4: Additional hardware signals
+  // CSS env(safe-area-inset-top) > 0: iOS notch/Dynamic Island — OS-level, not fakeable by JS
+  if ((ctx.safeAreaInsetTop ?? 0) > 0) return 'iOS'
+
+  // Tier 5: chPlatform alone (easily spoofed) — minimal fallback
+  if (chPlatform === 'Chrome OS') return 'Chrome OS'
+  // Android: require Linux ARM corroboration — pure chPlatform='Android' alone is too easy to spoof
+  if (chPlatform === 'Android' && (p.includes('android') || /^linux arm/i.test(ctx.platform ?? ''))) {
+    return 'Android'
+  }
+  if (p.includes('android') || /^linux arm/i.test(ctx.platform ?? '')) return 'Android'
+
+  return null
+}
+
+/**
+ * Approximate navigator.platform from the UA string for UA-only mode.
+ * Matches what real browsers return: 'MacIntel', 'Win32'/'Win64', 'iPhone', etc.
+ */
+function platformFromUA(ua: string): string {
+  if (/iPhone/.test(ua)) return 'iPhone'
+  if (/iPad/.test(ua))   return 'iPad'
+  if (/iPod/.test(ua))   return 'iPod'
+  if (/Macintosh/.test(ua)) return 'MacIntel'
+  if (/Windows NT/.test(ua)) return /Win64|WOW64/i.test(ua) ? 'Win64' : 'Win32'
+  if (/CrOS/.test(ua)) return 'Linux x86_64'
+  if (/Android/.test(ua)) return /aarch64|arm64/i.test(ua) ? 'Linux aarch64' : 'Linux armv8l'
+  if (/Linux/.test(ua)) {
+    if (/x86_64/i.test(ua))    return 'Linux x86_64'
+    if (/aarch64|arm64/i.test(ua)) return 'Linux aarch64'
+    return 'Linux'
+  }
+  return 'unknown'
+}
+
+/**
+ * Extract a BCP47 locale from UA strings that embed it (e.g. some Android OEM browsers:
+ * "Linux; Android 10; zh-CN; ..."). Standard Chrome/Firefox/Safari desktop UAs do not
+ * include locale, so this returns 'unknown' for them.
+ */
+function languageFromUA(ua: string): string {
+  // Match "; zh-CN;" / "; en-us;" / "; zh_CN;" between delimiters.
+  // Initial segment must be lowercase (filters OS names, Build strings, etc.).
+  const re = /[;(]\s*([a-z]{2,3}(?:[-_][A-Za-z]{2,4})+)\s*[;)]/g
+  let m
+  while ((m = re.exec(ua)) !== null) {
+    const parts = m[1].replace(/_/g, '-').split('-')
+    if (parts.length >= 2) {
+      // Normalize to standard BCP47 casing: lowercase lang, uppercase region
+      return `${parts[0].toLowerCase()}-${parts.slice(1).map(p => p.toUpperCase()).join('-')}`
+    }
+  }
+  return 'unknown'
 }
 
 /**
@@ -26,22 +155,29 @@ export interface ParseOptions {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
-  const effectiveNav: NavContext | undefined = options.ctx ?? options.nav
+  const effectiveNav: EnvContext | NavContext | undefined = options.ctx ?? options.nav
   const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
   const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
-  let osVersion = rawOsVersion
+  const { os: rawOs, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
+  let os: OsName = rawOs
+  let osVersion: string = rawOsVersion
   const device = detectDevice(ua, effectiveNav)
-  const arch = detectArch(ua, options.ctx)
+  const arch = detectArch(ua, options.ctx ?? effectiveNav as EnvContext | undefined)
   const nav = effectiveNav
-  const { isBot, botName } = detectBot(ua)
+  const { isBot, botName } = detectBot(ua, options.customBotDefs)
   const isHeadless = detectHeadless(ua)
-  const language = nav ? getLanguage(nav) : 'unknown'
-  const platform = nav?.platform ?? 'unknown'
+  const language = options.language
+    || (nav?.language || nav?.browserLanguage ? getLanguage(nav) : '')
+    || languageFromUA(ua)
+  const platform = nav?.platform || platformFromUA(ua)
 
   let browser: BrowserName = rawBrowser
   let version = rawVersion
+
+  // Brave cannot be detected via UA (it mimics Chrome). Override when the
+  // browser-side navigator.brave.isBrave() signal is available.
+  if (options.ctx?.hasBrave) browser = 'Brave'
 
   // ── Post-detection overrides ────────────────────────────────────────────────
 
@@ -106,9 +242,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   }
 
   // Firefox Nightly detection — only meaningful in a real browser environment.
-  // The heuristic checks for globals that exist in Chrome (clientInformation) but
-  // not in standard Firefox, or where u2f was removed in Nightly builds.
-  // Skip entirely in Node.js (no nav = not a browser).
   if (browser === 'Firefox' && nav) {
     try {
       if (typeof clientInformation !== 'undefined' || typeof u2f === 'undefined') {
@@ -121,7 +254,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
 
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
   // The Version/ token reliably reflects the real Safari/iOS version.
-  // When Version/ major > CPU iPhone OS major, use Version/ as the real osVersion.
   if (os === 'iOS' && browser === 'Safari') {
     const m = /Version\/([\d.]+)/.exec(ua)
     if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
@@ -129,11 +261,57 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
+  // macOS 26+: Apple unified version numbering — Safari major version = macOS major version.
+  // UA still freezes "Mac OS X 10_15_7"; Version/ carries the real macOS version from 26+.
+  if (os === 'MacOS' && browser === 'Safari') {
+    const m = /Version\/([\d.]+)/.exec(ua)
+    if (m && parseInt(m[1], 10) >= 26) {
+      osVersion = m[1]
+    }
+  }
+
+  // ── Hardware context: OS + osVersion + browser + version ──────────────────
+  if (options.ctx) {
+    const hwOs = osFromHardware(options.ctx)
+    if (hwOs !== null) {
+      if (hwOs !== rawOs) {
+        os = hwOs
+        osVersion = 'unknown'
+      }
+      // UA freezes macOS at 10.15.7 and Android version is often stale;
+      // platformVersion carries the real value. Skip Windows — already resolved via getWindowsVersion().
+      if (os !== 'Windows') {
+        const pv = options.ctx.highEntropyData?.platformVersion
+        if (pv && pv !== '0.0.0') {
+          const parts = pv.split('.').map(Number)
+          while (parts.length > 1 && parts[parts.length - 1] === 0) parts.pop()
+          if (parts[0]) osVersion = parts.join('.')
+        }
+      }
+    }
+
+    const fullVersionList = options.ctx.highEntropyData?.fullVersionList
+    if (fullVersionList) {
+      for (const [brand, browserName] of BRAND_TO_BROWSER) {
+        const entry = fullVersionList.find(e => e.brand === brand)
+        if (entry?.version) {
+          browser = browserName
+          version = entry.version
+          break
+        }
+      }
+    }
+  }
+
   const engine = detectEngine(ua, browser, version)
+
+  const versionMajor = parseInt(version.split('.')[0] ?? '0', 10) || 0
+  const connectionType = (options.ctx ?? options.nav)?.connection?.effectiveType ?? 'unknown'
 
   return {
     browser,
     version,
+    versionMajor,
     engine,
     os,
     osVersion,
@@ -144,6 +322,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     isBot,
     botName,
     language,
-    platform
+    platform,
+    connectionType,
   }
 }

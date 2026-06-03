@@ -53,6 +53,10 @@ export function parseHeaders(headers: Record<string, string | string[] | undefin
 
   const ua = get('user-agent') ?? ''
 
+  // Accept-Language: "zh-CN,zh;q=0.9,en;q=0.8" → take first tag before comma/semicolon
+  const rawLang = get('accept-language')
+  const language = rawLang ? (rawLang.split(',')[0]?.split(';')[0]?.trim() ?? '') : ''
+
   const architecture = unquote(get('sec-ch-ua-arch'))
   const bitness = unquote(get('sec-ch-ua-bitness'))
   const model = unquote(get('sec-ch-ua-model'))
@@ -74,7 +78,7 @@ export function parseHeaders(headers: Record<string, string | string[] | undefin
   const ctx: EnvContext = {
     userAgent: ua,
     platform,
-    language: '',
+    language,
     maxTouchPoints: isMobile ? 1 : 0,
     highEntropyData: Object.keys(highEntropyData).length > 0 ? highEntropyData : undefined,
     windowsVersion,

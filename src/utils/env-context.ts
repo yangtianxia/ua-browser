@@ -12,14 +12,29 @@ export interface UAHighEntropyValues {
 export interface EnvContext extends NavContext {
   webglRenderer?: string
   webglVendor?: string
+  webglMaxTextureSize?: number
+  webglFragPrecision?: number
+  webglCompressedFormats?: {
+    s3tc: boolean   // DXT/BC — desktop GPU
+    pvrtc: boolean  // PowerVR — iOS only
+    etc2: boolean   // GLES 3.0+ — Android mainstream
+    astc: boolean   // Adreno 4xx+ / Mali Txx+ — modern mobile
+  }
   hardwareConcurrency?: number
   deviceMemory?: number
   devicePixelRatio?: number
+  screenWidth?: number
+  screenHeight?: number
+  safeAreaInsetTop?: number
+  audioSampleRate?: number
+  hasVibration?: boolean
+  hasDeviceMotion?: boolean
   pointerType?: 'coarse' | 'fine' | 'none'
   hoverCapability?: boolean
   fontProbes?: Record<string, boolean>
   highEntropyData?: UAHighEntropyValues
   windowsVersion?: string | null
+  hasBrave?: boolean
 }
 
 // OS-specific system fonts used to cross-confirm UA-based OS detection.
@@ -51,19 +66,64 @@ function probeFonts(): Record<string, boolean> {
   }
 }
 
-function getWebGLInfo(): { renderer?: string; vendor?: string } {
+function getWebGLInfo(): {
+  renderer?: string
+  vendor?: string
+  maxTextureSize?: number
+  fragPrecision?: number
+  compressedFormats?: { s3tc: boolean; pvrtc: boolean; etc2: boolean; astc: boolean }
+} {
   try {
     const canvas = document.createElement('canvas')
     const gl = (canvas.getContext('webgl') ?? canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
     if (!gl) return {}
     const ext = gl.getExtension('WEBGL_debug_renderer_info')
-    if (!ext) return {}
-    return {
-      renderer: gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) as string,
-      vendor: gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) as string,
+    const result: ReturnType<typeof getWebGLInfo> = {
+      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+      fragPrecision:  gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT)?.rangeMax,
+      compressedFormats: {
+        s3tc:  !!gl.getExtension('WEBGL_compressed_texture_s3tc'),
+        pvrtc: !!gl.getExtension('WEBGL_compressed_texture_pvrtc'),
+        etc2:  !!gl.getExtension('WEBGL_compressed_texture_etc'),
+        astc:  !!gl.getExtension('WEBGL_compressed_texture_astc_ldr'),
+      },
     }
+    if (ext) {
+      result.renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) as string
+      result.vendor   = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) as string
+    }
+    return result
   } catch {
     return {}
+  }
+}
+
+// Probe CSS env(safe-area-inset-top). On iOS devices with notch / Dynamic Island
+// this returns a hardware-defined pixel value (47–59px). Desktop always returns 0.
+// The value originates from the OS rendering pipeline — it cannot be overridden via JS.
+function getSafeAreaInsetTop(): number {
+  try {
+    const el = document.createElement('div')
+    el.style.cssText = 'position:fixed;top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none'
+    document.body.appendChild(el)
+    const top = parseFloat(getComputedStyle(el).top)
+    document.body.removeChild(el)
+    return isNaN(top) ? 0 : top
+  } catch {
+    return 0
+  }
+}
+
+function getAudioSampleRate(): number | undefined {
+  try {
+    const AC = window.AudioContext ?? (window as any).webkitAudioContext
+    if (!AC) return undefined
+    const ac = new AC() as AudioContext
+    const rate = ac.sampleRate
+    void ac.close()
+    return rate
+  } catch {
+    return undefined
   }
 }
 
@@ -117,13 +177,27 @@ export async function getEnvContext(): Promise<EnvContext> {
   }
 
   if (typeof window !== 'undefined') {
-    ctx.devicePixelRatio = window.devicePixelRatio
-    ctx.pointerType = getPointerType()
+    ctx.devicePixelRatio  = window.devicePixelRatio
+    ctx.screenWidth       = window.screen?.width
+    ctx.screenHeight      = window.screen?.height
+    ctx.safeAreaInsetTop  = getSafeAreaInsetTop()
+    ctx.pointerType       = getPointerType()
     ctx.hoverCapability = getHoverCapability()
-    ctx.fontProbes = probeFonts()
-    const { renderer, vendor } = getWebGLInfo()
-    if (renderer !== undefined) ctx.webglRenderer = renderer
-    if (vendor !== undefined) ctx.webglVendor = vendor
+    ctx.fontProbes      = probeFonts()
+    ctx.audioSampleRate = getAudioSampleRate()
+    ctx.hasVibration    = 'vibrate' in navigator
+    ctx.hasDeviceMotion = 'DeviceMotionEvent' in window
+    try {
+      ctx.hasBrave = await (navigator as unknown as { brave?: { isBrave?(): Promise<boolean> } }).brave?.isBrave?.() ?? false
+    } catch {
+      ctx.hasBrave = false
+    }
+    const { renderer, vendor, maxTextureSize, fragPrecision, compressedFormats } = getWebGLInfo()
+    if (renderer !== undefined)          ctx.webglRenderer = renderer
+    if (vendor !== undefined)            ctx.webglVendor = vendor
+    if (maxTextureSize !== undefined)    ctx.webglMaxTextureSize = maxTextureSize
+    if (fragPrecision !== undefined)     ctx.webglFragPrecision = fragPrecision
+    if (compressedFormats !== undefined) ctx.webglCompressedFormats = compressedFormats
   }
 
   if (base.userAgentData) {

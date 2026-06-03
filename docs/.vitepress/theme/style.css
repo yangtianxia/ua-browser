@@ -1,3 +1,17 @@
+:root {
+  --vp-c-brand-1: #0d6edf;
+  --vp-c-brand-2: #1685fb;
+  --vp-c-brand-3: #1685fb;
+  --vp-c-brand-soft: rgba(22, 133, 251, 0.12);
+}
+
+.dark {
+  --vp-c-brand-1: #4da3ff;
+  --vp-c-brand-2: #3d9afc;
+  --vp-c-brand-3: #1685fb;
+  --vp-c-brand-soft: rgba(22, 133, 251, 0.16);
+}
+
 .pg-wrap {
   max-width: 1280px;
   margin: 0 auto;

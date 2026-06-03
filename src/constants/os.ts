@@ -26,6 +26,10 @@ export const OS_DEFS: readonly OsDef[] = [
   { name: 'Tizen',          detect: /Tizen/,                          versionPattern: /Tizen ([\d.]+)/ },
   { name: 'iOS',            detect: /like Mac OS X/,                  versionPattern: /OS ([\d_]+) like/ },
   { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/ },
+  // visionOS / tvOS must come AFTER iOS: their UAs also contain "like Mac OS X",
+  // so they need to override iOS via the last-match-wins iteration.
+  { name: 'visionOS',       detect: /visionOS/,                       versionPattern: /visionOS ([\d_]+)/ },
+  { name: 'tvOS',           detect: /Apple TV/,                       versionPattern: /OS ([\d_]+) like/ },
   { name: 'Android',        detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
   // HarmonyOS must come after Android: HarmonyOS UAs include "Android", so Android matches
   // first, then HarmonyOS overrides it. versionPattern tries direct extraction first (5.0+

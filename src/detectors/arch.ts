@@ -24,7 +24,13 @@ export function detectArch(ua: string, ctx?: EnvContext): ArchName {
   // Layer 2: WebGL renderer — disambiguates Apple Silicon vs Intel Mac
   const renderer = ctx?.webglRenderer
   if (renderer) {
-    if (/Apple\s+(M\d|A\d{1,2}[A-Z]?)\b/i.test(renderer) || /APPLE M\d/i.test(renderer)) {
+    // "Apple M1/M2/M3" (Chrome/Edge ANGLE) or "Apple GPU" (Safari Metal, no model exposed)
+    // are exclusive to M-series / A-series hardware; Intel Macs never show "Apple GPU".
+    if (
+      /Apple\s+(M\d|A\d{1,2}[A-Z]?)\b/i.test(renderer) ||
+      /APPLE M\d/i.test(renderer) ||
+      /^Apple GPU$/i.test(renderer)
+    ) {
       return 'arm64'
     }
     if (/\b(Intel|AMD|NVIDIA|Radeon)\b/i.test(renderer)) {
