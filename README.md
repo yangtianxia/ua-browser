@@ -164,6 +164,8 @@ import {
   detectBot,            // 独立爬虫检测
   detectBrowser,        // 独立浏览器检测
   detectOS,             // 独立操作系统检测
+  detectEngine,         // 独立渲染引擎检测
+  detectDevice,         // 独立设备类型检测
   detectArch,           // 独立 CPU 架构检测
   detectHeadless,       // 独立无头浏览器检测
   satisfies,            // 条件匹配辅助函数

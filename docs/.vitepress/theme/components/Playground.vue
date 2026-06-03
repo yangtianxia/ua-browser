@@ -9,7 +9,6 @@ const i18n = computed(() => isEn.value ? {
   tabBrowser: 'Current Browser',
   tabApi: 'API Testing',
   // Tab 1
-  redetect: 'Re-detect',
   loading: 'Detecting…',
   noNavigator: 'Open this page in a browser to detect the current environment.',
   parseLabel: 'uaBrowser()',
@@ -57,7 +56,6 @@ const i18n = computed(() => isEn.value ? {
   tabBrowser: '当前浏览器',
   tabApi: 'API 测试',
   // Tab 1
-  redetect: '重新检测',
   loading: '检测中…',
   noNavigator: '请在浏览器中打开此页面以检测当前环境。',
   parseLabel: 'uaBrowser()',
@@ -268,16 +266,6 @@ const diffKeys = computed(() => {
 
     <!-- ── Tab 1: Current Browser ───────────────────────── -->
     <template v-if="activeTab === 'browser'">
-
-      <div class="browser-action">
-        <button
-          class="btn btn--primary"
-          :disabled="!loaded || browserDetecting"
-          @click="runDetectBrowser"
-        >
-          {{ browserDetecting ? i18n.loading : i18n.redetect }}
-        </button>
-      </div>
 
       <div v-if="compareResult" class="result-area">
         <div v-if="diffKeys.size > 0" class="diff-hint">
@@ -601,15 +589,6 @@ const diffKeys = computed(() => {
 .tab--active {
   color: var(--vp-c-brand-1);
   border-bottom-color: var(--vp-c-brand-1);
-}
-
-/* ── Tab 1 action bar ───────────────────────────────────── */
-
-.browser-action {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--vp-c-divider);
-  display: flex;
-  justify-content: flex-end;
 }
 
 /* ── Input area (Tab 2) ─────────────────────────────────── */

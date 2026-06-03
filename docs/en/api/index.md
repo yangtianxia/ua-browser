@@ -528,6 +528,56 @@ const { os, osVersion } = detectOS(navigator.userAgent)
 
 ---
 
+## `detectEngine(ua)` {#detectengine}
+
+Standalone rendering engine detector. Does not run the full `parseUA()` pipeline.
+
+```typescript
+import { detectEngine } from 'ua-browser'
+
+detectEngine(ua: string): EngineName
+```
+
+| Parameter | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | Yes | User agent string |
+
+**Returns:** [`EngineName`](/en/api/types#enginename)
+
+**Example:**
+
+```typescript
+const engine = detectEngine(navigator.userAgent)
+// engine: 'Blink'
+```
+
+---
+
+## `detectDevice(ua)` {#detectdevice}
+
+Standalone device type detector. Does not run the full `parseUA()` pipeline. UA-only — does not use hardware signals.
+
+```typescript
+import { detectDevice } from 'ua-browser'
+
+detectDevice(ua: string): DeviceName
+```
+
+| Parameter | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | Yes | User agent string |
+
+**Returns:** [`DeviceName`](/en/api/types#devicename)
+
+**Example:**
+
+```typescript
+const device = detectDevice(navigator.userAgent)
+// device: 'Mobile'
+```
+
+---
+
 ## `satisfies(info, criteria)` {#satisfies}
 
 Condition-matching helper. TypeScript-aware, cleaner than chaining `&&` expressions.
