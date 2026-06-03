@@ -13,10 +13,17 @@ export type BotName =
   | 'Facebookbot'
   | 'Twitterbot'
   | 'LinkedInBot'
+  | 'PinterestBot'
+  | 'Slackbot'
+  | 'Discordbot'
+  | 'TelegramBot'
+  | 'WhatsApp'
   | 'SemrushBot'
   | 'AhrefsBot'
   | 'MJ12bot'
   | 'PetalBot'
+  | 'ScreamingFrog'
+  | 'DataForSeoBot'
   | 'GPTBot'
   | 'OAI-SearchBot'
   | 'ChatGPT-User'
@@ -30,6 +37,8 @@ export type BotName =
   | 'Diffbot'
   | 'cohere-ai'
   | 'YouBot'
+  | 'UptimeRobot'
+  | 'ia_archiver'
   | 'GenericBot'
   | 'unknown'
 
@@ -52,28 +61,39 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'PetalBot',    detect: /PetalBot/ },
   { name: 'Applebot-Extended', detect: /Applebot-Extended/ },
   { name: 'Applebot',    detect: /Applebot/ },
-  // Social
-  { name: 'Facebookbot', detect: /(facebookexternalhit|FacebookBot)/ },
-  { name: 'Twitterbot',  detect: /Twitterbot/ },
-  { name: 'LinkedInBot', detect: /LinkedInBot/ },
+  // Social media crawlers
+  { name: 'Facebookbot',  detect: /(facebookexternalhit|FacebookBot)/ },
+  { name: 'Twitterbot',   detect: /Twitterbot/ },
+  { name: 'LinkedInBot',  detect: /LinkedInBot/ },
+  { name: 'PinterestBot', detect: /Pinterest/ },
+  // Messaging link preview bots
+  { name: 'Slackbot',    detect: /Slackbot/ },
+  { name: 'Discordbot',  detect: /Discordbot/ },
+  { name: 'TelegramBot', detect: /TelegramBot/ },
+  { name: 'WhatsApp',    detect: /WhatsApp/ },
   // SEO tools
   { name: 'SemrushBot',    detect: /SemrushBot/ },
   { name: 'AhrefsBot',     detect: /AhrefsBot/ },
   { name: 'MJ12bot',       detect: /MJ12bot/ },
+  { name: 'ScreamingFrog', detect: /Screaming Frog/ },
+  { name: 'DataForSeoBot', detect: /DataForSeoBot/ },
   // AI / LLM crawlers
-  { name: 'GPTBot',            detect: /GPTBot/ },
-  { name: 'OAI-SearchBot',     detect: /OAI-SearchBot/ },
-  { name: 'ChatGPT-User',      detect: /ChatGPT-User/ },
-  { name: 'ClaudeBot',         detect: /ClaudeBot/ },
-  { name: 'PerplexityBot',     detect: /PerplexityBot/ },
-  { name: 'CCBot',             detect: /CCBot/ },
-  { name: 'AdsBot',            detect: /AdsBot-Google/ },
-  { name: 'Google-Extended',   detect: /Google-Extended/ },
+  { name: 'GPTBot',             detect: /GPTBot/ },
+  { name: 'OAI-SearchBot',      detect: /OAI-SearchBot/ },
+  { name: 'ChatGPT-User',       detect: /ChatGPT-User/ },
+  { name: 'ClaudeBot',          detect: /ClaudeBot/ },
+  { name: 'PerplexityBot',      detect: /PerplexityBot/ },
+  { name: 'CCBot',              detect: /CCBot/ },
+  { name: 'AdsBot',             detect: /AdsBot-Google/ },
+  { name: 'Google-Extended',    detect: /Google-Extended/ },
   { name: 'Meta-ExternalAgent', detect: /meta-externalagent/i },
-  { name: 'Amazonbot',         detect: /Amazonbot/ },
-  { name: 'Diffbot',           detect: /Diffbot/ },
-  { name: 'cohere-ai',         detect: /cohere-ai/ },
-  { name: 'YouBot',            detect: /YouBot/ },
+  { name: 'Amazonbot',          detect: /Amazonbot/ },
+  { name: 'Diffbot',            detect: /Diffbot/ },
+  { name: 'cohere-ai',          detect: /cohere-ai/ },
+  { name: 'YouBot',             detect: /YouBot/ },
+  // Monitoring / archiving
+  { name: 'UptimeRobot', detect: /UptimeRobot/ },
+  { name: 'ia_archiver', detect: /ia_archiver/ },
   // Generic catch-all (must be last)
-  { name: 'GenericBot',    detect: /(bot|crawler|spider|crawling|scraper)/i }
+  { name: 'GenericBot', detect: /(bot|crawler|spider|crawling|scraper)/i },
 ] as const

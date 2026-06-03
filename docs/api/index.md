@@ -1,48 +1,35 @@
 # API 参考
 
-## 默认导出
+## `uaBrowser()` {#uabrowser}
 
-### `uaBrowser(ua?)`
-
-同步解析 UA 字符串，返回完整的环境信息对象。在浏览器环境中自动读取 `navigator.userAgent` 并注入 `navigator` 上下文（语言、平台、触控点数）。
+检测当前浏览器环境，返回完整的环境信息对象。自动读取 `navigator.userAgent` 并注入 `navigator` 上下文（语言、平台、触控点数）。
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-uaBrowser(ua?: string, options?: { strategy?: DetectStrategy }): EnvOption
+uaBrowser(): EnvOption
 ```
-
-| 参数 | 类型 | 必填 | 说明 |
-| :-- | :-- | :-- | :-- |
-| `ua` | `string` | 否 | 要解析的 UA 字符串，省略时自动读取 `navigator.userAgent` |
-| `options.strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 否 | 信号裁决策略，默认 `'auto'` |
 
 **返回值：** [`EnvOption`](/api/types#envoption)
 
 **示例：**
 
 ```typescript
-// 在浏览器中自动读取 navigator.userAgent
 const info = uaBrowser()
-console.log(info.browser)    // 'Chrome'
-console.log(info.os)         // 'Windows'
-console.log(info.confidence) // 'low' — 纯 UA 字符串
-
-// 传入指定 UA 字符串
-const info2 = uaBrowser('Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 ...')
-console.log(info2.device) // 'Mobile'
+console.log(info.browser) // 'Chrome'
+console.log(info.os)      // 'Windows'
 ```
 
 **注意事项：**
 - 无法判断的字段返回 `'unknown'`，不会返回空字符串。
-- `confidence` 始终为 `'low'`，因为此函数不采集硬件信号。
 - 在 Node.js 中 `navigator` 不可用，`language` 和 `platform` 将为 `'unknown'`。
+- 若需要解析任意 UA 字符串，请使用 [`parseUA()`](#parseua)。
 - 若需要更高精度，浏览器端请使用 [`uaBrowser.detect()`](#uabrowser-detect)。
 
 默认导出对象同时挂载了以下静态成员：
 
 ```typescript
-uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
+uaBrowser.detect(): Promise<EnvOption>
 uaBrowser.isWebview(ua: string): boolean
 uaBrowser.getLanguage(): string
 uaBrowser.VERSION: string
@@ -50,20 +37,15 @@ uaBrowser.VERSION: string
 
 ---
 
-### `uaBrowser.detect(ua?)`
+## `uaBrowser.detect()` {#uabrowser-detect}
 
-`uaBrowser()` 的异步高精度版本。内部先调用 [`getEnvContext()`](#getenvcontext) 采集硬件与浏览器信号，再执行解析，返回的 `confidence` 通常为 `'medium'` 或 `'high'`。
+`uaBrowser()` 的异步高精度版本。内部先调用 [`getEnvContext()`](#getenvcontext) 采集硬件与浏览器信号，再执行解析，能更准确地识别设备类型和 CPU 架构。
 
 **这是浏览器端代码的推荐入口。**
 
 ```typescript
-uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<EnvOption>
+uaBrowser.detect(): Promise<EnvOption>
 ```
-
-| 参数 | 类型 | 必填 | 说明 |
-| :-- | :-- | :-- | :-- |
-| `ua` | `string` | 否 | UA 字符串，省略时自动读取 `navigator.userAgent` |
-| `options.strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 否 | 信号裁决策略，默认 `'auto'` |
 
 **返回值：** `Promise<`[`EnvOption`](/api/types#envoption)`>`
 
@@ -85,9 +67,8 @@ uaBrowser.detect(ua?: string, options?: { strategy?: DetectStrategy }): Promise<
 import uaBrowser from 'ua-browser'
 
 const result = await uaBrowser.detect()
-console.log(result.device)     // 'Mobile' — 即便开了桌面模式也能正确识别
-console.log(result.arch)       // 'arm64' 或 'x86_64'
-console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
+console.log(result.device) // 'Mobile' — 即便开了桌面模式也能正确识别
+console.log(result.arch)   // 'arm64' 或 'x86_64'
 ```
 
 **注意事项：**
@@ -96,9 +77,7 @@ console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
 
 ---
 
-## 命名导出
-
-### `parseUA(ua, options?)`
+## `parseUA(ua, options?)` {#parseua}
 
 纯函数版本：无全局状态、无 DOM 访问。适合 SSR、Node.js 及单元测试。
 
@@ -121,53 +100,39 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 | `windowsVersion` | `string \| null` | 由 `getWindowsVersion()` 预先获取的 Windows 版本，用于区分 Windows 10 / 11。 |
 | `ctx` | [`EnvContext`](/api/types#envcontext) | `getEnvContext()` 的返回值，包含完整多信号上下文。**同时传入时优先级高于 `nav` 和 `windowsVersion`**。 |
 | `customBotDefs` | `readonly BotDef[]` | 自定义 Bot 检测规则，插在 `GenericBot` 兜底之前，不影响全局状态。 |
-| `strategy` | [`DetectStrategy`](/api/types#detectstrategy) | 信号裁决策略，控制信号冲突时的处理方式。默认 `'auto'`。 |
+| `language` | `string` | 显式语言覆盖（BCP47，如 `"zh-CN"`）。优先级高于 nav/ctx 及 UA 推断，适合服务端传入 `Accept-Language` 请求头。 |
 
 **返回值：** [`EnvOption`](/api/types#envoption)
 
 **示例：**
 
 ```typescript
-// 最简用法：仅 UA 字符串（confidence: 'low'）
+// 最简用法：仅 UA 字符串
 const result = parseUA(navigator.userAgent)
 
-// 注入 navigator 上下文（confidence: 'low'，但 language/platform 已填充）
+// 注入 navigator 上下文（language/platform 已填充）
 import { parseUA, getNavContext } from 'ua-browser'
 const nav = getNavContext()
 const result = parseUA(navigator.userAgent, { nav })
 console.log(result.language) // 'zh-CN'
 console.log(result.platform) // 'Win32'
 
-// 注入完整环境上下文（confidence: 'medium'）
+// 注入完整环境上下文（启用多信号检测）
 import { parseUA, getEnvContext } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
-console.log(result.arch)     // 'arm64'（基于 WebGL / Client Hints）
+console.log(result.arch) // 'arm64'（基于 WebGL / Client Hints）
 
 // 自定义 Bot 规则
 import { parseUA } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 const myBots: BotDef[] = [{ name: 'GenericBot', detect: /MyInternalCrawler/ }]
 const result = parseUA(ua, { customBotDefs: myBots })
-
-// hardware-first：Client Hints / 硬件信号优先，忽略被篡改的 UA
-import { parseUA, getEnvContext } from 'ua-browser'
-const ctx = await getEnvContext()
-const result = parseUA(navigator.userAgent, { ctx, strategy: 'hardware-first' })
-// 例：Mac Chrome DevTools 开启 Android 模拟时：
-// result.os     → 'MacOS'  （来自 Client Hints，而非伪造的 UA）
-// result.device → 'PC'     （来自 ANGLE 渲染器，而非 UA）
-// result.confidence → 'high'
-
-// strict：信号矛盾的字段返回 'unknown'
-const result = parseUA(navigator.userAgent, { ctx, strategy: 'strict' })
-// result.os         → 'unknown'   （UA 说 Android，platform 说 MacOS）
-// result.confidence → 'conflict'
 ```
 
 ---
 
-### `parseHeaders(headers)`
+## `parseHeaders(headers)` {#parseheaders}
 
 从 HTTP 请求头中解析 UA 及 Client Hints，返回 [`EnvOption`](/api/types#envoption)。适用于 SSR 精准检测场景。
 
@@ -189,7 +154,7 @@ parseHeaders(headers: Record<string, string | string[] | undefined>): EnvOption
 | :-- | :-- |
 | `user-agent` | 完整 UA 字符串 |
 | `sec-ch-ua` | 浏览器品牌列表 |
-| `sec-ch-ua-full-version-list` | 精确浏览器版本 → `confidence: 'high'` |
+| `sec-ch-ua-full-version-list` | 精确浏览器版本 |
 | `sec-ch-ua-platform` | 操作系统名称 |
 | `sec-ch-ua-platform-version` | OS 版本（可区分 Windows 10 / 11） |
 | `sec-ch-ua-arch` | CPU 架构（如 `x86`、`arm`） |
@@ -207,18 +172,17 @@ res.setHeader('Accept-CH', ACCEPT_CH)
 
 // 后续请求携带 Client Hints 后
 const result = parseHeaders(req.headers)
-console.log(result.arch)       // 'x86_64'（来自 Sec-CH-UA-Arch）
-console.log(result.os)         // 'Windows'
-console.log(result.confidence) // 'high'（Sec-CH-UA-Full-Version-List 存在时）
+console.log(result.arch) // 'x86_64'（来自 Sec-CH-UA-Arch）
+console.log(result.os)   // 'Windows'
 ```
 
 **注意事项：**
 - 兼容 Express、Koa、Next.js API Route、Fastify、Hono 等任何以普通对象形式暴露请求头的框架。
-- Client Hints 请求头缺失时回退到纯 UA 解析（`confidence: 'low'`）。
+- Client Hints 请求头缺失时回退到纯 UA 解析。
 
 ---
 
-### `getEnvContext()`
+## `getEnvContext()` {#getenvcontext}
 
 一次性采集当前浏览器的所有可用信号，返回 [`EnvContext`](/api/types#envcontext) 对象，再传给 `parseUA({ ctx })` 以启用多信号检测。
 
@@ -252,10 +216,9 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.device)     // 'Mobile' — 开了桌面模式也能正确识别
-console.log(result.arch)       // 'arm64'（Apple Silicon）或 'x86_64'（Intel）
-console.log(result.language)   // 'zh-CN'
-console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
+console.log(result.device)   // 'Mobile' — 开了桌面模式也能正确识别
+console.log(result.arch)     // 'arm64'（Apple Silicon）或 'x86_64'（Intel）
+console.log(result.language) // 'zh-CN'
 ```
 
 **注意事项：**
@@ -265,7 +228,7 @@ console.log(result.confidence) // 'medium'（Client Hints 可用时为 'high'）
 
 ---
 
-### `getWindowsVersion(nav)`
+## `getWindowsVersion(nav)` {#getwindowsversion}
 
 异步获取精确的 Windows 版本，用于区分 Windows 10 与 Windows 11（两者 UA 字符串相同，均为 `Windows NT 10.0`）。
 
@@ -298,7 +261,7 @@ console.log(result.osVersion) // '11' 或 '10'
 
 ---
 
-### `detectBot(ua, customDefs?)`
+## `detectBot(ua, customDefs?)` {#detectbot}
 
 独立爬虫检测器，不运行完整 `parseUA()` 流水线。
 
@@ -347,7 +310,7 @@ parseUA(ua, { customBotDefs: myDefs })
 
 ---
 
-### `detectArch(ua, ctx?)`
+## `detectArch(ua, ctx?)` {#detectarch}
 
 独立 CPU 架构检测器。不传 `ctx` 时仅依赖 UA 字符串启发式推断。
 
@@ -383,7 +346,7 @@ const arch = detectArch(navigator.userAgent, ctx)
 
 ---
 
-### `detectHeadless(ua)`
+## `detectHeadless(ua)` {#detectheadless}
 
 检测 UA 字符串是否表明当前为无头浏览器。
 
@@ -399,7 +362,9 @@ detectHeadless(ua: string): boolean
 
 **返回值：** `boolean`
 
-**可检测的标识：** `HeadlessChrome`、`Headless`、`PhantomJS`、`SlimerJS`、`Nightmare`、`Puppeteer`、`Playwright`、`jsdom` 等常见无头标识。
+**可检测的标识：** `HeadlessChrome`、`Headless`、`PhantomJS`、`Electron`、`Playwright`、`jsdom`、`Selenium`。
+
+> 现代 Puppeteer / Playwright 使用隐身模式可隐藏上述标识，此函数仅覆盖未经伪装的常见场景。
 
 **示例：**
 
@@ -410,7 +375,7 @@ detectHeadless('Mozilla/5.0 ... HeadlessChrome/124.0.0.0 ...')
 
 ---
 
-### `isWebview(ua)`
+## `isWebview(ua)` {#iswebview}
 
 检测 UA 是否表明当前为嵌入式 WebView（Android Webview 或 iOS WKWebView）。
 
@@ -440,7 +405,7 @@ isWebview('Mozilla/5.0 ... Version/17.4 ... Safari/604.1') // false （真实 Sa
 
 ---
 
-### `getNavContext()`
+## `getNavContext()` {#getnavcontext}
 
 读取当前浏览器的 `navigator`，返回 [`NavContext`](/api/types#navcontext) 对象。在 Node.js 中返回安全的空对象，调用方无需做环境判断。
 
@@ -468,7 +433,7 @@ console.log(result.platform) // 'Win32'
 
 ---
 
-### `getLanguage(nav)`
+## `getLanguage(nav)` {#getlanguage}
 
 从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言。将语言标签规范化为 BCP 47 格式（如 `'en-us'` → `'en-US'`，`'ZH_CN'` → `'zh-CN'`）。
 
@@ -493,7 +458,7 @@ console.log(getLanguage(nav)) // 'zh-CN'
 
 ---
 
-### `ACCEPT_CH`
+## `ACCEPT_CH` {#accept-ch}
 
 包含 `parseHeaders()` 可消费的所有 Client Hints 请求头名称的常量字符串。将其设置为 `Accept-CH` 响应头，以请求支持的浏览器（Chrome / Edge 90+）在后续请求中携带这些信息。
 
@@ -513,12 +478,94 @@ res.setHeader('Vary', 'Sec-CH-UA, Sec-CH-UA-Full-Version-List')  // 推荐同时
 
 ---
 
-### `VERSION`
+## `detectBrowser(ua)` {#detectbrowser}
+
+独立浏览器检测器，不运行完整 `parseUA()` 流水线。
+
+```typescript
+import { detectBrowser } from 'ua-browser'
+
+detectBrowser(ua: string): { browser: BrowserName; version: string }
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | 是 | UA 字符串 |
+
+**返回值：** `{ browser: BrowserName; version: string }`
+
+**示例：**
+
+```typescript
+const { browser, version } = detectBrowser(navigator.userAgent)
+// browser: 'Chrome', version: '124.0.0.0'
+```
+
+---
+
+## `detectOS(ua)` {#detectos}
+
+独立操作系统检测器，不运行完整 `parseUA()` 流水线。
+
+```typescript
+import { detectOS } from 'ua-browser'
+
+detectOS(ua: string): { os: OsName; osVersion: string }
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | 是 | UA 字符串 |
+
+**返回值：** `{ os: OsName; osVersion: string }`
+
+**示例：**
+
+```typescript
+const { os, osVersion } = detectOS(navigator.userAgent)
+// os: 'Windows', osVersion: '10'
+```
+
+---
+
+## `satisfies(info, criteria)` {#satisfies}
+
+条件匹配辅助函数。支持 TypeScript 类型检查，比手写 `&&` 链更简洁。
+
+```typescript
+import { satisfies } from 'ua-browser'
+
+satisfies(info: EnvOption, criteria: Partial<EnvOption>): boolean
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `info` | [`EnvOption`](/api/types#envoption) | 是 | `parseUA()` 或 `uaBrowser()` 的返回值 |
+| `criteria` | `Partial<EnvOption>` | 是 | 要匹配的字段子集 |
+
+**返回值：** `boolean`
+
+**示例：**
+
+```typescript
+import uaBrowser, { satisfies } from 'ua-browser'
+
+const info = uaBrowser()
+
+// 等同于 info.os === 'iOS' && info.device === 'Mobile'
+if (satisfies(info, { os: 'iOS', device: 'Mobile' })) {
+  // ...
+}
+```
+
+---
+
+## `VERSION` {#version}
 
 当前库版本号字符串，与 `package.json` 中的 `version` 字段一致。
 
 ```typescript
 import { VERSION } from 'ua-browser'
 
-VERSION: string  // 例如 '1.5.0'
+VERSION: string  // 例如 '2.0.0'
 ```

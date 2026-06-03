@@ -37,7 +37,7 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
-    "docs:dev": "pnpm build && vitepress dev docs",
+    "docs:dev": "pnpm build && vitepress dev docs --host 0.0.0.0",
     "docs:build": "pnpm build && vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },

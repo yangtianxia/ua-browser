@@ -272,3 +272,21 @@ describe('detectDevice', () => {
     })
   })
 })
+
+describe('Console / XR devices', () => {
+  it('PlayStation 5 → Console', () => {
+    expect(detectDevice(UA.ps5.browser)).toBe('Console')
+  })
+
+  it('Xbox Edge UA → Console', () => {
+    expect(detectDevice(UA.xbox.edge)).toBe('Console')
+  })
+
+  it('Meta Quest → XR', () => {
+    expect(detectDevice(UA.quest.browser)).toBe('XR')
+  })
+
+  it('visionOS UA → XR', () => {
+    expect(detectDevice(UA.visionOS.v1)).toBe('XR')
+  })
+})

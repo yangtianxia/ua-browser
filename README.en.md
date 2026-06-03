@@ -11,11 +11,12 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, headl
 
 ## Features
 
-- **Comprehensive UA detection** — browser, OS, engine, device type (Mobile / Tablet / TV / PC), CPU arch, bots, headless browsers
+- **Comprehensive UA detection** — browser (incl. Arc / Brave), OS (incl. visionOS / tvOS), engine, device type (Mobile / Tablet / PC / TV / Console / XR), CPU arch, bots, headless browsers
 - **Robust device detection** — hardware signals (WebGL GPU renderer, CSS safe-area-inset, DPR, vibration/motion APIs) correctly identify mobile devices even when desktop mode is enabled
 - **Multi-signal arch detection** — `getEnvContext()` collects Client Hints, WebGL renderer, and font probes to accurately distinguish Apple Silicon from Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH` for precise server-side detection (CPU arch, platform) in Chrome / Edge 90+
-- **AI bot recognition** — built-in support for GPTBot, ClaudeBot, PerplexityBot, CCBot and more
+- **AI bot recognition** — 40+ built-in bot rules: GPTBot, ClaudeBot, PerplexityBot, CCBot, messaging link-preview bots (Slack, Discord, Telegram, WhatsApp), and more
+- **Condition matching** — `satisfies(info, { os: 'iOS', device: 'Mobile' })` helper with TypeScript type checking
 - **Zero dependencies** — no runtime dependencies, tiny bundle size after gzip
 - **Pure function** — `parseUA()` has no global state, works seamlessly with SSR / Node.js
 - **TypeScript** — full type definitions with precise literal union types (`BrowserName`, `OsName`, etc.)
@@ -40,24 +41,25 @@ const info = uaBrowser()
 
 console.log(info)
 // {
-//   browser:    'Chrome',
-//   version:    '124.0.0.0',
-//   engine:     'Blink',
-//   os:         'Windows',
-//   osVersion:  '10',
-//   device:     'PC',
-//   arch:       'x86_64',
-//   isWebview:  false,
-//   isHeadless: false,
-//   isBot:      false,
-//   botName:    'unknown',
-//   language:   'en-US',
-//   platform:   'Win32',
-//   confidence: 'low'    // UA string only
+//   browser:        'Chrome',
+//   version:        '124.0.0.0',
+//   versionMajor:   124,
+//   engine:         'Blink',
+//   os:             'Windows',
+//   osVersion:      '10',
+//   device:         'PC',
+//   arch:           'x86_64',
+//   isWebview:      false,
+//   isHeadless:     false,
+//   isBot:          false,
+//   botName:        'unknown',
+//   language:       'en-US',
+//   platform:       'Win32',
+//   connectionType: 'unknown'
 // }
 ```
 
-> Pass a custom UA string: `uaBrowser('Mozilla/5.0 ...')`
+> To parse an arbitrary UA string, use the named export: `parseUA('Mozilla/5.0 ...')`
 
 ## Usage
 
@@ -69,9 +71,8 @@ Use `detect()` for accurate device and arch detection — it collects hardware s
 import uaBrowser from 'ua-browser'
 
 const result = await uaBrowser.detect()
-console.log(result.device)     // 'Mobile' — correct even in desktop mode
-console.log(result.arch)       // 'arm64' or 'x86_64'
-console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+console.log(result.device) // 'Mobile' — correct even in desktop mode
+console.log(result.arch)   // 'arm64' or 'x86_64'
 
 if (result.device === 'Mobile') {
   // redirect to mobile version
@@ -122,9 +123,8 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.device)     // 'Mobile' — correct even in desktop mode
-console.log(result.arch)       // 'arm64' or 'x86_64'
-console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+console.log(result.device) // 'Mobile' — correct even in desktop mode
+console.log(result.arch)   // 'arm64' or 'x86_64'
 ```
 
 ### SSR Client Hints
@@ -158,13 +158,13 @@ console.log(result.osVersion) // '10' or '11'
 
 ## API
 
-### Default export `uaBrowser(ua?)`
+### Default export `uaBrowser()`
 
-Automatically injects the `navigator` context (language, platform, MIME types, etc.) in browser environments.
+Detects the current browser environment, automatically injecting the `navigator` context (language, platform, MIME types, etc.).
 
 ```typescript
-uaBrowser()          // reads navigator.userAgent automatically
-uaBrowser(customUA)  // custom UA string, still injects browser context
+uaBrowser()         // reads navigator.userAgent automatically
+parseUA(customUA)   // parse any UA string without browser context
 ```
 
 ### Named exports (tree-shakeable)
@@ -180,8 +180,11 @@ import {
   ACCEPT_CH,            // response header constant to request Client Hints
   isWebview,            // detect Android Webview / iOS WKWebView
   detectBot,            // standalone bot detection
+  detectBrowser,        // standalone browser detection
+  detectOS,             // standalone OS detection
   detectArch,           // standalone CPU architecture detection
   detectHeadless,       // standalone headless browser detection
+  satisfies,            // condition-matching helper
   VERSION,              // current library version
 } from 'ua-browser'
 ```
@@ -192,10 +195,11 @@ import {
 | :-- | :-- | :-- |
 | `browser` | `BrowserName` | Browser name |
 | `version` | `string` | Browser version |
+| `versionMajor` | `number` | Browser major version (`parseInt(version)`) |
 | `engine` | `EngineName` | Rendering engine |
 | `os` | `OsName` | Operating system |
 | `osVersion` | `string` | OS version |
-| `device` | `DeviceName` | Device type: `Mobile` \| `Tablet` \| `TV` \| `PC` |
+| `device` | `DeviceName` | Device type: `Mobile` \| `Tablet` \| `PC` \| `TV` \| `Console` \| `XR` |
 | `arch` | `ArchName` | CPU architecture |
 | `isWebview` | `boolean` | Whether running in Android Webview or iOS WKWebView |
 | `isHeadless` | `boolean` | Whether running in a headless / automated browser |
@@ -203,19 +207,19 @@ import {
 | `botName` | `BotName` | Bot name |
 | `language` | `string` | Browser language, e.g. `en-US` |
 | `platform` | `string` | Platform identifier, e.g. `Win32` |
-| `confidence` | `'high' \| 'medium' \| 'low'` | Detection reliability: `high` = Client Hints used; `medium` = `ctx` provided; `low` = UA string only |
+| `connectionType` | `string` | Network type: `4g` \| `3g` \| `2g` \| `slow-2g` \| `unknown` |
 
 > All fields return `'unknown'` when undetected — never an empty string or `null`.
 
 ## Supported
 
-Over 70 browsers, 17 operating systems, and 19 bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
+Over 70 browsers, 20 operating systems, and 40+ bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
 
 Highlights:
-- **Browsers** — Chrome, Safari, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu and more
-- **OS** — Windows, macOS, Android, iOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
-- **AI bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot and more
-- **Devices** — Mobile, Tablet, TV (Samsung Smart TV, HbbTV), PC
+- **Browsers** — Chrome, Safari, Arc, Brave, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu and more
+- **OS** — Windows, macOS, Android, iOS, visionOS, tvOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
+- **Bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot; messaging bots (Slack, Discord, Telegram, WhatsApp) and more
+- **Devices** — Mobile, Tablet, PC, TV (Samsung Smart TV, HbbTV), Console (PS5, Xbox, Switch), XR (Vision Pro, Quest)
 
 ## License
 

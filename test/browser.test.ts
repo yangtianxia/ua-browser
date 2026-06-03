@@ -345,6 +345,24 @@ describe('detectBrowser', () => {
     })
   })
 
+  describe('Arc browser', () => {
+    it('detects Arc on macOS', () => {
+      const r = detectBrowser(UA.arc.mac)
+      expect(r.browser).toBe('Arc')
+      expect(r.version).toBe('1.34.0')
+    })
+
+    it('detects Arc on Windows', () => {
+      const r = detectBrowser(UA.arc.windows)
+      expect(r.browser).toBe('Arc')
+      expect(r.version).toBe('1.34.0')
+    })
+
+    it('Arc UA is not detected as Chrome', () => {
+      expect(detectBrowser(UA.arc.mac).browser).not.toBe('Chrome')
+    })
+  })
+
   describe('international browsers', () => {
     it('detects Samsung Internet', () => {
       const r = detectBrowser(UA.samsungInternet.mobile)

@@ -1,4 +1,4 @@
-import type { EnvOption, BrowserName, OsName, DetectStrategy } from './types.js'
+import type { EnvOption, BrowserName, OsName } from './types.js'
 import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
@@ -20,74 +20,132 @@ export interface ParseOptions {
   /** Additional bot definitions prepended before the GenericBot catch-all. */
   customBotDefs?: readonly BotDef[]
   /**
-   * Signal arbitration strategy.
-   *
-   * - `'auto'` (default) — UA first, hardware fills gaps
-   * - `'ua-first'` — UA string is authoritative; hardware only supplements language/platform/arch
-   * - `'hardware-first'` — hardware signals (Client Hints, WebGL) take precedence over UA
-   * - `'strict'` — contradicting signals produce `'unknown'` and `confidence: 'conflict'`
+   * Explicit language override (BCP47, e.g. "zh-CN"). Useful for server-side parsing
+   * where the Accept-Language header is available but no browser context exists.
+   * Takes precedence over language derived from ctx/nav or UA string.
    */
-  strategy?: DetectStrategy
+  language?: string
 }
 
-// Maps detected BrowserName to the expected brand strings in Sec-CH-UA-Full-Version-List.
-// Only Chromium-based browsers that actually send Client Hints are included.
-// Brave blocks Client Hints by default; Samsung Internet doesn't support them.
-const BRAND_MAP: Partial<Record<BrowserName, string[]>> = {
-  Chrome:   ['Google Chrome', 'Chromium'],
-  Edge:     ['Microsoft Edge'],
-  Chromium: ['Chromium'],
-  Opera:    ['Opera'],
-  Vivaldi:  ['Vivaldi'],
-}
-
-// All brand strings that identify a Chromium-based browser in fullVersionList.
-const ALL_CHROMIUM_BRANDS = new Set(Object.values(BRAND_MAP).flat())
+// Priority-ordered brand → browser, derived from Client Hints fullVersionList.
+// More specific brands (Edge, Opera, Vivaldi) listed before the generic Chrome/Chromium
+// so that e.g. an Edge UA with both 'Microsoft Edge' and 'Chromium' resolves to Edge.
+const BRAND_TO_BROWSER: ReadonlyArray<[string, BrowserName]> = [
+  ['Microsoft Edge', 'Edge'],
+  ['Opera',          'Opera'],
+  ['Vivaldi',        'Vivaldi'],
+  ['Google Chrome',  'Chrome'],
+  ['Chromium',       'Chromium'],
+]
 
 /**
- * Infer the OS from hardware context (Client Hints platform or navigator.platform).
- * Returns null when neither source provides enough information.
+ * Infer the OS from hardware context using a tiered trust model.
  *
- * Priority rationale:
- * - navigator.platform is NOT spoofed by Chrome DevTools device emulation.
- * - userAgentData.platform IS spoofed (DevTools sets it to 'Android' etc.).
- * - So for Mac/Win/iOS we trust navigator.platform first; for Android/ChromeOS we
- *   use userAgentData.platform to distinguish them from generic Linux.
- * - Generic 'Linux' is intentionally NOT returned — it is too ambiguous (could be
- *   a Node.js server process running on Linux, not a real browser hardware signal).
+ * Tier 1 — WebGL (unspoofable by DevTools):
+ *   pvrtc = PowerVR GPU → iOS only; ANGLE → desktop (blocks DevTools mobile emulation);
+ *   Adreno/Mali → Android.
+ * Tier 2 — Client Hints with platformVersion (getHighEntropyValues call, harder to fake consistently).
+ * Tier 3 — navigator.platform (reliable for Mac/Win/iOS; DevTools rarely changes this).
+ * Tier 4 — Additional hardware signals: CSS safe-area-inset (iOS notch/Dynamic Island).
+ * Tier 5 — chPlatform alone with Linux ARM corroboration (last-resort Android fallback).
+ *
+ * Generic 'Linux' is intentionally not returned — too ambiguous for server vs. desktop.
  */
 function osFromHardware(ctx: EnvContext): OsName | null {
-  // navigator.platform — NOT spoofed by DevTools, unambiguous for Mac/Win/iOS.
   const p = (ctx.platform ?? '').toLowerCase()
+  const chPlatform = ctx.userAgentData?.platform
+  const platformVersion = ctx.highEntropyData?.platformVersion
+  const hasPlatformVersion = !!(platformVersion && platformVersion !== '0.0.0')
+
+  // Tier 1: WebGL — cannot be spoofed by DevTools device emulation
+  // pvrtc = PowerVR GPU, exclusive to iOS; never present on Android or any desktop GPU
+  if (ctx.webglCompressedFormats?.pvrtc && !ctx.webglCompressedFormats.s3tc) return 'iOS'
+  // ANGLE = desktop Chromium translating WebGL via D3D/Metal — definitively not mobile.
+  // Returning null when Mac/Win/ChromeOS can't be confirmed prevents DevTools iOS/Android
+  // platform signals from leaking through when the real GPU exposes a desktop renderer.
+  if (ctx.webglRenderer && /^ANGLE\b/.test(ctx.webglRenderer)) {
+    if (p.startsWith('mac') || chPlatform === 'macOS') return 'MacOS'
+    if (p.startsWith('win') || chPlatform === 'Windows') return 'Windows'
+    if (chPlatform === 'Chrome OS') return 'Chrome OS'
+    // Cannot confirm which desktop OS — null blocks DevTools-spoofed os/osVersion from
+    // leaking through. Note: if platformVersion were available, Tier 2 would already
+    // have returned a specific OS before reaching this point, so null is safe here.
+    return null
+  }
+  // Adreno (Qualcomm) and Mali (ARM) are Android-exclusive mobile GPU families
+  if (ctx.webglRenderer && (/Adreno/i.test(ctx.webglRenderer) || /Mali[-\s]/i.test(ctx.webglRenderer))) {
+    return 'Android'
+  }
+
+  // Tier 2: Client Hints platform + platformVersion — requires getHighEntropyValues(),
+  // harder to fake consistently across both fields simultaneously
+  if (chPlatform && hasPlatformVersion) {
+    const chMap: Partial<Record<string, OsName>> = {
+      Windows: 'Windows', macOS: 'MacOS', Android: 'Android',
+      iOS: 'iOS', 'Chrome OS': 'Chrome OS',
+    }
+    const mapped = chMap[chPlatform]
+    if (mapped) return mapped
+  }
+
+  // Tier 3: navigator.platform — reliable for Mac/Win/iOS; DevTools rarely spoofs this
   if (p.startsWith('mac')) return 'MacOS'
   if (p.startsWith('win')) return 'Windows'
   if (p === 'iphone' || p === 'ipad' || p === 'ipod') return 'iOS'
 
-  // userAgentData.platform — distinguishes Android/ChromeOS from generic Linux on real devices.
-  // At this point we have already returned for Mac/Win/iOS above, so if userAgentData
-  // says 'Android' here we are on a real Android device (or DevTools Linux emulation,
-  // which we can't distinguish — acceptable trade-off).
-  // 'Linux' is intentionally excluded: a Node.js server on Linux should not
-  // be treated as a browser hardware signal.
-  const chPlatform = ctx.userAgentData?.platform
-  if (chPlatform) {
-    const map: Partial<Record<string, OsName>> = {
-      Windows: 'Windows',
-      macOS: 'MacOS',
-      Android: 'Android',
-      iOS: 'iOS',
-      'Chrome OS': 'Chrome OS',
-    }
-    const mapped = map[chPlatform]
-    if (mapped) return mapped
-  }
+  // Tier 4: Additional hardware signals
+  // CSS env(safe-area-inset-top) > 0: iOS notch/Dynamic Island — OS-level, not fakeable by JS
+  if ((ctx.safeAreaInsetTop ?? 0) > 0) return 'iOS'
 
-  // Specific Android navigator.platform patterns (older Android Chrome before UA-CH).
-  // '/^linux arm/' targets 'Linux armv8l', 'Linux aarch64', etc. which are real mobile
-  // ARM cores and cannot appear on an x86 server without cross-compilation.
+  // Tier 5: chPlatform alone (easily spoofed) — minimal fallback
+  if (chPlatform === 'Chrome OS') return 'Chrome OS'
+  // Android: require Linux ARM corroboration — pure chPlatform='Android' alone is too easy to spoof
+  if (chPlatform === 'Android' && (p.includes('android') || /^linux arm/i.test(ctx.platform ?? ''))) {
+    return 'Android'
+  }
   if (p.includes('android') || /^linux arm/i.test(ctx.platform ?? '')) return 'Android'
 
   return null
+}
+
+/**
+ * Approximate navigator.platform from the UA string for UA-only mode.
+ * Matches what real browsers return: 'MacIntel', 'Win32'/'Win64', 'iPhone', etc.
+ */
+function platformFromUA(ua: string): string {
+  if (/iPhone/.test(ua)) return 'iPhone'
+  if (/iPad/.test(ua))   return 'iPad'
+  if (/iPod/.test(ua))   return 'iPod'
+  if (/Macintosh/.test(ua)) return 'MacIntel'
+  if (/Windows NT/.test(ua)) return /Win64|WOW64/i.test(ua) ? 'Win64' : 'Win32'
+  if (/CrOS/.test(ua)) return 'Linux x86_64'
+  if (/Android/.test(ua)) return /aarch64|arm64/i.test(ua) ? 'Linux aarch64' : 'Linux armv8l'
+  if (/Linux/.test(ua)) {
+    if (/x86_64/i.test(ua))    return 'Linux x86_64'
+    if (/aarch64|arm64/i.test(ua)) return 'Linux aarch64'
+    return 'Linux'
+  }
+  return 'unknown'
+}
+
+/**
+ * Extract a BCP47 locale from UA strings that embed it (e.g. some Android OEM browsers:
+ * "Linux; Android 10; zh-CN; ..."). Standard Chrome/Firefox/Safari desktop UAs do not
+ * include locale, so this returns 'unknown' for them.
+ */
+function languageFromUA(ua: string): string {
+  // Match "; zh-CN;" / "; en-us;" / "; zh_CN;" between delimiters.
+  // Initial segment must be lowercase (filters OS names, Build strings, etc.).
+  const re = /[;(]\s*([a-z]{2,3}(?:[-_][A-Za-z]{2,4})+)\s*[;)]/g
+  let m
+  while ((m = re.exec(ua)) !== null) {
+    const parts = m[1].replace(/_/g, '-').split('-')
+    if (parts.length >= 2) {
+      // Normalize to standard BCP47 casing: lowercase lang, uppercase region
+      return `${parts[0].toLowerCase()}-${parts.slice(1).map(p => p.toUpperCase()).join('-')}`
+    }
+  }
+  return 'unknown'
 }
 
 /**
@@ -97,7 +155,6 @@ function osFromHardware(ctx: EnvContext): OsName | null {
  * supplied through `options.nav`; omit it for Node.js / testing contexts.
  */
 export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
-  const strategy: DetectStrategy = options.strategy ?? 'auto'
   const effectiveNav: EnvContext | NavContext | undefined = options.ctx ?? options.nav
   const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
@@ -105,16 +162,22 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   const { os: rawOs, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
   let os: OsName = rawOs
   let osVersion: string = rawOsVersion
-  const device = detectDevice(ua, effectiveNav, strategy)
-  const arch = detectArch(ua, options.ctx)
+  const device = detectDevice(ua, effectiveNav)
+  const arch = detectArch(ua, options.ctx ?? effectiveNav as EnvContext | undefined)
   const nav = effectiveNav
   const { isBot, botName } = detectBot(ua, options.customBotDefs)
   const isHeadless = detectHeadless(ua)
-  const language = nav ? getLanguage(nav) : 'unknown'
-  const platform = nav?.platform ?? 'unknown'
+  const language = options.language
+    || (nav?.language || nav?.browserLanguage ? getLanguage(nav) : '')
+    || languageFromUA(ua)
+  const platform = nav?.platform || platformFromUA(ua)
 
   let browser: BrowserName = rawBrowser
   let version = rawVersion
+
+  // Brave cannot be detected via UA (it mimics Chrome). Override when the
+  // browser-side navigator.brave.isBrave() signal is available.
+  if (options.ctx?.hasBrave) browser = 'Brave'
 
   // ── Post-detection overrides ────────────────────────────────────────────────
 
@@ -198,100 +261,57 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
-  // ── hardware-first: OS + osVersion from hardware signals ───────────────────
-  if (strategy === 'hardware-first' && options.ctx) {
+  // macOS 26+: Apple unified version numbering — Safari major version = macOS major version.
+  // UA still freezes "Mac OS X 10_15_7"; Version/ carries the real macOS version from 26+.
+  if (os === 'MacOS' && browser === 'Safari') {
+    const m = /Version\/([\d.]+)/.exec(ua)
+    if (m && parseInt(m[1], 10) >= 26) {
+      osVersion = m[1]
+    }
+  }
+
+  // ── Hardware context: OS + osVersion + browser + version ──────────────────
+  if (options.ctx) {
     const hwOs = osFromHardware(options.ctx)
     if (hwOs !== null) {
       if (hwOs !== rawOs) {
         os = hwOs
         osVersion = 'unknown'
       }
-      // Use Client Hints platformVersion as the authoritative OS version.
       // UA freezes macOS at 10.15.7 and Android version is often stale;
-      // platformVersion carries the real value (e.g. "14.5.0" for macOS Sonoma).
-      // Skip Windows — its version is already resolved via getWindowsVersion().
+      // platformVersion carries the real value. Skip Windows — already resolved via getWindowsVersion().
       if (os !== 'Windows') {
         const pv = options.ctx.highEntropyData?.platformVersion
         if (pv && pv !== '0.0.0') {
-          const [major, minor] = pv.split('.')
-          if (major && major !== '0') {
-            osVersion = minor && minor !== '0' ? `${major}.${minor}` : major
-          }
+          const parts = pv.split('.').map(Number)
+          while (parts.length > 1 && parts[parts.length - 1] === 0) parts.pop()
+          if (parts[0]) osVersion = parts.join('.')
         }
       }
     }
-  }
 
-  // ── Client Hints version override (skipped for ua-first) ───────────────────
-  // Chrome/Edge/Opera/Vivaldi freeze their patch version in the UA string; fullVersionList
-  // carries the real full version (e.g. "124.0.6367.201" vs "124.0.0.0").
-  let usedClientHintsVersion = false
-  if (strategy !== 'ua-first') {
-    const fullVersionList = options.ctx?.highEntropyData?.fullVersionList
-    if (fullVersionList) {
-      const brands = BRAND_MAP[browser]
-      if (brands) {
-        for (const brandName of brands) {
-          const entry = fullVersionList.find(e => e.brand === brandName)
-          if (entry?.version) {
-            version = entry.version
-            usedClientHintsVersion = true
-            break
-          }
-        }
-      }
-    }
-  }
-
-  // ── strict: conflict detection ──────────────────────────────────────────────
-  let hasConflict = false
-  if (strategy === 'strict' && options.ctx) {
-    // OS conflict: hardware says different OS than UA
-    const hwOs = osFromHardware(options.ctx)
-    if (hwOs !== null && hwOs !== rawOs) {
-      os = 'unknown'
-      osVersion = 'unknown'
-      hasConflict = true
-    }
-
-    // Browser/version conflict: fullVersionList contradicts UA-detected browser
     const fullVersionList = options.ctx.highEntropyData?.fullVersionList
-    if (fullVersionList && fullVersionList.length > 0) {
-      const brands = BRAND_MAP[browser]
-      if (brands) {
-        // UA says a Chromium browser — verify its brand appears in fullVersionList
-        const found = brands.some(b => fullVersionList.some(e => e.brand === b))
-        if (!found) {
-          browser = 'unknown'
-          version = 'unknown'
-          hasConflict = true
-        }
-      } else {
-        // UA says non-Chromium browser (Safari, Firefox, etc.) —
-        // if fullVersionList has a Chromium brand, the real browser is different
-        if (fullVersionList.some(e => ALL_CHROMIUM_BRANDS.has(e.brand))) {
-          browser = 'unknown'
-          version = 'unknown'
-          hasConflict = true
+    if (fullVersionList) {
+      for (const [brand, browserName] of BRAND_TO_BROWSER) {
+        const entry = fullVersionList.find(e => e.brand === brand)
+        if (entry?.version) {
+          browser = browserName
+          version = entry.version
+          break
         }
       }
     }
-
-    // Device conflict is signalled by detectDevice returning 'unknown'
-    if (device === 'unknown') hasConflict = true
   }
 
   const engine = detectEngine(ua, browser, version)
 
-  const confidence: 'high' | 'medium' | 'low' | 'conflict' =
-    strategy === 'strict' && hasConflict ? 'conflict'
-    : usedClientHintsVersion             ? 'high'
-    : options.ctx                        ? 'medium'
-    : 'low'
+  const versionMajor = parseInt(version.split('.')[0] ?? '0', 10) || 0
+  const connectionType = (options.ctx ?? options.nav)?.connection?.effectiveType ?? 'unknown'
 
   return {
     browser,
     version,
+    versionMajor,
     engine,
     os,
     osVersion,
@@ -303,6 +323,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     botName,
     language,
     platform,
-    confidence,
+    connectionType,
   }
 }

@@ -11,10 +11,11 @@
 
 ## 特性
 
-- **全面 UA 检测** — 浏览器、OS、渲染内核、设备类型（Mobile / Tablet / TV / PC）、CPU 架构、爬虫、无头浏览器
+- **全面 UA 检测** — 浏览器（含 Arc / Brave）、OS（含 visionOS / tvOS）、渲染内核、设备类型（Mobile / Tablet / TV / PC / Console / XR）、CPU 架构、爬虫、无头浏览器
 - **多信号架构检测** — `getEnvContext()` 采集 Client Hints、WebGL 渲染器、字体探针，精确区分 Apple Silicon 与 Intel Mac
 - **SSR Client Hints** — `parseHeaders()` + `ACCEPT_CH`，在 Chrome / Edge 90+ 中实现服务端精准检测（CPU 架构、平台等）
-- **AI 爬虫识别** — 内置 GPTBot、ClaudeBot、PerplexityBot、CCBot 等主流 AI 抓取机器人
+- **AI 爬虫识别** — 内置 GPTBot、ClaudeBot、PerplexityBot、CCBot 等 40+ 种爬虫规则，含消息应用链接预览 Bot（Slack、Discord、Telegram）
+- **条件匹配** — `satisfies(info, { os: 'iOS', device: 'Mobile' })` 辅助函数，支持 TypeScript 类型检查
 - **零依赖** — 无任何运行时依赖，gzip 后体积极小
 - **纯函数** — `parseUA()` 无全局状态，天然支持 SSR / Node.js
 - **TypeScript** — 完整类型定义，`BrowserName`、`OsName` 等均为精确字面量联合类型
@@ -39,23 +40,25 @@ const info = uaBrowser()
 
 console.log(info)
 // {
-//   browser:    'Chrome',
-//   version:    '124.0.0.0',
-//   engine:     'Blink',
-//   os:         'Windows',
-//   osVersion:  '10',
-//   device:     'PC',
-//   arch:       'x86_64',
-//   isWebview:  false,
-//   isHeadless: false,
-//   isBot:      false,
-//   botName:    'unknown',
-//   language:   'zh-CN',
-//   platform:   'Win32'
+//   browser:        'Chrome',
+//   version:        '124.0.0.0',
+//   versionMajor:   124,
+//   engine:         'Blink',
+//   os:             'Windows',
+//   osVersion:      '10',
+//   device:         'PC',
+//   arch:           'x86_64',
+//   isWebview:      false,
+//   isHeadless:     false,
+//   isBot:          false,
+//   botName:        'unknown',
+//   language:       'zh-CN',
+//   platform:       'Win32',
+//   connectionType: 'unknown'
 // }
 ```
 
-> 传入自定义 UA 字符串：`uaBrowser('Mozilla/5.0 ...')`
+> 解析任意 UA 字符串请使用命名导出：`parseUA('Mozilla/5.0 ...')`
 
 ## 使用
 
@@ -137,13 +140,13 @@ console.log(result.osVersion) // '10' 或 '11'
 
 ## API
 
-### 默认导出 `uaBrowser(ua?)`
+### 默认导出 `uaBrowser()`
 
-在浏览器环境中自动注入 `navigator` 上下文（语言、平台、MIME 类型等）。
+检测当前浏览器环境，自动注入 `navigator` 上下文（语言、平台、MIME 类型等）。
 
 ```typescript
-uaBrowser()           // 自动读取 navigator.userAgent
-uaBrowser(customUA)   // 传入自定义 UA，仍注入当前浏览器上下文
+uaBrowser()          // 自动读取 navigator.userAgent
+parseUA(customUA)    // 解析任意 UA 字符串（无浏览器上下文依赖）
 ```
 
 ### 命名导出（按需引入）
@@ -159,8 +162,11 @@ import {
   ACCEPT_CH,            // 响应头常量，告知浏览器上报 Client Hints
   isWebview,            // 检测 Android Webview / iOS WKWebView
   detectBot,            // 独立爬虫检测
+  detectBrowser,        // 独立浏览器检测
+  detectOS,             // 独立操作系统检测
   detectArch,           // 独立 CPU 架构检测
   detectHeadless,       // 独立无头浏览器检测
+  satisfies,            // 条件匹配辅助函数
   VERSION,              // 当前版本号
 } from 'ua-browser'
 ```
@@ -171,10 +177,11 @@ import {
 | :-- | :-- | :-- |
 | `browser` | `BrowserName` | 浏览器名称 |
 | `version` | `string` | 浏览器版本 |
+| `versionMajor` | `number` | 浏览器主版本号（`parseInt(version)`） |
 | `engine` | `EngineName` | 渲染内核 |
 | `os` | `OsName` | 操作系统 |
 | `osVersion` | `string` | 系统版本 |
-| `device` | `DeviceName` | 设备类型：`Mobile` \| `Tablet` \| `TV` \| `PC` |
+| `device` | `DeviceName` | 设备类型：`Mobile` \| `Tablet` \| `PC` \| `TV` \| `Console` \| `XR` |
 | `arch` | `ArchName` | CPU 架构 |
 | `isWebview` | `boolean` | 是否为 Android Webview / iOS WKWebView |
 | `isHeadless` | `boolean` | 是否为无头 / 自动化浏览器 |
@@ -182,18 +189,19 @@ import {
 | `botName` | `BotName` | 爬虫名称 |
 | `language` | `string` | 浏览器语言，如 `zh-CN` |
 | `platform` | `string` | 平台标识，如 `Win32` |
+| `connectionType` | `string` | 网络类型：`4g` \| `3g` \| `2g` \| `slow-2g` \| `unknown` |
 
 > 所有字段在无法识别时统一返回 `'unknown'`，不返回空字符串或 `null`。
 
 ## 支持范围
 
-内置超过 70 种浏览器、17 种操作系统、19 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
+内置超过 70 种浏览器、20 种操作系统、40+ 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
 
 部分覆盖：
-- **浏览器** — Chrome、Safari、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书等
-- **操作系统** — Windows、macOS、Android、iOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
-- **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot 等
-- **设备** — Mobile、Tablet、TV（含三星 Smart TV、HbbTV 标准）、PC
+- **浏览器** — Chrome、Safari、Arc、Brave、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书等
+- **操作系统** — Windows、macOS、Android、iOS、visionOS、tvOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
+- **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot；消息应用 Bot（Slack、Discord、Telegram、WhatsApp）等
+- **设备** — Mobile、Tablet、PC、TV（含三星 Smart TV、HbbTV 标准）、Console（PS5、Xbox、Switch）、XR（Vision Pro、Quest）
 
 ## License
 

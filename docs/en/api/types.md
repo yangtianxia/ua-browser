@@ -6,28 +6,23 @@ The return type of `uaBrowser()` and `parseUA()`.
 
 ```typescript
 interface EnvOption {
-  browser:    BrowserName
-  version:    string
-  engine:     EngineName
-  os:         OsName
-  osVersion:  string
-  device:     DeviceName
-  arch:       ArchName
-  isWebview:  boolean
-  isHeadless: boolean
-  isBot:      boolean
-  botName:    BotName
-  language:   string
-  platform:   string
-  confidence: 'high' | 'medium' | 'low' | 'conflict'
+  browser:        BrowserName
+  version:        string
+  versionMajor:   number
+  engine:         EngineName
+  os:             OsName
+  osVersion:      string
+  device:         DeviceName
+  arch:           ArchName
+  isWebview:      boolean
+  isHeadless:     boolean
+  isBot:          boolean
+  botName:        BotName
+  language:       string
+  platform:       string
+  connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'
 }
 ```
-
-`confidence` indicates the reliability of the detection result:
-- `'high'`: Client Hints `fullVersionList` provided the exact version (Chrome/Edge/Opera/Vivaldi)
-- `'medium'`: `ctx` was provided — multi-signal detection (WebGL, platform info, etc.)
-- `'low'`: UA string only; least accurate after UA freezing
-- `'conflict'`: `strategy: 'strict'` was used and contradictory signals were detected; conflicting fields are set to `'unknown'`
 
 ---
 
@@ -35,10 +30,10 @@ interface EnvOption {
 
 ```typescript
 type BrowserName =
-  | 'Safari' | 'Chrome' | 'IE' | 'Edge' | 'Firefox' | 'Firefox Focus'
-  | 'Firefox Nightly' | 'Chromium' | 'Opera' | 'Vivaldi' | 'Yandex'
-  | 'Samsung Internet' | 'DuckDuckGo' | 'Puffin' | 'Coc Coc' | 'Kindle'
-  | 'Konqueror' | 'SeaMonkey' | 'Epiphany'
+  | 'Safari' | 'Chrome' | 'Arc' | 'Brave' | 'IE' | 'Edge' | 'Firefox'
+  | 'Firefox Focus' | 'Firefox Nightly' | 'Chromium' | 'Opera' | 'Vivaldi'
+  | 'Yandex' | 'Samsung Internet' | 'DuckDuckGo' | 'Puffin' | 'Coc Coc'
+  | 'Kindle' | 'Konqueror' | 'SeaMonkey' | 'Epiphany'
   | '360' | '360EE' | '360SE' | 'UC' | 'QQBrowser' | 'QQ' | 'Baidu'
   | 'Maxthon' | 'Sogou' | 'Liebao' | '2345Explorer' | '115Browser'
   | 'TheWorld' | 'XiaoMi' | 'Vivo' | 'Huawei' | 'OPPO' | 'Quark'
@@ -47,6 +42,8 @@ type BrowserName =
   | 'Douyin' | 'Bilibili' | 'Kuaishou' | 'Xiaohongshu' | 'Feishu'
   | 'Toutiao' | 'JD' | 'Meituan' | 'unknown'
 ```
+
+> **Arc**: UA contains the `Arc/X.X.X` token — pure UA detection. **Brave**: UA is identical to Chrome; only detectable in browser environments via `navigator.brave.isBrave()` (requires `uaBrowser.detect()` or passing `ctx`).
 
 ---
 
@@ -66,8 +63,8 @@ type EngineName =
 type OsName =
   | 'Windows' | 'Linux' | 'MacOS' | 'Android' | 'HarmonyOS' | 'OpenHarmony'
   | 'Ubuntu' | 'FreeBSD' | 'Debian' | 'Windows Phone'
-  | 'BlackBerry' | 'MeeGo' | 'Symbian' | 'iOS' | 'Chrome OS'
-  | 'WebOS' | 'Tizen' | 'KaiOS' | 'unknown'
+  | 'BlackBerry' | 'MeeGo' | 'Symbian' | 'iOS' | 'visionOS' | 'tvOS'
+  | 'Chrome OS' | 'WebOS' | 'Tizen' | 'KaiOS' | 'unknown'
 ```
 
 ---
@@ -75,8 +72,18 @@ type OsName =
 ## DeviceName
 
 ```typescript
-type DeviceName = 'Mobile' | 'Tablet' | 'TV' | 'PC'
+type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'Console' | 'XR' | 'unknown'
 ```
+
+| Value | Description |
+| :-- | :-- |
+| `Mobile` | Smartphone |
+| `Tablet` | Tablet |
+| `PC` | Desktop computer |
+| `TV` | Smart TV (Samsung Smart TV, HbbTV, etc.) |
+| `Console` | Game console (PlayStation, Xbox, Nintendo Switch) |
+| `XR` | Extended reality device (Apple Vision Pro, Meta Quest) |
+| `unknown` | Unrecognized |
 
 ---
 
@@ -92,15 +99,24 @@ type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
 ```typescript
 type BotName =
+  // Search engines
   | 'Googlebot' | 'Bingbot' | 'Baiduspider' | 'Bytespider'
-  | 'YandexBot' | 'DuckDuckBot' | 'Slurp' | 'Sogou' | '360Spider'
+  | 'YandexBot' | 'DuckDuckBot' | 'Slurp' | 'Sogou' | '360Spider' | 'PetalBot'
   | 'Applebot-Extended' | 'Applebot'
-  | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot'
-  | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'PetalBot'
+  // Social media crawlers
+  | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot' | 'PinterestBot'
+  // Messaging link preview bots
+  | 'Slackbot' | 'Discordbot' | 'TelegramBot' | 'WhatsApp'
+  // SEO tools
+  | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'ScreamingFrog' | 'DataForSeoBot'
+  // AI / LLM crawlers
   | 'GPTBot' | 'OAI-SearchBot' | 'ChatGPT-User'
   | 'ClaudeBot' | 'PerplexityBot' | 'CCBot' | 'AdsBot'
   | 'Google-Extended' | 'Meta-ExternalAgent' | 'Amazonbot'
   | 'Diffbot' | 'cohere-ai' | 'YouBot'
+  // Monitoring / archiving
+  | 'UptimeRobot' | 'ia_archiver'
+  // Generic catch-all
   | 'GenericBot' | 'unknown'
 ```
 
@@ -174,25 +190,11 @@ interface EnvContext extends NavContext {
 
   // Font probes
   fontProbes?: Record<string, boolean>  // OS-specific font availability
+
+  // Browser features
+  hasBrave?: boolean  // navigator.brave.isBrave() — true only in Brave browser
 }
 ```
-
----
-
-## DetectStrategy
-
-Controls how `parseUA()` arbitrates when hardware signals and the UA string disagree.
-
-```typescript
-type DetectStrategy = 'auto' | 'ua-first' | 'hardware-first' | 'strict'
-```
-
-| Value | Behaviour | `confidence` |
-| :-- | :-- | :-- |
-| `'auto'` | Default. Library decides signal priority internally (current behaviour). | Unchanged |
-| `'ua-first'` | UA string is the primary source. Hardware signals only fill fields the UA cannot provide (`arch`, `language`, `platform`). | `'medium'` or `'low'` |
-| `'hardware-first'` | Client Hints and hardware signals take priority. UA fills fields hardware cannot detect (e.g. `browser`, `engine`). Recommended for browser-side code when DevTools device emulation is in use. | `'high'` or `'medium'` |
-| `'strict'` | Both UA and hardware are evaluated independently. Any field where they disagree is set to `'unknown'`. | `'conflict'` when contradictions exist |
 
 ---
 
@@ -206,6 +208,6 @@ interface ParseOptions {
   windowsVersion?: string | null       // pre-resolved result of getWindowsVersion()
   ctx?:            EnvContext          // return value of getEnvContext(); takes priority over nav and windowsVersion
   customBotDefs?:  readonly BotDef[]   // custom bot rules, inserted before the GenericBot catch-all
-  strategy?:       DetectStrategy      // signal arbitration strategy; default 'auto'
+  language?:       string              // explicit language override (BCP47), highest priority, useful for server-side Accept-Language
 }
 ```

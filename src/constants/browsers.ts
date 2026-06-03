@@ -22,6 +22,7 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   // ── Generic / low-priority base browsers ──────────────────────────────────
   { name: 'Safari',        priority: 10,  detect: /Safari/,              versionPattern: /Version\/([\d.]+)/ },
   { name: 'Chrome',        priority: 20,  detect: /(Chrome|CriOS)/,      versionPattern: [/Chrome\/([\d.]+)/, /CriOS\/([\d.]+)/] },
+  { name: 'Arc',           priority: 35,  detect: /Arc\//,               versionPattern: /Arc\/([\d.]+)/ },
   { name: 'IE',            priority: 30,  detect: /(MSIE|Trident)/,      versionPattern: [/MSIE ([\d.]+)/, /rv:([\d.]+)/] },
   { name: 'Edge',          priority: 40,  detect: /(Edge|Edg\/|EdgA|EdgiOS)/, versionPattern: [/Edge\/([\d.]+)/, /Edg\/([\d.]+)/, /EdgA\/([\d.]+)/, /EdgiOS\/([\d.]+)/] },
   { name: 'Firefox',       priority: 50,  detect: /(Firefox|FxiOS)/,    versionPattern: [/Firefox\/([\d.]+)/, /FxiOS\/([\d.]+)/] },

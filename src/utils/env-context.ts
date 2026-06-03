@@ -34,6 +34,7 @@ export interface EnvContext extends NavContext {
   fontProbes?: Record<string, boolean>
   highEntropyData?: UAHighEntropyValues
   windowsVersion?: string | null
+  hasBrave?: boolean
 }
 
 // OS-specific system fonts used to cross-confirm UA-based OS detection.
@@ -186,6 +187,11 @@ export async function getEnvContext(): Promise<EnvContext> {
     ctx.audioSampleRate = getAudioSampleRate()
     ctx.hasVibration    = 'vibrate' in navigator
     ctx.hasDeviceMotion = 'DeviceMotionEvent' in window
+    try {
+      ctx.hasBrave = await (navigator as unknown as { brave?: { isBrave?(): Promise<boolean> } }).brave?.isBrave?.() ?? false
+    } catch {
+      ctx.hasBrave = false
+    }
     const { renderer, vendor, maxTextureSize, fragPrecision, compressedFormats } = getWebGLInfo()
     if (renderer !== undefined)          ctx.webglRenderer = renderer
     if (vendor !== undefined)            ctx.webglVendor = vendor

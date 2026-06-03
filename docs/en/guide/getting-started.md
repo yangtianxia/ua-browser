@@ -26,9 +26,6 @@ import uaBrowser from 'ua-browser'
 // Automatically reads the current browser's UA
 const info = uaBrowser()
 
-// Or pass a custom UA string
-const info = uaBrowser('Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...')
-
 console.log(info)
 // {
 //   browser:    'Chrome',
@@ -43,8 +40,7 @@ console.log(info)
 //   isBot:      false,
 //   botName:    'unknown',
 //   language:   'en-US',
-//   platform:   'Win32',
-//   confidence: 'low'    // UA string only
+//   platform:   'Win32'
 // }
 ```
 
@@ -58,45 +54,14 @@ import uaBrowser from 'ua-browser'
 // Collects hardware signals, then parses — recommended for browsers
 const result = await uaBrowser.detect()
 
-console.log(result.device)     // 'Mobile' — correct even in desktop mode
-console.log(result.arch)       // 'arm64' or 'x86_64'
-console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+console.log(result.device) // 'Mobile' — correct even in desktop mode
+console.log(result.arch)   // 'arm64' or 'x86_64'
 ```
 
-| API | Sync | Accuracy | Recommended for |
-| :-- | :-- | :-- | :-- |
-| `uaBrowser()` | Yes | `confidence: 'low'` | SSR / simple UA lookups |
-| `uaBrowser.detect()` | No (async) | `confidence: 'medium'–'high'` | Browser-side feature detection |
-
-## Signal Strategy
-
-When hardware signals and the UA string contradict each other (e.g. Chrome DevTools device emulation changes the UA but not Client Hints or `navigator.platform`), the default `'auto'` mode may return results that are hard to trust. Use the `strategy` option to declare which source wins:
-
-```typescript
-import uaBrowser from 'ua-browser'
-
-// hardware-first: Client Hints / hardware takes priority over the UA string
-// Recommended when you want accurate results even under DevTools emulation
-const result = await uaBrowser.detect({ strategy: 'hardware-first' })
-// On a Mac with Android DevTools emulation:
-// result.os     → 'MacOS'   (real platform, not spoofed UA)
-// result.device → 'PC'      (real hardware, not UA)
-// result.confidence → 'high'
-
-// strict: any field where signals disagree is set to 'unknown'
-const result = await uaBrowser.detect({ strategy: 'strict' })
-// result.os         → 'unknown'   (UA says Android, platform says MacOS)
-// result.confidence → 'conflict'
-```
-
-| Strategy | Behaviour |
-| :-- | :-- |
-| `'auto'` | Library decides internally (default) |
-| `'ua-first'` | UA string wins; hardware only fills gaps (`arch`, `language`, `platform`) |
-| `'hardware-first'` | Client Hints / hardware wins; UA fills the rest |
-| `'strict'` | Conflicting fields → `'unknown'`; `confidence: 'conflict'` |
-
-See [`DetectStrategy`](/en/api/types#detectstrategy) for full details.
+| API | Sync | Recommended for |
+| :-- | :-- | :-- |
+| `uaBrowser()` | Yes | SSR / simple UA lookups |
+| `uaBrowser.detect()` | No (async) | Browser-side, needs hardware signal assistance |
 
 ## Named Exports (Tree-shakeable)
 
@@ -158,10 +123,9 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.device)     // 'Mobile' — correct even in desktop mode
-console.log(result.arch)       // 'arm64' (Apple Silicon) or 'x86_64'
-console.log(result.language)   // 'en-US'
-console.log(result.confidence) // 'medium' (or 'high' if Client Hints available)
+console.log(result.device)   // 'Mobile' — correct even in desktop mode
+console.log(result.arch)     // 'arm64' (Apple Silicon) or 'x86_64'
+console.log(result.language) // 'en-US'
 ```
 
 ## SSR Client Hints (parseHeaders)

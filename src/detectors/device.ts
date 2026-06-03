@@ -1,4 +1,4 @@
-import type { DeviceName, DetectStrategy } from '../types.js'
+import type { DeviceName } from '../types.js'
 import { DEVICE_DEFS } from '../constants/devices.js'
 import type { NavContext } from '../utils/navigator.js'
 
@@ -20,13 +20,14 @@ type DeviceNav = Pick<NavContext, 'platform' | 'maxTouchPoints'> & {
 /**
  * Detect the device type from a user agent string.
  *
- * @param ua       - Raw user agent string
- * @param nav      - Optional nav context; used for hardware signal overrides
- * @param strategy - Detection strategy (default: 'auto')
+ * @param ua  - Raw user agent string
+ * @param nav - Optional nav context; hardware signals take precedence over UA when available
  */
-export function detectDevice(ua: string, nav?: DeviceNav, strategy: DetectStrategy = 'auto'): DeviceName {
+export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
   // ── UA-only detection (pure UA string signals) ───────────────────────────
   function uaDetect(): DeviceName | null {
+    if (/PlayStation|Xbox|Nintendo/.test(ua)) return 'Console'
+    if (/visionOS|Quest/.test(ua)) return 'XR'
     if (/(SMART-TV|HbbTV|SmartTV|TV Safari|Android TV|GoogleTV)/.test(ua)) return 'TV'
     if (/iPad/.test(ua)) return 'Tablet'
     if (/Android/.test(ua) && !/Mobile/.test(ua)) return 'Tablet'
@@ -115,22 +116,5 @@ export function detectDevice(ua: string, nav?: DeviceNav, strategy: DetectStrate
     return null
   }
 
-  if (strategy === 'ua-first') return uaDetect() ?? 'PC'
-
-  if (strategy === 'hardware-first') return hwDetect() ?? uaDetect() ?? 'PC'
-
-  if (strategy === 'strict') {
-    const uaResult = uaDetect()
-    const hwResult = hwDetect()
-    // Both have explicit opinions and they conflict → signal contradiction
-    if (uaResult !== null && hwResult !== null && uaResult !== hwResult) {
-      return 'unknown'
-    }
-    return hwResult ?? uaResult ?? 'PC'
-  }
-
-  // auto (default): UA signals first, hardware fills gaps
-  const uaResult = uaDetect()
-  if (uaResult !== null) return uaResult
-  return hwDetect() ?? 'PC'
+  return hwDetect() ?? uaDetect() ?? 'PC'
 }

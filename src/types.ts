@@ -12,6 +12,8 @@ export type EngineName =
 export type BrowserName =
   | 'Safari'
   | 'Chrome'
+  | 'Arc'
+  | 'Brave'
   | 'IE'
   | 'Edge'
   | 'Firefox'
@@ -83,15 +85,15 @@ export type OsName =
   | 'MeeGo'
   | 'Symbian'
   | 'iOS'
+  | 'visionOS'
+  | 'tvOS'
   | 'Chrome OS'
   | 'WebOS'
   | 'Tizen'
   | 'KaiOS'
   | 'unknown'
 
-export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'unknown'
-
-export type DetectStrategy = 'ua-first' | 'hardware-first' | 'strict' | 'auto'
+export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'Console' | 'XR' | 'unknown'
 
 export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
@@ -110,10 +112,17 @@ export type BotName =
   | 'Facebookbot'
   | 'Twitterbot'
   | 'LinkedInBot'
+  | 'PinterestBot'
+  | 'Slackbot'
+  | 'Discordbot'
+  | 'TelegramBot'
+  | 'WhatsApp'
   | 'SemrushBot'
   | 'AhrefsBot'
   | 'MJ12bot'
   | 'PetalBot'
+  | 'ScreamingFrog'
+  | 'DataForSeoBot'
   | 'GPTBot'
   | 'OAI-SearchBot'
   | 'ChatGPT-User'
@@ -127,24 +136,27 @@ export type BotName =
   | 'Diffbot'
   | 'cohere-ai'
   | 'YouBot'
+  | 'UptimeRobot'
+  | 'ia_archiver'
   | 'GenericBot'
   | 'unknown'
 
 export interface EnvOption {
-  browser: BrowserName
-  version: string
-  engine: EngineName
-  os: OsName
-  osVersion: string
-  device: DeviceName
-  arch: ArchName
-  isWebview: boolean
-  isHeadless: boolean
-  isBot: boolean
-  botName: BotName
-  language: string
-  platform: string
-  confidence: 'high' | 'medium' | 'low' | 'conflict'
+  browser:        BrowserName
+  version:        string
+  versionMajor:   number
+  engine:         EngineName
+  os:             OsName
+  osVersion:      string
+  device:         DeviceName
+  arch:           ArchName
+  isWebview:      boolean
+  isHeadless:     boolean
+  isBot:          boolean
+  botName:        BotName
+  language:       string
+  platform:       string
+  connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'
 }
 
 // ---------------------------------------------------------------------------
