@@ -36,6 +36,8 @@ const i18n = computed(() => isEn.value ? {
     parseUA:        'Full parse — all fields',
     detectBrowser:  'Browser name + version',
     detectOS:       'OS name + version',
+    detectEngine:   'Rendering engine',
+    detectDevice:   'Device type',
     detectBot:      'Bot / crawler detection',
     detectArch:     'CPU architecture',
     detectHeadless: 'Headless browser check',
@@ -44,6 +46,8 @@ const i18n = computed(() => isEn.value ? {
   detectorFields: {
     browser: 'Browser', version: 'Version',
     os: 'OS', osVersion: 'OS Version',
+    engine: 'Engine',
+    device: 'Device',
     arch: 'Arch',
     isBot: 'Is Bot', botName: 'Bot Name',
     headless: 'Headless',
@@ -80,6 +84,8 @@ const i18n = computed(() => isEn.value ? {
     parseUA:        '完整解析——所有字段',
     detectBrowser:  '浏览器名称 + 版本',
     detectOS:       '操作系统 + 版本',
+    detectEngine:   '渲染引擎',
+    detectDevice:   '设备类型',
     detectBot:      '爬虫 / 机器人检测',
     detectArch:     'CPU 架构',
     detectHeadless: '无头浏览器检测',
@@ -88,6 +94,8 @@ const i18n = computed(() => isEn.value ? {
   detectorFields: {
     browser: '浏览器', version: '版本',
     os: '操作系统', osVersion: '系统版本',
+    engine: '引擎',
+    device: '设备',
     arch: '架构',
     isBot: '是否爬虫', botName: '爬虫名称',
     headless: 'Headless',
@@ -108,6 +116,8 @@ interface ApiResults {
   parseUA:        ParseResult
   detectBrowser:  { browser: string; version: string }
   detectOS:       { os: string; osVersion: string }
+  detectEngine:   string
+  detectDevice:   string
   detectBot:      { isBot: boolean; botName: string }
   detectArch:     string
   detectHeadless: boolean
@@ -133,6 +143,8 @@ let _uaBrowser:      (() => ParseResult) | null = null
 let _detectBrowser:  ((ua: string) => { browser: string; version: string }) | null = null
 let _detectOS:       ((ua: string) => { os: string; osVersion: string }) | null = null
 let _detectBot:      ((ua: string) => { isBot: boolean; botName: string }) | null = null
+let _detectEngine:   ((ua: string) => string) | null = null
+let _detectDevice:   ((ua: string) => string) | null = null
 let _detectArch:     ((ua: string) => string) | null = null
 let _detectHeadless: ((ua: string) => boolean) | null = null
 let _isWebview:      ((ua: string) => boolean) | null = null
@@ -144,6 +156,8 @@ onMounted(async () => {
   _uaBrowser      = mod.default
   _detectBrowser  = mod.detectBrowser
   _detectOS       = mod.detectOS
+  _detectEngine   = mod.detectEngine
+  _detectDevice   = mod.detectDevice
   _detectBot      = mod.detectBot
   _detectArch     = mod.detectArch
   _detectHeadless = mod.detectHeadless
@@ -172,6 +186,8 @@ function runApi() {
     parseUA:        _parseUA(ua),
     detectBrowser:  _detectBrowser!(ua),
     detectOS:       _detectOS!(ua),
+    detectEngine:   _detectEngine!(ua),
+    detectDevice:   _detectDevice!(ua),
     detectBot:      _detectBot!(ua),
     detectArch:     _detectArch!(ua),
     detectHeadless: _detectHeadless!(ua),
@@ -426,6 +442,38 @@ const diffKeys = computed(() => {
                 <div class="result-item">
                   <span class="result-label">{{ i18n.detectorFields.osVersion }}</span>
                   <span class="result-value">{{ apiResults.detectOS.osVersion || '—' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- detectEngine() -->
+          <div class="api-card">
+            <div class="api-header">
+              <code class="api-fn">detectEngine(ua)</code>
+              <span class="api-desc">{{ i18n.detectorDescs.detectEngine }}</span>
+            </div>
+            <div class="api-body">
+              <div class="result-list">
+                <div class="result-item">
+                  <span class="result-label">{{ i18n.detectorFields.engine }}</span>
+                  <span class="result-value">{{ apiResults.detectEngine || '—' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- detectDevice() -->
+          <div class="api-card">
+            <div class="api-header">
+              <code class="api-fn">detectDevice(ua)</code>
+              <span class="api-desc">{{ i18n.detectorDescs.detectDevice }}</span>
+            </div>
+            <div class="api-body">
+              <div class="result-list">
+                <div class="result-item">
+                  <span class="result-label">{{ i18n.detectorFields.device }}</span>
+                  <span class="result-value">{{ apiResults.detectDevice || '—' }}</span>
                 </div>
               </div>
             </div>
