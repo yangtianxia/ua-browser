@@ -33,8 +33,8 @@ describe('detectArch', () => {
     expect(detectArch(ua)).toBe('unknown')
   })
 
-  it('iOS mobile → unknown (no arch in UA)', () => {
-    expect(detectArch(UA.safari.ios)).toBe('unknown')
+  it('iOS mobile → arm64 (iPhone 5S+ / all modern iOS is arm64)', () => {
+    expect(detectArch(UA.safari.ios)).toBe('arm64')
   })
 
   it('empty UA → unknown', () => {
@@ -62,6 +62,14 @@ describe('detectArch', () => {
   it('Layer 2: WebGL Apple M2 renderer → arm64', () => {
     const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
       webglRenderer: 'Apple M2' }
+    expect(detectArch('', ctx)).toBe('arm64')
+  })
+
+  it('Layer 2: WebGL "Apple GPU" renderer (Safari Metal, no model string) → arm64', () => {
+    // Safari on Apple Silicon reports "Apple GPU" via WEBGL_debug_renderer_info without
+    // the M-series model number. Intel Macs always report their Intel/AMD GPU name, never "Apple GPU".
+    const ctx = { userAgent: '', platform: '', language: '', maxTouchPoints: 0,
+      webglRenderer: 'Apple GPU' }
     expect(detectArch('', ctx)).toBe('arm64')
   })
 

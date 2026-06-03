@@ -26,9 +26,6 @@ import uaBrowser from 'ua-browser'
 // Automatically reads the current browser's UA
 const info = uaBrowser()
 
-// Or pass a custom UA string
-const info = uaBrowser('Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...')
-
 console.log(info)
 // {
 //   browser:    'Chrome',
@@ -46,6 +43,25 @@ console.log(info)
 //   platform:   'Win32'
 // }
 ```
+
+## High-Accuracy Detection (`detect`)
+
+`uaBrowser.detect()` is the recommended entry point for browser-side code. It internally calls `getEnvContext()` to collect hardware signals (GPU renderer, CSS safe-area-inset, device pixel ratio, vibration/motion APIs, network type, etc.), then parses with all signals at once.
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// Collects hardware signals, then parses — recommended for browsers
+const result = await uaBrowser.detect()
+
+console.log(result.device) // 'Mobile' — correct even in desktop mode
+console.log(result.arch)   // 'arm64' or 'x86_64'
+```
+
+| API | Sync | Recommended for |
+| :-- | :-- | :-- |
+| `uaBrowser()` | Yes | SSR / simple UA lookups |
+| `uaBrowser.detect()` | No (async) | Browser-side, needs hardware signal assistance |
 
 ## Named Exports (Tree-shakeable)
 
@@ -97,9 +113,9 @@ const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 console.log(result.osVersion) // '11' or '10'
 ```
 
-## High-Accuracy Architecture Detection (getEnvContext)
+## High-Accuracy Detection (getEnvContext)
 
-`getEnvContext()` collects Client Hints, WebGL renderer, font probes, and other signals in one async call, enabling precise arch detection (e.g. Apple Silicon vs. Intel Mac):
+When you need to reuse the context object or compose it with other options, use `getEnvContext()` directly. It collects Client Hints, WebGL renderer, font probes, and other signals in one async call:
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -107,6 +123,7 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
+console.log(result.device)   // 'Mobile' — correct even in desktop mode
 console.log(result.arch)     // 'arm64' (Apple Silicon) or 'x86_64'
 console.log(result.language) // 'en-US'
 ```

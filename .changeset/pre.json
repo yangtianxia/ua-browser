@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "ua-browser": "1.4.0"
+  },
+  "changesets": [
+    "release-1-5-0"
+  ]
+}

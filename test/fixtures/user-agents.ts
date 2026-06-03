@@ -8,6 +8,10 @@ export const UA = {
     crios26: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/147.0.7727.99 Mobile/15E148 Safari/604.1',
     old26: 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31'
   },
+  arc: {
+    mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.60 Safari/537.36 Arc/1.34.0',
+    windows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.60 Safari/537.36 Arc/1.34.0'
+  },
   edge: {
     chromium: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0',
     legacy: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
@@ -24,7 +28,9 @@ export const UA = {
     ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
     ipad: 'Mozilla/5.0 (iPad; CPU OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
     // iOS 26+: Apple freezes CPU iPhone OS at 18_7; Version/ carries the real version
-    ios26: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Mobile/15E148 Safari/604.1'
+    ios26: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Mobile/15E148 Safari/604.1',
+    // macOS 26+: UA still freezes "Mac OS X 10_15_7"; Version/ aligns with macOS major version
+    mac26: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15'
   },
   ie: {
     ie11: 'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
@@ -43,7 +49,9 @@ export const UA = {
   },
   qq: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.0.0 Mobile Safari/537.36 QQBrowser/13.4.5.5055',
-    qq: 'Mozilla/5.0 (Linux; Android 12; SM-G991B Build/SP1A.210812.016) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36 QQ/8.9.28.635'
+    qq: 'Mozilla/5.0 (Linux; Android 12; SM-G991B Build/SP1A.210812.016) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36 QQ/8.9.28.635',
+    // iOS uses MQQBrowser/ token instead of QQBrowser/
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 MQQBrowser/16.3.2 Mobile/15E148 Safari/604.1'
   },
   uc: {
     mobile: 'Mozilla/5.0 (Linux; U; Android 9; zh-CN; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 UCBrowser/13.4.2.1306 Mobile Safari/537.36'
@@ -69,12 +77,71 @@ export const UA = {
   douyin: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 aweme/20.6.0 app_version/20.6.0'
   },
+  // Desktop domestic browsers
+  '360': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 QihooBrowser/12.0'
+  },
+  sogou: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 SE 2.X MetaSr 1.0',
+    mobile:  'Mozilla/5.0 (Linux; Android 9; SM-G965F) AppleWebKit/537.36 (KHTML, like Gecko) SogouMobileBrowser/6.14.3 Chrome/87.0.4280.141 Mobile Safari/537.36'
+  },
+  maxthon: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 Maxthon/6.1.3.1000'
+  },
+  liebao: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36 LBBROWSER'
+  },
+  '2345explorer': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 2345Explorer/10.0.0.16835'
+  },
+  '115browser': {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 115Browser/23.9.3.1'
+  },
+  theWorld: {
+    desktop: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 TheWorld 7.0.0.1'
+  },
+  // Mobile brand browsers
+  xiaomi: {
+    mobile: 'Mozilla/5.0 (Linux; Android 13; M2012K11AC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36 XiaoMi/MiuiBrowser/14.0.9'
+  },
+  vivo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 13; V2209A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36 VivoBrowser/17.0.0.0'
+  },
+  huawei: {
+    mobile: 'Mozilla/5.0 (Linux; Android 11; ELS-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.127 HuaweiBrowser/12.0.0.303 Mobile Safari/537.36',
+    // Old format: HuaweiBrowser token without /version — falls back to Version/ pattern
+    old:    'Mozilla/5.0 (Linux; Android 6.0; PLK-AL10 Build/HuaweiPLK-AL10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 HuaweiBrowser Mobile Safari/537.36'
+  },
+  oppo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; CPH2399) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.74 Mobile Safari/537.36 HeyTapBrowser/40.8.32.1'
+  },
+  quark: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/98.0.4758.101 Mobile Safari/537.36 Quark/6.8.0.560'
+  },
+  qiyu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 9; vivo X23) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Mobile Safari/537.36 Qiyu/3.9.1'
+  },
+  // App WebViews (previously missing)
+  weibo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Weibo weibo__13.4.0'
+  },
+  douban: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 com.douban.frodo/7.54.0'
+  },
+  suning: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 SNEBUY-APP9.3.0'
+  },
+  iqiyi: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 IqiyiApp IqiyiVersion/13.4.0'
+  },
   // International browsers
   samsungInternet: {
     mobile: 'Mozilla/5.0 (Linux; Android 14; SAMSUNG SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/24.0 Chrome/117.0.0.0 Mobile Safari/537.36'
   },
   duckduckgo: {
     ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 DuckDuckGo/7 Safari/604.1',
+    // v26+: token changed from DuckDuckGo/ to Ddg/
+    iosDdg: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Mobile/15E148 Safari/604.1 Ddg/26.4',
     android: 'Mozilla/5.0 (Linux; Android 12; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36 DuckDuckGo/5'
   },
   puffin: {
@@ -117,6 +184,24 @@ export const UA = {
   },
   meituan: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MeituanHybrid/1.0'
+  },
+  // Apple platform variants
+  visionOS: {
+    v1: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1 visionOS/1.0'
+  },
+  tvOS: {
+    v17: 'Mozilla/5.0 (Apple TV; U; CPU OS 17_4 like Mac OS X) AppleWebKit/606.1 (KHTML, like Gecko) Version/17.0 Safari/606.1'
+  },
+  // Gaming consoles
+  ps5: {
+    browser: 'Mozilla/5.0 (PlayStation 5 3.20) AppleWebKit/605.1.15 (KHTML, like Gecko)'
+  },
+  xbox: {
+    edge: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; Xbox; Xbox One) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586'
+  },
+  // XR headsets
+  quest: {
+    browser: 'Mozilla/5.0 (Linux; Android 10; Quest 3) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/32.0.0.0 SamsungBrowser/4.3 Chrome/130.0.0.0 Mobile Safari/537.36'
   },
   // Empty / edge cases
   empty: '',

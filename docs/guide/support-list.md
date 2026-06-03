@@ -202,6 +202,7 @@ v1.1.0 起采用四层优先级检测链，前层成功则跳过后层：
 | Sogou Spider | `Sogou` | 搜狗 |
 | 360Spider | `360Spider` | 360 |
 | PetalBot | `PetalBot` | 华为 |
+| Applebot-Extended | `Applebot-Extended` | Apple（AI 训练，UA 同时含 Applebot，优先匹配此项） |
 | Applebot | `Applebot` | Apple |
 
 ### AI / LLM 爬虫
@@ -209,10 +210,18 @@ v1.1.0 起采用四层优先级检测链，前层成功则跳过后层：
 | 爬虫 | `BotName` | 归属 |
 | :-- | :-- | :-- |
 | GPTBot | `GPTBot` | OpenAI |
+| OAI-SearchBot | `OAI-SearchBot` | OpenAI（实时搜索） |
+| ChatGPT-User | `ChatGPT-User` | OpenAI（ChatGPT 浏览插件） |
 | ClaudeBot | `ClaudeBot` | Anthropic |
 | PerplexityBot | `PerplexityBot` | Perplexity AI |
 | CCBot | `CCBot` | Common Crawl |
 | AdsBot-Google | `AdsBot` | Google Ads |
+| Google-Extended | `Google-Extended` | Google（AI 训练，可通过 robots.txt 屏蔽） |
+| meta-externalagent | `Meta-ExternalAgent` | Meta AI |
+| Amazonbot | `Amazonbot` | Amazon（Alexa AI） |
+| Diffbot | `Diffbot` | Diffbot |
+| cohere-ai | `cohere-ai` | Cohere |
+| YouBot | `YouBot` | You.com |
 
 ### 社交媒体爬虫
 
