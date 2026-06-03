@@ -133,17 +133,27 @@ function platformFromUA(ua: string): string {
  * "Linux; Android 10; zh-CN; ..."). Standard Chrome/Firefox/Safari desktop UAs do not
  * include locale, so this returns 'unknown' for them.
  */
+function normalizeBCP47(raw: string): string {
+  const parts = raw.replace(/_/g, '-').split('-')
+  return parts.map((p, i) => {
+    if (i === 0) return p.toLowerCase()
+    if (p.length === 4) return p[0].toUpperCase() + p.slice(1).toLowerCase()  // script subtag: TitleCase
+    return p.toUpperCase()                                                      // region subtag: UPPERCASE
+  }).join('-')
+}
+
 function languageFromUA(ua: string): string {
-  // Match "; zh-CN;" / "; en-us;" / "; zh_CN;" between delimiters.
+  // WeChat / many app UAs: "Language/zh_CN", "Language/zh-Hans-CN", etc.
+  const kwMatch = /\bLanguage\/([a-zA-Z]{2,3}(?:[-_][a-zA-Z]{2,4}){1,2})\b/i.exec(ua)
+  if (kwMatch) return normalizeBCP47(kwMatch[1])
+
+  // Standard: "; zh-CN;" / "; en-us;" / "; zh_CN;" between delimiters.
   // Initial segment must be lowercase (filters OS names, Build strings, etc.).
   const re = /[;(]\s*([a-z]{2,3}(?:[-_][A-Za-z]{2,4})+)\s*[;)]/g
   let m
   while ((m = re.exec(ua)) !== null) {
     const parts = m[1].replace(/_/g, '-').split('-')
-    if (parts.length >= 2) {
-      // Normalize to standard BCP47 casing: lowercase lang, uppercase region
-      return `${parts[0].toLowerCase()}-${parts.slice(1).map(p => p.toUpperCase()).join('-')}`
-    }
+    if (parts.length >= 2) return normalizeBCP47(m[1])
   }
   return 'unknown'
 }

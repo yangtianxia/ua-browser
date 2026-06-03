@@ -528,6 +528,56 @@ const { os, osVersion } = detectOS(navigator.userAgent)
 
 ---
 
+## `detectEngine(ua)` {#detectengine}
+
+独立渲染引擎检测器，不运行完整 `parseUA()` 流水线。
+
+```typescript
+import { detectEngine } from 'ua-browser'
+
+detectEngine(ua: string): EngineName
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | 是 | UA 字符串 |
+
+**返回值：** [`EngineName`](/api/types#enginename)
+
+**示例：**
+
+```typescript
+const engine = detectEngine(navigator.userAgent)
+// engine: 'Blink'
+```
+
+---
+
+## `detectDevice(ua)` {#detectdevice}
+
+独立设备类型检测器，不运行完整 `parseUA()` 流水线。仅基于 UA 字符串推断，不使用硬件信号。
+
+```typescript
+import { detectDevice } from 'ua-browser'
+
+detectDevice(ua: string): DeviceName
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | 是 | UA 字符串 |
+
+**返回值：** [`DeviceName`](/api/types#devicename)
+
+**示例：**
+
+```typescript
+const device = detectDevice(navigator.userAgent)
+// device: 'Mobile'
+```
+
+---
+
 ## `satisfies(info, criteria)` {#satisfies}
 
 条件匹配辅助函数。支持 TypeScript 类型检查，比手写 `&&` 链更简洁。

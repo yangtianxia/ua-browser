@@ -182,6 +182,8 @@ import {
   detectBot,            // standalone bot detection
   detectBrowser,        // standalone browser detection
   detectOS,             // standalone OS detection
+  detectEngine,         // standalone rendering engine detection
+  detectDevice,         // standalone device type detection
   detectArch,           // standalone CPU architecture detection
   detectHeadless,       // standalone headless browser detection
   satisfies,            // condition-matching helper
