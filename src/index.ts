@@ -45,6 +45,11 @@ uaBrowser.detect = async (): Promise<EnvOption> => {
   return parseUA(ctx.userAgent, { ctx })
 }
 
+uaBrowser.detect = async (ua?: string): Promise<EnvOption> => {
+	const ctx = await getEnvContext()
+  return parseUA(ua ?? ctx.userAgent, { ctx })
+}
+
 uaBrowser.isWebview = isWebview
 uaBrowser.getLanguage = (): string => getLanguage(getNavContext())
 uaBrowser.VERSION = VERSION
