@@ -1,14 +1,20 @@
 import type { EngineName } from '../types.js'
 import { ENGINE_DEFS } from '../constants/engines.js'
+import { detectBrowser } from './browser.js'
 
 /**
- * Detect the rendering engine, with post-detection upgrades for Blink and EdgeHTML.
+ * Detect the rendering engine from a user agent string.
  *
- * @param ua          - Raw user agent string
- * @param browser     - Already-detected browser name (for Blink/EdgeHTML disambiguation)
- * @param version     - Already-detected browser version string
+ * @param ua      - Raw user agent string
+ * @param browser - Pre-detected browser name; auto-detected when omitted
+ * @param version - Pre-detected browser version; auto-detected when omitted
  */
-export function detectEngine(ua: string, browser: string, version: string): EngineName {
+export function detectEngine(ua: string, browser?: string, version?: string): EngineName {
+  if (browser === undefined || version === undefined) {
+    const b = detectBrowser(ua)
+    browser  = browser  ?? b.browser
+    version  = version  ?? b.version
+  }
   let engine: EngineName = 'unknown'
 
   for (const def of ENGINE_DEFS) {

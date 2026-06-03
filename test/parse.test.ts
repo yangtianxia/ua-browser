@@ -423,6 +423,21 @@ describe('parseUA — UA-only platform / language / arch inference', () => {
     expect(parseUA(UA.chrome.windows).language).toBe('unknown')
     expect(parseUA(UA.safari.desktop).language).toBe('unknown')
   })
+
+  it('WeChat UA with Language/zh_CN → language zh-CN', () => {
+    const ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.73(0x18004939) NetType/WIFI Language/zh_CN'
+    expect(parseUA(ua).language).toBe('zh-CN')
+  })
+
+  it('WeChat UA with Language/en_US → language en-US', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36 MicroMessenger/8.0.73 Language/en_US'
+    expect(parseUA(ua).language).toBe('en-US')
+  })
+
+  it('Alipay UA with Language/zh-Hans-CN → language zh-Hans-CN', () => {
+    const ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AlipayClient/10.5.36 Language/zh-Hans-CN'
+    expect(parseUA(ua).language).toBe('zh-Hans-CN')
+  })
 })
 
 describe('parseUA — customBotDefs', () => {

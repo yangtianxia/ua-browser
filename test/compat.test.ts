@@ -8,6 +8,8 @@ import uaBrowser, {
   getEnvContext,
   detectBot,
   detectArch,
+  detectEngine,
+  detectDevice,
   detectHeadless,
   parseHeaders,
   ACCEPT_CH,
@@ -66,6 +68,14 @@ describe('API surface', () => {
     expect(typeof detectHeadless).toBe('function')
   })
 
+  it('named export detectEngine is a function', () => {
+    expect(typeof detectEngine).toBe('function')
+  })
+
+  it('named export detectDevice is a function', () => {
+    expect(typeof detectDevice).toBe('function')
+  })
+
   it('isWebview correctly identifies webview UA', () => {
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K); wv)')).toBe(true)
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K)')).toBe(false)
@@ -112,6 +122,34 @@ describe('API surface', () => {
   it('named export BotDef type is available (BotDef import compiles)', async () => {
     const mod = await import('../src/index.js')
     expect(mod).toBeDefined()
+  })
+})
+
+describe('detectEngine() — standalone', () => {
+  const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+
+  it('detects Blink from Chrome UA without pre-detected browser/version', () => {
+    expect(detectEngine(CHROME_UA)).toBe('Blink')
+  })
+
+  it('accepts pre-detected browser and version', () => {
+    expect(detectEngine(CHROME_UA, 'Chrome', '124')).toBe('Blink')
+  })
+})
+
+describe('detectDevice() — standalone', () => {
+  it('detects Mobile from Android Mobile UA', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
+    expect(detectDevice(ua)).toBe('Mobile')
+  })
+
+  it('detects Tablet from Android non-Mobile UA', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; SM-T870) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    expect(detectDevice(ua)).toBe('Tablet')
+  })
+
+  it('detects PC from Windows UA', () => {
+    expect(detectDevice(WIN_UA)).toBe('PC')
   })
 })
 
