@@ -508,3 +508,88 @@ describe('parseUA — Brave override via ctx', () => {
     expect(parseUA(UA.chrome.windows).browser).toBe('Chrome')
   })
 })
+
+describe('parseUA — new enriched fields', () => {
+  it('Chrome on Windows → browserType: browser', () => {
+    expect(parseUA(UA.chrome.windows).browserType).toBe('browser')
+  })
+
+  it('WeChat mobile → browserType: app', () => {
+    expect(parseUA(UA.wechat.mobile).browserType).toBe('app')
+  })
+
+  it('Chrome on Windows → engineVersion from AppleWebKit token', () => {
+    expect(parseUA(UA.chrome.windows).engineVersion).toBe('537.36')
+  })
+
+  it('Safari desktop → engineVersion 605.1.15', () => {
+    expect(parseUA(UA.safari.desktop).engineVersion).toBe('605.1.15')
+  })
+
+  it('Firefox desktop → engineVersion 20100101', () => {
+    expect(parseUA(UA.firefox.desktop).engineVersion).toBe('20100101')
+  })
+
+  it('macOS Sonoma (14.x) → osVersionName: Sonoma', () => {
+    const r = parseUA(UA.safari.desktop) // Mac OS X 14_3
+    expect(r.osVersionName).toBe('Sonoma')
+  })
+
+  it('Windows 10 → osVersionName: Windows 10', () => {
+    expect(parseUA(UA.chrome.windows).osVersionName).toBe('Windows 10')
+  })
+
+  it('Windows 11 via windowsVersion override → osVersionName: Windows 11', () => {
+    const r = parseUA(UA.chrome.windows, { windowsVersion: '11' })
+    expect(r.osVersionName).toBe('Windows 11')
+  })
+
+  it('iOS → osVersionName: unknown (no named iOS versions)', () => {
+    expect(parseUA(UA.safari.ios).osVersionName).toBe('unknown')
+  })
+
+  it('Android Samsung SM-G991B → vendor: Samsung, model: SM-G991B', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; SM-G991B Build/TP1A.220624.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36'
+    const r = parseUA(ua)
+    expect(r.vendor).toBe('Samsung')
+    expect(r.model).toBe('SM-G991B')
+  })
+
+  it('iPhone → vendor: Apple, model: iPhone', () => {
+    const r = parseUA(UA.safari.ios)
+    expect(r.vendor).toBe('Apple')
+    expect(r.model).toBe('iPhone')
+  })
+
+  it('Pixel 7 → vendor: Google, model: Pixel 7', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
+    const r = parseUA(ua)
+    expect(r.vendor).toBe('Google')
+    expect(r.model).toBe('Pixel 7')
+  })
+
+  it('Windows Chrome → vendor: unknown, model: unknown (no device info in desktop UA)', () => {
+    const r = parseUA(UA.chrome.windows)
+    expect(r.vendor).toBe('unknown')
+    expect(r.model).toBe('unknown')
+  })
+
+  it('Googlebot → botCategory: search-engine', () => {
+    const r = parseUA('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)')
+    expect(r.botCategory).toBe('search-engine')
+  })
+
+  it('GPTBot → botCategory: ai-llm', () => {
+    const r = parseUA('Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot')
+    expect(r.botCategory).toBe('ai-llm')
+  })
+
+  it('regular Chrome → botCategory: unknown', () => {
+    expect(parseUA(UA.chrome.windows).botCategory).toBe('unknown')
+  })
+
+  it('Brave → browserType: browser (not unknown)', () => {
+    const r = parseUA(UA.chrome.windows, { ctx: { userAgent: UA.chrome.windows, platform: '', language: '', maxTouchPoints: 0, hasBrave: true } as any })
+    expect(r.browserType).toBe('browser')
+  })
+})

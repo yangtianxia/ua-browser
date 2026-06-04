@@ -129,11 +129,11 @@ describe('detectEngine() — standalone', () => {
   const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
 
   it('detects Blink from Chrome UA without pre-detected browser/version', () => {
-    expect(detectEngine(CHROME_UA)).toBe('Blink')
+    expect(detectEngine(CHROME_UA).engine).toBe('Blink')
   })
 
   it('accepts pre-detected browser and version', () => {
-    expect(detectEngine(CHROME_UA, 'Chrome', '124')).toBe('Blink')
+    expect(detectEngine(CHROME_UA, 'Chrome', '124').engine).toBe('Blink')
   })
 })
 

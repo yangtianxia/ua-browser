@@ -269,7 +269,7 @@ console.log(result.osVersion) // '11' 或 '10'
 import { detectBot } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 
-detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName }
+detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName; botCategory: BotCategory }
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
@@ -277,22 +277,23 @@ detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName
 | `ua` | `string` | 是 | 要检测的 UA 字符串 |
 | `customDefs` | `readonly BotDef[]` | 否 | 附加 Bot 规则，插在内置规则之后、`GenericBot` 兜底之前 |
 
-**返回值：** `{ isBot: boolean; botName: BotName }`
+**返回值：** `{ isBot: boolean; botName: BotName; botCategory: BotCategory }`
 
 **`BotDef` 结构：**
 
 ```typescript
 interface BotDef {
-  name: BotName   // 匹配后返回的 botName 值
-  detect: RegExp  // 与 UA 字符串匹配的正则
+  name: BotName         // 匹配后返回的 botName 值
+  detect: RegExp        // 与 UA 字符串匹配的正则
+  category: BotCategory // Bot 分类
 }
 ```
 
 **示例：**
 
 ```typescript
-const { isBot, botName } = detectBot(ua)
-// isBot: true, botName: 'Googlebot'
+const { isBot, botName, botCategory } = detectBot(ua)
+// isBot: true, botName: 'Googlebot', botCategory: 'search-engine'
 
 // 自定义规则
 const myDefs: BotDef[] = [
@@ -604,6 +605,16 @@ const info = uaBrowser()
 
 // 等同于 info.os === 'iOS' && info.device === 'Mobile'
 if (satisfies(info, { os: 'iOS', device: 'Mobile' })) {
+  // ...
+}
+
+// 仅匹配 AI 爬虫
+if (satisfies(info, { isBot: true, botCategory: 'ai-llm' })) {
+  // ...
+}
+
+// 仅匹配 App 内嵌浏览器（微信、钉钉等）
+if (satisfies(info, { browserType: 'app' })) {
   // ...
 }
 ```

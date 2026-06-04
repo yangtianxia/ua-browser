@@ -2,6 +2,21 @@ import type { EngineName } from '../types.js'
 import { ENGINE_DEFS } from '../constants/engines.js'
 import { detectBrowser } from './browser.js'
 
+export interface EngineResult {
+  engine:        EngineName
+  engineVersion: string
+}
+
+const ENGINE_VERSION_RE: Record<string, RegExp> = {
+  WebKit:  /AppleWebKit\/([\d.]+)/,
+  Blink:   /AppleWebKit\/([\d.]+)/,
+  ArkWeb:  /AppleWebKit\/([\d.]+)/,
+  Gecko:   /Gecko\/([\d.]+)/,
+  Trident: /Trident\/([\d.]+)/,
+  Presto:  /Presto\/([\d.]+)/,
+  KHTML:   /KHTML\/([\d.]+)/,
+}
+
 /**
  * Detect the rendering engine from a user agent string.
  *
@@ -9,11 +24,11 @@ import { detectBrowser } from './browser.js'
  * @param browser - Pre-detected browser name; auto-detected when omitted
  * @param version - Pre-detected browser version; auto-detected when omitted
  */
-export function detectEngine(ua: string, browser?: string, version?: string): EngineName {
+export function detectEngine(ua: string, browser?: string, version?: string): EngineResult {
   if (browser === undefined || version === undefined) {
     const b = detectBrowser(ua)
-    browser  = browser  ?? b.browser
-    version  = version  ?? b.version
+    browser = browser ?? b.browser
+    version = version ?? b.version
   }
   let engine: EngineName = 'unknown'
 
@@ -41,5 +56,9 @@ export function detectEngine(ua: string, browser?: string, version?: string): En
     engine = parseInt(version, 10) > 75 ? 'Blink' : 'EdgeHTML'
   }
 
-  return engine
+  const engineVersion = ENGINE_VERSION_RE[engine]
+    ? (ENGINE_VERSION_RE[engine]!.exec(ua)?.[1] ?? 'unknown')
+    : 'unknown'
+
+  return { engine, engineVersion }
 }

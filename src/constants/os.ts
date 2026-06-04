@@ -7,6 +7,8 @@ export interface OsDef {
   versionPattern: RegExp | RegExp[] | null
   /** Lookup table: raw version token → display version. */
   versionLookup?: Record<string, string>
+  /** Human-readable version names: display version → name (e.g. '14' → 'Sonoma'). */
+  versionNames?: Record<string, string>
 }
 
 // Detection uses last-match-wins: entries that appear later override earlier matches.
@@ -25,7 +27,13 @@ export const OS_DEFS: readonly OsDef[] = [
   { name: 'Chrome OS',      detect: /CrOS/,                           versionPattern: null },
   { name: 'Tizen',          detect: /Tizen/,                          versionPattern: /Tizen ([\d.]+)/ },
   { name: 'iOS',            detect: /like Mac OS X/,                  versionPattern: /OS ([\d_]+) like/ },
-  { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/ },
+  { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/,
+    versionNames: {
+      '10.9': 'Mavericks', '10.10': 'Yosemite', '10.11': 'El Capitan',
+      '10.12': 'Sierra', '10.13': 'High Sierra', '10.14': 'Mojave',
+      '10.15': 'Catalina', '11': 'Big Sur', '12': 'Monterey',
+      '13': 'Ventura', '14': 'Sonoma', '15': 'Sequoia',
+    } },
   // visionOS / tvOS must come AFTER iOS: their UAs also contain "like Mac OS X",
   // so they need to override iOS via the last-match-wins iteration.
   { name: 'visionOS',       detect: /visionOS/,                       versionPattern: /visionOS ([\d_]+)/ },
@@ -46,6 +54,10 @@ export const OS_DEFS: readonly OsDef[] = [
     versionLookup: {
       '10': '10', '6.4': '10', '6.3': '8.1', '6.2': '8',
       '6.1': '7', '6.0': 'Vista', '5.2': 'XP', '5.1': 'XP', '5.0': '2000'
+    },
+    versionNames: {
+      '7': 'Windows 7', '8': 'Windows 8', '8.1': 'Windows 8.1',
+      '10': 'Windows 10', '11': 'Windows 11',
     } },
   { name: 'Windows Phone',  detect: /(IEMobile|Windows Phone)/,       versionPattern: /Windows Phone(?: OS)? ([\d.]+)/ },
 ] as const

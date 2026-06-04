@@ -97,6 +97,22 @@ export type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'Console' | 'XR' | 
 
 export type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
+export type BotCategory =
+  | 'search-engine'
+  | 'ai-llm'
+  | 'social'
+  | 'link-preview'
+  | 'seo-tool'
+  | 'monitoring'
+  | 'generic'
+  | 'unknown'
+
+export type BrowserType =
+  | 'browser'
+  | 'brand'
+  | 'app'
+  | 'unknown'
+
 export type BotName =
   | 'Googlebot'
   | 'Bingbot'
@@ -145,15 +161,21 @@ export interface EnvOption {
   browser:        BrowserName
   version:        string
   versionMajor:   number
+  browserType:    BrowserType
   engine:         EngineName
+  engineVersion:  string
   os:             OsName
   osVersion:      string
+  osVersionName:  string
   device:         DeviceName
+  vendor:         string
+  model:          string
   arch:           ArchName
   isWebview:      boolean
   isHeadless:     boolean
   isBot:          boolean
   botName:        BotName
+  botCategory:    BotCategory
   language:       string
   platform:       string
   connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'

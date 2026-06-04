@@ -269,7 +269,7 @@ Standalone bot detector. Returns the bot detection result without running the fu
 import { detectBot } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 
-detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName }
+detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName; botCategory: BotCategory }
 ```
 
 | Parameter | Type | Required | Description |
@@ -277,22 +277,23 @@ detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName
 | `ua` | `string` | Yes | UA string to test. |
 | `customDefs` | `readonly BotDef[]` | No | Additional bot rules. Inserted after built-in rules, before `GenericBot` catch-all. |
 
-**Returns:** `{ isBot: boolean; botName: BotName }`
+**Returns:** `{ isBot: boolean; botName: BotName; botCategory: BotCategory }`
 
 **`BotDef` shape:**
 
 ```typescript
 interface BotDef {
-  name: BotName   // the bot label returned in botName
-  detect: RegExp  // matched against the UA string
+  name: BotName         // the bot label returned in botName
+  detect: RegExp        // matched against the UA string
+  category: BotCategory // bot classification
 }
 ```
 
 **Example:**
 
 ```typescript
-const { isBot, botName } = detectBot(ua)
-// isBot: true, botName: 'Googlebot'
+const { isBot, botName, botCategory } = detectBot(ua)
+// isBot: true, botName: 'Googlebot', botCategory: 'search-engine'
 
 // Custom rules
 const myDefs: BotDef[] = [
@@ -604,6 +605,16 @@ const info = uaBrowser()
 
 // equivalent to: info.os === 'iOS' && info.device === 'Mobile'
 if (satisfies(info, { os: 'iOS', device: 'Mobile' })) {
+  // ...
+}
+
+// match AI crawlers only
+if (satisfies(info, { isBot: true, botCategory: 'ai-llm' })) {
+  // ...
+}
+
+// match in-app browsers (WeChat, DingTalk, etc.)
+if (satisfies(info, { browserType: 'app' })) {
   // ...
 }
 ```

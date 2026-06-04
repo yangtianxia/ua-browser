@@ -1,10 +1,12 @@
-import type { BrowserName } from '../types.js'
+import type { BrowserName, BrowserType } from '../types.js'
 import { BROWSER_DEFS } from '../constants/browsers.js'
 import { extractVersionFromPatterns, lookupFromChromeVersion } from '../utils/extract.js'
 
 export interface BrowserResult {
-  browser: BrowserName
-  version: string
+  browser:     BrowserName
+  version:     string
+  browserType: BrowserType
+  priority:    number
 }
 
 /**
@@ -24,7 +26,7 @@ export function detectBrowser(ua: string): BrowserResult {
     }
   }
 
-  if (!best) return { browser: 'unknown', version: 'unknown' }
+  if (!best) return { browser: 'unknown', version: 'unknown', browserType: 'unknown', priority: 0 }
 
   let version: string | null = null
 
@@ -41,5 +43,7 @@ export function detectBrowser(ua: string): BrowserResult {
     version = extractVersionFromPatterns(ua, patterns)
   }
 
-  return { browser: best.name, version: version ?? 'unknown' }
+  const p = best.priority
+  const browserType: BrowserType = p >= 500 ? 'app' : p >= 300 ? 'brand' : 'browser'
+  return { browser: best.name, version: version ?? 'unknown', browserType, priority: p }
 }

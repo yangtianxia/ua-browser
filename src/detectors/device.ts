@@ -118,3 +118,55 @@ export function detectDevice(ua: string, nav?: DeviceNav): DeviceName {
 
   return hwDetect() ?? uaDetect() ?? 'PC'
 }
+
+export interface VendorModelResult {
+  vendor: string
+  model:  string
+}
+
+const VENDOR_MAP: [RegExp, string][] = [
+  [/^SM-|^GT-|^SGH-|^SCH-|^SHW-|^SPH-|^SAMSUNG /i, 'Samsung'],
+  [/^Pixel |^Nexus /,                                 'Google'],
+  [/^moto |^motorola /i,                              'Motorola'],
+  [/^HONOR /i,                                        'Honor'],
+  [/^ELS-|^LYA-|^HMA-|^VOG-|^ANA-|^CLT-|^JNY-|^NOH-|^PLK-|^BAH-|^BKL-|^COL-|^DUB-|^FIG-|^KIW-|^MAR-|^VTR-|^WAS-/i, 'Huawei'],
+  [/^CPH/,                                            'OPPO'],
+  [/^RMX/,                                            'Realme'],
+  [/^V\d{4}[A-Z]|^vivo /i,                           'Vivo'],
+  [/^iqoo/i,                                          'Vivo'],
+  [/^Redmi |^POCO |^Mi /,                             'Xiaomi'],
+  [/^2\d{9}|^2\d{3}[A-Z]/,                           'Xiaomi'],
+  [/^OnePlus |^IN2|^KB2|^LE2/i,                       'OnePlus'],
+  [/^LM-|^LGE |^LG-/i,                               'LG'],
+  [/^HTC/i,                                           'HTC'],
+  [/^Nokia/i,                                         'Nokia'],
+  [/^XQ-/,                                            'Sony'],
+  [/^ASUS_|^ZB6|^ZS6|^ZE[56]/i,                      'Asus'],
+  [/^Quest /i,                                        'Meta'],
+]
+
+const ANDROID_MODEL_RE = /Android [0-9.]+;(?:\s*U;)?(?:\s*[a-z]{2}[-_][a-zA-Z]{2,4};)?\s*([^;)]+?)(?:\s+Build\/|[;)])/
+
+/**
+ * Extract device vendor and model from a user agent string.
+ * Returns 'unknown' for both when the UA does not carry recognisable device info.
+ */
+export function detectVendorModel(ua: string): VendorModelResult {
+  // iOS / visionOS — vendor is always Apple
+  if (/visionOS/.test(ua)) return { vendor: 'Apple', model: 'Apple Vision Pro' }
+  if (/iPhone/.test(ua))   return { vendor: 'Apple', model: 'iPhone' }
+  if (/iPad/.test(ua))     return { vendor: 'Apple', model: 'iPad' }
+  if (/iPod/.test(ua))     return { vendor: 'Apple', model: 'iPod touch' }
+
+  // Android — extract model string then infer vendor
+  const m = ANDROID_MODEL_RE.exec(ua)
+  if (m) {
+    const model = m[1]!.trim()
+    for (const [re, vendor] of VENDOR_MAP) {
+      if (re.test(model)) return { vendor, model }
+    }
+    return { vendor: 'unknown', model }
+  }
+
+  return { vendor: 'unknown', model: 'unknown' }
+}
