@@ -486,20 +486,20 @@ Standalone browser detector that does not run the full `parseUA()` pipeline.
 ```typescript
 import { detectBrowser } from 'ua-browser'
 
-detectBrowser(ua: string): { browser: BrowserName; version: string }
+detectBrowser(ua: string): { browser: BrowserName; version: string; browserType: BrowserType }
 ```
 
 | Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | Yes | UA string |
 
-**Returns:** `{ browser: BrowserName; version: string }`
+**Returns:** `{ browser: BrowserName; version: string; browserType: BrowserType }`
 
 **Example:**
 
 ```typescript
-const { browser, version } = detectBrowser(navigator.userAgent)
-// browser: 'Chrome', version: '124.0.0.0'
+const { browser, version, browserType } = detectBrowser(navigator.userAgent)
+// browser: 'Chrome', version: '124.0.0.0', browserType: 'browser'
 ```
 
 ---
@@ -511,20 +511,20 @@ Standalone OS detector that does not run the full `parseUA()` pipeline.
 ```typescript
 import { detectOS } from 'ua-browser'
 
-detectOS(ua: string): { os: OsName; osVersion: string }
+detectOS(ua: string): { os: OsName; osVersion: string; osVersionName: string }
 ```
 
 | Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | Yes | UA string |
 
-**Returns:** `{ os: OsName; osVersion: string }`
+**Returns:** `{ os: OsName; osVersion: string; osVersionName: string }`
 
 **Example:**
 
 ```typescript
-const { os, osVersion } = detectOS(navigator.userAgent)
-// os: 'Windows', osVersion: '10'
+const { os, osVersion, osVersionName } = detectOS(navigator.userAgent)
+// os: 'Windows', osVersion: '10', osVersionName: 'Windows 10'
 ```
 
 ---
@@ -536,20 +536,45 @@ Standalone rendering engine detector. Does not run the full `parseUA()` pipeline
 ```typescript
 import { detectEngine } from 'ua-browser'
 
-detectEngine(ua: string): EngineName
+detectEngine(ua: string): { engine: EngineName; engineVersion: string }
 ```
 
 | Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | Yes | User agent string |
 
-**Returns:** [`EngineName`](/en/api/types#enginename)
+**Returns:** `{ engine: EngineName; engineVersion: string }`
 
 **Example:**
 
 ```typescript
-const engine = detectEngine(navigator.userAgent)
-// engine: 'Blink'
+const { engine, engineVersion } = detectEngine(navigator.userAgent)
+// engine: 'Blink', engineVersion: '537.36'
+```
+
+---
+
+## `detectVendorModel(ua)` {#detectvendormodel}
+
+Standalone device vendor/model extractor.
+
+```typescript
+import { detectVendorModel } from 'ua-browser'
+
+detectVendorModel(ua: string): VendorModelResult
+```
+
+| Parameter | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | Yes | User agent string |
+
+**Returns:** [`VendorModelResult`](/en/api/types#vendormodelresult)
+
+**Example:**
+
+```typescript
+const { vendor, model } = detectVendorModel(ua)
+// vendor: 'Samsung', model: 'SM-G991B'
 ```
 
 ---

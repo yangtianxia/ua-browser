@@ -9,15 +9,21 @@ interface EnvOption {
   browser:        BrowserName
   version:        string
   versionMajor:   number
+  browserType:    BrowserType      // 'browser' | 'brand' | 'app' | 'unknown'
   engine:         EngineName
+  engineVersion:  string           // engine version, e.g. '537.36', '605.1.15'
   os:             OsName
   osVersion:      string
+  osVersionName:  string           // e.g. 'Sonoma', 'Windows 11'; 'unknown' when unnamed
   device:         DeviceName
+  vendor:         string           // device manufacturer, e.g. 'Samsung', 'Apple'; 'unknown' when unrecognized
+  model:          string           // device model, e.g. 'SM-G991B', 'iPhone'; 'unknown' when unrecognized
   arch:           ArchName
   isWebview:      boolean
   isHeadless:     boolean
   isBot:          boolean
   botName:        BotName
+  botCategory:    BotCategory      // bot classification
   language:       string
   platform:       string
   connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'
@@ -118,6 +124,49 @@ type BotName =
   | 'UptimeRobot' | 'ia_archiver'
   // Generic catch-all
   | 'GenericBot' | 'unknown'
+```
+
+---
+
+## BotCategory
+
+```typescript
+type BotCategory =
+  | 'search-engine'   // Googlebot, Bingbot, Baiduspider, etc.
+  | 'ai-llm'          // GPTBot, ClaudeBot, PerplexityBot, etc.
+  | 'social'          // Facebookbot, Twitterbot, LinkedInBot, etc.
+  | 'link-preview'    // Slackbot, Discordbot, TelegramBot, etc.
+  | 'seo-tool'        // SemrushBot, AhrefsBot, MJ12bot, etc.
+  | 'monitoring'      // UptimeRobot, ia_archiver, etc.
+  | 'generic'         // GenericBot catch-all
+  | 'unknown'
+```
+
+---
+
+## BrowserType
+
+```typescript
+type BrowserType =
+  | 'browser'   // Standard browsers: Chrome, Firefox, Safari, Edge, etc.
+  | 'brand'     // Regional/OEM browsers: UC, QQBrowser, 360SE, Huawei Browser, etc.
+  | 'app'       // In-app browsers: WeChat, DingTalk, Douyin, Bilibili, etc.
+  | 'unknown'
+```
+
+Derived from the `priority` field in `BROWSER_DEFS`: ≥500 → `'app'`, ≥300 → `'brand'`, otherwise `'browser'`.
+
+---
+
+## VendorModelResult
+
+Return type of `detectVendorModel()`.
+
+```typescript
+interface VendorModelResult {
+  vendor: string   // device manufacturer, e.g. 'Samsung', 'Apple', 'Google'; 'unknown' when unrecognized
+  model:  string   // device model, e.g. 'SM-G991B', 'iPhone', 'Pixel 7'; 'unknown' when unrecognized
+}
 ```
 
 ---
