@@ -3,8 +3,22 @@ import { OS_DEFS } from '../constants/os.js'
 import { extractVersion, extractVersionFromPatterns } from '../utils/extract.js'
 
 export interface OsResult {
-  os: OsName
-  osVersion: string
+  os:            OsName
+  osVersion:     string
+  osVersionName: string
+}
+
+/**
+ * Look up a human-readable name for a version string, trying progressively shorter prefixes.
+ * e.g. '14.3' tries '14.3' → '14'; '10.15.7' tries '10.15.7' → '10.15' → '10'.
+ */
+function lookupVersionName(map: Record<string, string>, version: string): string {
+  const parts = version.split('.')
+  for (let len = parts.length; len >= 1; len--) {
+    const key = parts.slice(0, len).join('.')
+    if (Object.prototype.hasOwnProperty.call(map, key)) return map[key]!
+  }
+  return 'unknown'
 }
 
 /**
@@ -24,7 +38,7 @@ export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
     }
   }
 
-  if (!matchedDef) return { os: 'unknown', osVersion: 'unknown' }
+  if (!matchedDef) return { os: 'unknown', osVersion: 'unknown', osVersionName: 'unknown' }
 
   let osVersion = 'unknown'
 
@@ -64,5 +78,8 @@ export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
     osVersion = windowsVersion
   }
 
-  return { os: matchedDef.name, osVersion }
+  const osVersionName = matchedDef.versionNames
+    ? lookupVersionName(matchedDef.versionNames, osVersion)
+    : 'unknown'
+  return { os: matchedDef.name, osVersion, osVersionName }
 }

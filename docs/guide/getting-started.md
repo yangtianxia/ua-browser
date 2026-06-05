@@ -26,9 +26,6 @@ import uaBrowser from 'ua-browser'
 // 自动读取当前浏览器 UA
 const info = uaBrowser()
 
-// 或传入自定义 UA 字符串
-const info = uaBrowser('Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...')
-
 console.log(info)
 // {
 //   browser:    'Chrome',
@@ -46,6 +43,25 @@ console.log(info)
 //   platform:   'Win32'
 // }
 ```
+
+## 高精度检测（detect）
+
+`uaBrowser.detect()` 是浏览器端代码的推荐入口。内部调用 `getEnvContext()` 采集硬件信号（GPU 渲染器、CSS safe-area-inset、设备像素比、振动/运动 API、网络类型等），再一次性完成解析。
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// 采集硬件信号后解析——浏览器端推荐写法
+const result = await uaBrowser.detect()
+
+console.log(result.device) // 'Mobile' — 即便开了桌面模式也能正确识别
+console.log(result.arch)   // 'arm64' 或 'x86_64'
+```
+
+| API | 是否异步 | 适用场景 |
+| :-- | :-- | :-- |
+| `uaBrowser()` | 否（同步） | SSR / 简单 UA 查询 |
+| `uaBrowser.detect()` | 是（异步） | 浏览器端，需要硬件信号辅助检测 |
 
 ## 命名导出（Tree-shakeable）
 
@@ -97,9 +113,9 @@ const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 console.log(result.osVersion) // '11' 或 '10'
 ```
 
-## 高精度架构检测（getEnvContext）
+## 高精度检测（getEnvContext）
 
-`getEnvContext()` 一次性采集 Client Hints、WebGL 渲染器、字体探针等多维信号，可区分 Apple Silicon 与 Intel Mac：
+需要复用上下文对象或与其他选项组合时，直接使用 `getEnvContext()`。它一次性采集 Client Hints、WebGL 渲染器、字体探针等多维信号：
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -107,6 +123,7 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
+console.log(result.device)   // 'Mobile' — 开了桌面模式也能正确识别
 console.log(result.arch)     // 'arm64'（Apple Silicon）或 'x86_64'
 console.log(result.language) // 'zh-CN'
 ```

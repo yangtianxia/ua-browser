@@ -128,3 +128,19 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('unknown')
   })
 })
+
+describe('visionOS / tvOS', () => {
+  it('detects visionOS', () => {
+    const r = detectOs(UA.visionOS.v1)
+    expect(r.os).toBe('visionOS')
+  })
+
+  it('detects tvOS (Apple TV)', () => {
+    const r = detectOs(UA.tvOS.v17)
+    expect(r.os).toBe('tvOS')
+  })
+
+  it('visionOS is not detected as iOS', () => {
+    expect(detectOs(UA.visionOS.v1).os).not.toBe('iOS')
+  })
+})

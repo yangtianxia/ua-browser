@@ -8,11 +8,15 @@ import uaBrowser, {
   getEnvContext,
   detectBot,
   detectArch,
+  detectEngine,
+  detectDevice,
   detectHeadless,
   parseHeaders,
   ACCEPT_CH,
   VERSION
 } from '../src/index.js'
+
+const WIN_UA = 'Mozilla/5.0 (Windows NT 10.0) Chrome/124.0.0.0'
 
 describe('API surface', () => {
   it('default export is a function', () => {
@@ -64,19 +68,27 @@ describe('API surface', () => {
     expect(typeof detectHeadless).toBe('function')
   })
 
+  it('named export detectEngine is a function', () => {
+    expect(typeof detectEngine).toBe('function')
+  })
+
+  it('named export detectDevice is a function', () => {
+    expect(typeof detectDevice).toBe('function')
+  })
+
   it('isWebview correctly identifies webview UA', () => {
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K); wv)')).toBe(true)
     expect(isWebview('Mozilla/5.0 (Linux; Android 10; K)')).toBe(false)
   })
 
   it('parseUA result has platform (not platfrom)', () => {
-    const result = parseUA('Mozilla/5.0 (Windows NT 10.0) Chrome/124.0.0.0')
+    const result = parseUA(WIN_UA)
     expect(result).toHaveProperty('platform')
     expect(result).not.toHaveProperty('platfrom')
   })
 
   it('VERSION matches package.json version', async () => {
-    const pkg = await import('../package.json', { assert: { type: 'json' } })
+    const pkg = await import('../package.json', { with: { type: 'json' } })
     expect(VERSION).toBe(pkg.default.version)
   })
 
@@ -107,17 +119,66 @@ describe('API surface', () => {
     expect(isWebview(crios)).toBe(false)
   })
 
-  it('default export has .detect async method', () => {
-    expect(typeof uaBrowser.detect).toBe('function')
+  it('named export BotDef type is available (BotDef import compiles)', async () => {
+    const mod = await import('../src/index.js')
+    expect(mod).toBeDefined()
   })
-
-  it('uaBrowser.detect() returns EnvOption shape', async () => {
-    const result = await uaBrowser.detect('Mozilla/5.0 (Windows NT 10.0) Chrome/124.0.0.0')
-    expect(result).toHaveProperty('browser')
-    expect(result).toHaveProperty('os')
-    expect(result).toHaveProperty('engine')
-    expect(result.browser).toBe('Chrome')
-    expect(result.os).toBe('Windows')
-  })
-
 })
+
+describe('detectEngine() — standalone', () => {
+  const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+
+  it('detects Blink from Chrome UA without pre-detected browser/version', () => {
+    expect(detectEngine(CHROME_UA).engine).toBe('Blink')
+  })
+
+  it('accepts pre-detected browser and version', () => {
+    expect(detectEngine(CHROME_UA, 'Chrome', '124').engine).toBe('Blink')
+  })
+})
+
+describe('detectDevice() — standalone', () => {
+  it('detects Mobile from Android Mobile UA', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
+    expect(detectDevice(ua)).toBe('Mobile')
+  })
+
+  it('detects Tablet from Android non-Mobile UA', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 13; SM-T870) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    expect(detectDevice(ua)).toBe('Tablet')
+  })
+
+  it('detects PC from Windows UA', () => {
+    expect(detectDevice(WIN_UA)).toBe('PC')
+  })
+})
+
+describe('uaBrowser() — default export sync', () => {
+  it('returns EnvOption shape', () => {
+    const r = uaBrowser()
+    const keys = ['browser', 'version', 'engine', 'os', 'osVersion', 'device',
+      'arch', 'isWebview', 'isHeadless', 'isBot', 'botName', 'language', 'platform']
+    for (const k of keys) expect(r).toHaveProperty(k)
+  })
+
+  it('parseUA parses a custom UA string', () => {
+    const r = parseUA(WIN_UA)
+    expect(r.browser).toBe('Chrome')
+    expect(r.os).toBe('Windows')
+  })
+})
+
+describe('uaBrowser.detect() — async', () => {
+  it('is an async function on the default export', () => {
+    expect(typeof uaBrowser.detect).toBe('function')
+    expect(uaBrowser.detect()).toBeInstanceOf(Promise)
+  })
+
+  it('returns full EnvOption shape', async () => {
+    const r = await uaBrowser.detect()
+    const keys = ['browser', 'version', 'engine', 'os', 'osVersion', 'device',
+      'arch', 'isWebview', 'isHeadless', 'isBot', 'botName', 'language', 'platform']
+    for (const k of keys) expect(r).toHaveProperty(k)
+  })
+})
+

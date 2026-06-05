@@ -95,11 +95,98 @@ describe('detectBot', () => {
       expect(r.botName).toBe('AdsBot')
     })
 
+    it('detects Applebot-Extended (before Applebot)', () => {
+      const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15 (Applebot-Extended/0.1; +http://www.apple.com/go/applebot)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Applebot-Extended')
+    })
+
+    it('detects OAI-SearchBot', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('OAI-SearchBot')
+    })
+
+    it('detects ChatGPT-User', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ChatGPT-User/1.0; +https://openai.com/bot'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('ChatGPT-User')
+    })
+
+    it('detects Meta-ExternalAgent', () => {
+      const ua = 'meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Meta-ExternalAgent')
+    })
+
+    it('detects Amazonbot', () => {
+      const ua = 'Mozilla/5.0 (compatible; Amazonbot/0.1; +https://developer.amazon.com/support/amazonbot)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Amazonbot')
+    })
+
+    it('detects Diffbot', () => {
+      const ua = 'Mozilla/5.0 (compatible; Diffbot/0.1; +https://www.diffbot.com)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Diffbot')
+    })
+
+    it('detects cohere-ai', () => {
+      const ua = 'cohere-ai/1.0'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('cohere-ai')
+    })
+
+    it('detects YouBot', () => {
+      const ua = 'Mozilla/5.0 (compatible; YouBot/1.0; +https://you.com/youbot)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('YouBot')
+    })
+
+    it('detects Google-Extended', () => {
+      const ua = 'Mozilla/5.0 (compatible; Google-Extended)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Google-Extended')
+    })
+
     it('detects generic bot by keyword', () => {
       const ua = 'MyCustomCrawler/1.0 (a custom web crawler)'
       const r = detectBot(ua)
       expect(r.isBot).toBe(true)
       expect(r.botName).toBe('GenericBot')
+    })
+  })
+
+  describe('customBotDefs', () => {
+    it('detects custom bot injected via customDefs', () => {
+      const ua = 'MyInternalScraper/2.0'
+      const customDefs = [{ name: 'GenericBot' as const, detect: /MyInternalScraper/ }]
+      const r = detectBot(ua, customDefs)
+      expect(r.isBot).toBe(true)
+    })
+
+    it('custom bot does not shadow GenericBot catch-all for unmatched UA', () => {
+      const ua = 'some-unknown-crawler'
+      const customDefs = [{ name: 'GenericBot' as const, detect: /MyInternalScraper/ }]
+      const r = detectBot(ua, customDefs)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('GenericBot')
+    })
+
+    it('without customDefs, custom UA returns unknown', () => {
+      const ua = 'MyInternalFetcher/2.0'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(false)
+      expect(r.botName).toBe('unknown')
     })
   })
 
@@ -121,5 +208,51 @@ describe('detectBot', () => {
     it('empty UA is not a bot', () => {
       expect(detectBot('').isBot).toBe(false)
     })
+  })
+})
+
+describe('detectBot — botCategory', () => {
+  it('Googlebot → search-engine', () => {
+    expect(detectBot('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)').botCategory).toBe('search-engine')
+  })
+
+  it('Bingbot → search-engine', () => {
+    expect(detectBot('Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)').botCategory).toBe('search-engine')
+  })
+
+  it('GPTBot → ai-llm', () => {
+    expect(detectBot('Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot').botCategory).toBe('ai-llm')
+  })
+
+  it('ClaudeBot → ai-llm', () => {
+    expect(detectBot('Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ClaudeBot/0.1; +claudebot@anthropic.com').botCategory).toBe('ai-llm')
+  })
+
+  it('Facebookbot → social', () => {
+    expect(detectBot('facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)').botCategory).toBe('social')
+  })
+
+  it('Twitterbot → social', () => {
+    expect(detectBot('Twitterbot/1.0').botCategory).toBe('social')
+  })
+
+  it('Slackbot → link-preview', () => {
+    expect(detectBot('Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)').botCategory).toBe('link-preview')
+  })
+
+  it('AhrefsBot → seo-tool', () => {
+    expect(detectBot('Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)').botCategory).toBe('seo-tool')
+  })
+
+  it('UptimeRobot → monitoring', () => {
+    expect(detectBot('Mozilla/5.0 (compatible; UptimeRobot/2.0)').botCategory).toBe('monitoring')
+  })
+
+  it('GenericBot → generic', () => {
+    expect(detectBot('MyCustomCrawler/1.0').botCategory).toBe('generic')
+  })
+
+  it('regular Chrome → botCategory unknown', () => {
+    expect(detectBot('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0.0.0').botCategory).toBe('unknown')
   })
 })
