@@ -4,13 +4,30 @@
 
 ### Minor Changes
 
-- 新增 AI Bot 检测扩展与 UA 冻结防御
+- **Six new `EnvOption` fields**, bridging the gap with ua-parser-js / device-detector-js:
+  - `vendor` + `model`: device manufacturer and model (e.g. Samsung/SM-G991B, Apple/iPhone); covers 17 vendors
+  - `browserType`: browser category (`'browser' | 'brand' | 'app' | 'unknown'`)
+  - `engineVersion`: rendering engine version (e.g. `'537.36'`, `'605.1.15'`)
+  - `osVersionName`: human-readable OS version name (e.g. `'Sonoma'`, `'Windows 11'`)
+  - `botCategory`: bot classification (`'search-engine' | 'ai-llm' | 'social' | 'link-preview' | 'seo-tool' | 'monitoring' | 'generic' | 'unknown'`)
+- **Standalone detector enhancements**: `detectBrowser()` returns `browserType`, `detectEngine()` returns `{ engine, engineVersion }`, `detectOS()` returns `osVersionName`, `detectBot()` returns `botCategory`; new `detectVendorModel()` export
+- **New type exports**: `BotCategory`, `BrowserType`, `VendorModelResult`
+- **Bot detection expansion**: 9 new AI/LLM crawlers (`Applebot-Extended`, `OAI-SearchBot`, `ChatGPT-User`, `Google-Extended`, `Meta-ExternalAgent`, `Amazonbot`, `Diffbot`, `cohere-ai`, `YouBot`); new `customBotDefs` option for injecting custom bot rules
+- **Browser**: Added Arc and Brave detection (Brave requires runtime API)
+- **OS**: Added visionOS and tvOS detection
+- **Device**: Added `Console` (PlayStation, Xbox, Nintendo Switch) and `XR` (Apple Vision Pro, Meta Quest) device types
+- **Language detection**: Recognizes `Language/xx_XX` format from UA strings; supports 3-part BCP47 tags (common in WeChat, Alipay, etc.)
+- **UA freeze defense**: Uses Client Hints `fullVersionList` for accurate version when available (Chrome, Edge, Opera, Vivaldi)
+- **New `EnvOption` fields**: `versionMajor` (browser major version as number), `connectionType` (network type)
 
-  - 新增 9 个 AI/LLM 爬虫检测：`Applebot-Extended`、`OAI-SearchBot`、`ChatGPT-User`、`Google-Extended`、`Meta-ExternalAgent`、`Amazonbot`、`Diffbot`、`cohere-ai`、`YouBot`
-  - 新增 `customBotDefs` 选项（`ParseOptions` 及 `detectBot()`），支持注入自定义 Bot 规则，无全局副作用
-  - 导出 `BotDef` 类型，方便构造自定义规则
-  - UA 冻结防御：当 `ctx.highEntropyData.fullVersionList` 可用时，优先使用 Client Hints 精确版本替代冻结的 UA 版本号（适用于 Chrome、Edge、Opera、Vivaldi）
-  - `EnvOption` 新增 `confidence` 字段（`'high' | 'medium' | 'low'`），反映检测结果的可信度
+### Patch Changes
+
+- Added standalone exports: `detectEngine()`, `detectDevice()`
+- Removed redundant re-detect button from Playground
+
+### Breaking Changes
+
+- Removed `DetectStrategy`, `strategy` option, and `confidence` field
 
 ## 1.3.1
 
