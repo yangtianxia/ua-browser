@@ -1,8 +1,9 @@
 import type { EnvOption, BrowserName, OsName } from './types.js'
+import { OS_DEFS } from './constants/os.js'
 import { detectBrowser } from './detectors/browser.js'
 import { detectEngine } from './detectors/engine.js'
 import { detectOs } from './detectors/os.js'
-import { detectDevice } from './detectors/device.js'
+import { detectDevice, detectVendorModel } from './detectors/device.js'
 import { detectBot, type BotDef } from './detectors/bot.js'
 import { detectArch } from './detectors/arch.js'
 import { detectHeadless } from './detectors/headless.js'
@@ -168,14 +169,15 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   const effectiveNav: EnvContext | NavContext | undefined = options.ctx ?? options.nav
   const effectiveWindowsVersion = options.ctx?.windowsVersion ?? options.windowsVersion
 
-  const { browser: rawBrowser, version: rawVersion } = detectBrowser(ua)
-  const { os: rawOs, osVersion: rawOsVersion } = detectOs(ua, effectiveWindowsVersion)
+  const { browser: rawBrowser, version: rawVersion, browserType } = detectBrowser(ua)
+  const { os: rawOs, osVersion: rawOsVersion, osVersionName } = detectOs(ua, effectiveWindowsVersion)
   let os: OsName = rawOs
   let osVersion: string = rawOsVersion
   const device = detectDevice(ua, effectiveNav)
+  const { vendor, model } = detectVendorModel(ua)
   const arch = detectArch(ua, options.ctx ?? effectiveNav as EnvContext | undefined)
   const nav = effectiveNav
-  const { isBot, botName } = detectBot(ua, options.customBotDefs)
+  const { isBot, botName, botCategory } = detectBot(ua, options.customBotDefs)
   const isHeadless = detectHeadless(ua)
   const language = options.language
     || (nav?.language || nav?.browserLanguage ? getLanguage(nav) : '')
@@ -313,24 +315,45 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
-  const engine = detectEngine(ua, browser, version)
+  const { engine, engineVersion } = detectEngine(ua, browser, version)
 
   const versionMajor = parseInt(version.split('.')[0] ?? '0', 10) || 0
   const connectionType = (options.ctx ?? options.nav)?.connection?.effectiveType ?? 'unknown'
+
+  // Recompute osVersionName after any Windows 11 override in options.
+  // Use tiered lookup: try '14.3' → '14' so that versionNames keyed on major version match too.
+  const finalOsVersionName = (os === 'MacOS' || os === 'Windows')
+    ? (() => {
+        const map = OS_DEFS.find(d => d.name === os)?.versionNames
+        if (!map) return 'unknown'
+        const parts = osVersion.split('.')
+        for (let len = parts.length; len >= 1; len--) {
+          const key = parts.slice(0, len).join('.')
+          if (Object.prototype.hasOwnProperty.call(map, key)) return map[key]!
+        }
+        return 'unknown'
+      })()
+    : osVersionName
 
   return {
     browser,
     version,
     versionMajor,
+    browserType: browser === 'Brave' ? 'browser' : browserType,
     engine,
+    engineVersion,
     os,
     osVersion,
+    osVersionName: finalOsVersionName,
     device,
+    vendor,
+    model,
     arch,
     isWebview: isWebview(ua),
     isHeadless,
     isBot,
     botName,
+    botCategory,
     language,
     platform,
     connectionType,

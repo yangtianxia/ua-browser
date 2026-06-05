@@ -9,15 +9,21 @@ interface EnvOption {
   browser:        BrowserName
   version:        string
   versionMajor:   number
+  browserType:    BrowserType      // 'browser' | 'brand' | 'app' | 'unknown'
   engine:         EngineName
+  engineVersion:  string           // 引擎版本，如 '537.36'、'605.1.15'
   os:             OsName
   osVersion:      string
+  osVersionName:  string           // 如 'Sonoma'、'Windows 11'，无名称时为 'unknown'
   device:         DeviceName
+  vendor:         string           // 设备厂商，如 'Samsung'、'Apple'，未知时为 'unknown'
+  model:          string           // 设备型号，如 'SM-G991B'、'iPhone'，未知时为 'unknown'
   arch:           ArchName
   isWebview:      boolean
   isHeadless:     boolean
   isBot:          boolean
   botName:        BotName
+  botCategory:    BotCategory      // Bot 分类
   language:       string
   platform:       string
   connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'
@@ -118,6 +124,49 @@ type BotName =
   | 'UptimeRobot' | 'ia_archiver'
   // 通用兜底
   | 'GenericBot' | 'unknown'
+```
+
+---
+
+## BotCategory
+
+```typescript
+type BotCategory =
+  | 'search-engine'   // Googlebot、Bingbot、Baiduspider 等
+  | 'ai-llm'          // GPTBot、ClaudeBot、PerplexityBot 等
+  | 'social'          // Facebookbot、Twitterbot、LinkedInBot 等
+  | 'link-preview'    // Slackbot、Discordbot、TelegramBot 等
+  | 'seo-tool'        // SemrushBot、AhrefsBot、MJ12bot 等
+  | 'monitoring'      // UptimeRobot、ia_archiver 等
+  | 'generic'         // GenericBot 通用捕获
+  | 'unknown'
+```
+
+---
+
+## BrowserType
+
+```typescript
+type BrowserType =
+  | 'browser'   // 标准/通用浏览器：Chrome、Firefox、Safari、Edge 等
+  | 'brand'     // 品牌/地区浏览器：UC、QQBrowser、360SE、华为浏览器 等
+  | 'app'       // App 内嵌浏览器：微信、钉钉、抖音、Bilibili 等
+  | 'unknown'
+```
+
+由 `BROWSER_DEFS` 中的 `priority` 字段推导：≥500 为 `'app'`，≥300 为 `'brand'`，其余为 `'browser'`。
+
+---
+
+## VendorModelResult
+
+`detectVendorModel()` 的返回类型。
+
+```typescript
+interface VendorModelResult {
+  vendor: string   // 设备厂商，如 'Samsung'、'Apple'、'Google'，未知时为 'unknown'
+  model:  string   // 设备型号，如 'SM-G991B'、'iPhone'、'Pixel 7'，未知时为 'unknown'
+}
 ```
 
 ---

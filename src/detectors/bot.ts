@@ -1,10 +1,12 @@
 import { BOT_DEFS, type BotDef, type BotName } from '../constants/bots.js'
+import type { BotCategory } from '../types.js'
 
 export type { BotDef }
 
 export interface BotResult {
-  isBot: boolean
-  botName: BotName
+  isBot:       boolean
+  botName:     BotName
+  botCategory: BotCategory
 }
 
 /**
@@ -20,8 +22,8 @@ export function detectBot(ua: string, customDefs?: readonly BotDef[]): BotResult
     : BOT_DEFS
   for (const def of defs) {
     if (def.detect.test(ua)) {
-      return { isBot: true, botName: def.name }
+      return { isBot: true, botName: def.name, botCategory: def.category }
     }
   }
-  return { isBot: false, botName: 'unknown' }
+  return { isBot: false, botName: 'unknown', botCategory: 'unknown' }
 }

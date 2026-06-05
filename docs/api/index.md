@@ -269,7 +269,7 @@ console.log(result.osVersion) // '11' 或 '10'
 import { detectBot } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 
-detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName }
+detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName; botCategory: BotCategory }
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
@@ -277,22 +277,23 @@ detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName
 | `ua` | `string` | 是 | 要检测的 UA 字符串 |
 | `customDefs` | `readonly BotDef[]` | 否 | 附加 Bot 规则，插在内置规则之后、`GenericBot` 兜底之前 |
 
-**返回值：** `{ isBot: boolean; botName: BotName }`
+**返回值：** `{ isBot: boolean; botName: BotName; botCategory: BotCategory }`
 
 **`BotDef` 结构：**
 
 ```typescript
 interface BotDef {
-  name: BotName   // 匹配后返回的 botName 值
-  detect: RegExp  // 与 UA 字符串匹配的正则
+  name: BotName         // 匹配后返回的 botName 值
+  detect: RegExp        // 与 UA 字符串匹配的正则
+  category: BotCategory // Bot 分类
 }
 ```
 
 **示例：**
 
 ```typescript
-const { isBot, botName } = detectBot(ua)
-// isBot: true, botName: 'Googlebot'
+const { isBot, botName, botCategory } = detectBot(ua)
+// isBot: true, botName: 'Googlebot', botCategory: 'search-engine'
 
 // 自定义规则
 const myDefs: BotDef[] = [
@@ -485,20 +486,20 @@ res.setHeader('Vary', 'Sec-CH-UA, Sec-CH-UA-Full-Version-List')  // 推荐同时
 ```typescript
 import { detectBrowser } from 'ua-browser'
 
-detectBrowser(ua: string): { browser: BrowserName; version: string }
+detectBrowser(ua: string): { browser: BrowserName; version: string; browserType: BrowserType }
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
 
-**返回值：** `{ browser: BrowserName; version: string }`
+**返回值：** `{ browser: BrowserName; version: string; browserType: BrowserType }`
 
 **示例：**
 
 ```typescript
-const { browser, version } = detectBrowser(navigator.userAgent)
-// browser: 'Chrome', version: '124.0.0.0'
+const { browser, version, browserType } = detectBrowser(navigator.userAgent)
+// browser: 'Chrome', version: '124.0.0.0', browserType: 'browser'
 ```
 
 ---
@@ -510,20 +511,20 @@ const { browser, version } = detectBrowser(navigator.userAgent)
 ```typescript
 import { detectOS } from 'ua-browser'
 
-detectOS(ua: string): { os: OsName; osVersion: string }
+detectOS(ua: string): { os: OsName; osVersion: string; osVersionName: string }
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
 
-**返回值：** `{ os: OsName; osVersion: string }`
+**返回值：** `{ os: OsName; osVersion: string; osVersionName: string }`
 
 **示例：**
 
 ```typescript
-const { os, osVersion } = detectOS(navigator.userAgent)
-// os: 'Windows', osVersion: '10'
+const { os, osVersion, osVersionName } = detectOS(navigator.userAgent)
+// os: 'Windows', osVersion: '10', osVersionName: 'Windows 10'
 ```
 
 ---
@@ -535,20 +536,45 @@ const { os, osVersion } = detectOS(navigator.userAgent)
 ```typescript
 import { detectEngine } from 'ua-browser'
 
-detectEngine(ua: string): EngineName
+detectEngine(ua: string): { engine: EngineName; engineVersion: string }
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
 
-**返回值：** [`EngineName`](/api/types#enginename)
+**返回值：** `{ engine: EngineName; engineVersion: string }`
 
 **示例：**
 
 ```typescript
-const engine = detectEngine(navigator.userAgent)
-// engine: 'Blink'
+const { engine, engineVersion } = detectEngine(navigator.userAgent)
+// engine: 'Blink', engineVersion: '537.36'
+```
+
+---
+
+## `detectVendorModel(ua)` {#detectvendormodel}
+
+独立设备厂商/型号提取器。
+
+```typescript
+import { detectVendorModel } from 'ua-browser'
+
+detectVendorModel(ua: string): VendorModelResult
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `ua` | `string` | 是 | UA 字符串 |
+
+**返回值：** [`VendorModelResult`](/api/types#vendormodelresult)
+
+**示例：**
+
+```typescript
+const { vendor, model } = detectVendorModel(ua)
+// vendor: 'Samsung', model: 'SM-G991B'
 ```
 
 ---
@@ -604,6 +630,16 @@ const info = uaBrowser()
 
 // 等同于 info.os === 'iOS' && info.device === 'Mobile'
 if (satisfies(info, { os: 'iOS', device: 'Mobile' })) {
+  // ...
+}
+
+// 仅匹配 AI 爬虫
+if (satisfies(info, { isBot: true, botCategory: 'ai-llm' })) {
+  // ...
+}
+
+// 仅匹配 App 内嵌浏览器（微信、钉钉等）
+if (satisfies(info, { browserType: 'app' })) {
   // ...
 }
 ```

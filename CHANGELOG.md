@@ -1,5 +1,47 @@
 # ua-browser
 
+## 1.4.0
+
+### Minor Changes
+
+- ffd7822: Add vendor, model, browserType, engineVersion, osVersionName, botCategory to EnvOption
+
+  Six new fields close the gap with ua-parser-js / device-detector-js:
+
+  - `vendor` + `model`: device manufacturer and model (Samsung/SM-G991B, Apple/iPhone, etc.)
+  - `browserType`: `'browser' | 'brand' | 'app' | 'unknown'`
+  - `engineVersion`: rendering engine version string (e.g. `'537.36'`, `'605.1.15'`)
+  - `osVersionName`: human-readable OS name (`'Sonoma'`, `'Windows 11'`, etc.)
+  - `botCategory`: bot classification (`'search-engine'` | `'ai-llm'` | `'social'` | `'link-preview'` | `'seo-tool'` | `'monitoring'` | `'generic'` | `'unknown'`)
+
+  Standalone detectors enriched: `detectBrowser` returns `browserType`, `detectEngine` returns `{ engine, engineVersion }`, `detectOS` returns `osVersionName`, `detectBot` returns `botCategory`.
+
+  New exports: `BotCategory`, `BrowserType`, `VendorModelResult`, `detectVendorModel`.
+
+- bf26c3c: Arc/Brave 浏览器检测、visionOS/tvOS OS 检测、Console/XR 设备类型、9 种新 Bot、detectBrowser/detectOS/satisfies 独立导出、versionMajor/connectionType 新字段、Playground 重设计。移除 DetectStrategy、strategy 选项和 confidence 字段。
+
+### Patch Changes
+
+- a0d3e9c: 新增 detectEngine / detectDevice 独立导出；修复微信等 App UA 中 Language/xx_XX 格式语言检测；移除 Playground 无意义的重新检测按钮
+
+## 1.4.0-beta.2
+
+### Minor Changes
+
+- Add vendor, model, browserType, engineVersion, osVersionName, botCategory to EnvOption
+
+  Six new fields close the gap with ua-parser-js / device-detector-js:
+
+  - `vendor` + `model`: device manufacturer and model (Samsung/SM-G991B, Apple/iPhone, etc.)
+  - `browserType`: `'browser' | 'brand' | 'app' | 'unknown'`
+  - `engineVersion`: rendering engine version string (e.g. `'537.36'`, `'605.1.15'`)
+  - `osVersionName`: human-readable OS name (`'Sonoma'`, `'Windows 11'`, etc.)
+  - `botCategory`: bot classification (`'search-engine'` | `'ai-llm'` | `'social'` | `'link-preview'` | `'seo-tool'` | `'monitoring'` | `'generic'` | `'unknown'`)
+
+  Standalone detectors enriched: `detectBrowser` returns `browserType`, `detectEngine` returns `{ engine, engineVersion }`, `detectOS` returns `osVersionName`, `detectBot` returns `botCategory`.
+
+  New exports: `BotCategory`, `BrowserType`, `VendorModelResult`, `detectVendorModel`.
+
 ## 1.4.0-beta.1
 
 ### Patch Changes
