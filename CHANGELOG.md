@@ -4,55 +4,30 @@
 
 ### Minor Changes
 
-- ffd7822: Add vendor, model, browserType, engineVersion, osVersionName, botCategory to EnvOption
-
-  Six new fields close the gap with ua-parser-js / device-detector-js:
-
-  - `vendor` + `model`: device manufacturer and model (Samsung/SM-G991B, Apple/iPhone, etc.)
-  - `browserType`: `'browser' | 'brand' | 'app' | 'unknown'`
-  - `engineVersion`: rendering engine version string (e.g. `'537.36'`, `'605.1.15'`)
-  - `osVersionName`: human-readable OS name (`'Sonoma'`, `'Windows 11'`, etc.)
-  - `botCategory`: bot classification (`'search-engine'` | `'ai-llm'` | `'social'` | `'link-preview'` | `'seo-tool'` | `'monitoring'` | `'generic'` | `'unknown'`)
-
-  Standalone detectors enriched: `detectBrowser` returns `browserType`, `detectEngine` returns `{ engine, engineVersion }`, `detectOS` returns `osVersionName`, `detectBot` returns `botCategory`.
-
-  New exports: `BotCategory`, `BrowserType`, `VendorModelResult`, `detectVendorModel`.
-
-- bf26c3c: Arc/Brave 浏览器检测、visionOS/tvOS OS 检测、Console/XR 设备类型、9 种新 Bot、detectBrowser/detectOS/satisfies 独立导出、versionMajor/connectionType 新字段、Playground 重设计。移除 DetectStrategy、strategy 选项和 confidence 字段。
-
-### Patch Changes
-
-- a0d3e9c: 新增 detectEngine / detectDevice 独立导出；修复微信等 App UA 中 Language/xx_XX 格式语言检测；移除 Playground 无意义的重新检测按钮
-
-## 1.4.0-beta.2
-
-### Minor Changes
-
-- Add vendor, model, browserType, engineVersion, osVersionName, botCategory to EnvOption
-
-  Six new fields close the gap with ua-parser-js / device-detector-js:
-
-  - `vendor` + `model`: device manufacturer and model (Samsung/SM-G991B, Apple/iPhone, etc.)
-  - `browserType`: `'browser' | 'brand' | 'app' | 'unknown'`
-  - `engineVersion`: rendering engine version string (e.g. `'537.36'`, `'605.1.15'`)
-  - `osVersionName`: human-readable OS name (`'Sonoma'`, `'Windows 11'`, etc.)
-  - `botCategory`: bot classification (`'search-engine'` | `'ai-llm'` | `'social'` | `'link-preview'` | `'seo-tool'` | `'monitoring'` | `'generic'` | `'unknown'`)
-
-  Standalone detectors enriched: `detectBrowser` returns `browserType`, `detectEngine` returns `{ engine, engineVersion }`, `detectOS` returns `osVersionName`, `detectBot` returns `botCategory`.
-
-  New exports: `BotCategory`, `BrowserType`, `VendorModelResult`, `detectVendorModel`.
-
-## 1.4.0-beta.1
+- **EnvOption 新增六个字段**，与 ua-parser-js / device-detector-js 看齐：
+  - `vendor` + `model`：设备厂商和型号（如 Samsung/SM-G991B、Apple/iPhone），支持 17 家厂商
+  - `browserType`：浏览器类型分类（`'browser' | 'brand' | 'app' | 'unknown'`）
+  - `engineVersion`：渲染引擎版本号（如 `'537.36'`、`'605.1.15'`）
+  - `osVersionName`：操作系统版本名称（如 `'Sonoma'`、`'Windows 11'`）
+  - `botCategory`：Bot 分类（`'search-engine' | 'ai-llm' | 'social' | 'link-preview' | 'seo-tool' | 'monitoring' | 'generic' | 'unknown'`）
+- **独立检测器增强**：`detectBrowser()` 返回 `browserType`，`detectEngine()` 返回 `{ engine, engineVersion }`，`detectOS()` 返回 `osVersionName`，`detectBot()` 返回 `botCategory`；新增 `detectVendorModel()` 独立导出
+- **新增导出类型**：`BotCategory`、`BrowserType`、`VendorModelResult`
+- **Bot 检测扩展**：新增 9 个 AI/LLM 爬虫（`Applebot-Extended`、`OAI-SearchBot`、`ChatGPT-User`、`Google-Extended`、`Meta-ExternalAgent`、`Amazonbot`、`Diffbot`、`cohere-ai`、`YouBot`）；新增 `customBotDefs` 注入自定义 Bot 规则
+- **浏览器**：新增 Arc、Brave 检测（Brave 需运行时 API）
+- **操作系统**：新增 visionOS、tvOS 检测
+- **设备类型**：新增 `Console`（PlayStation、Xbox、Nintendo Switch）、`XR`（Apple Vision Pro、Meta Quest）
+- **语言检测**：从 UA 字符串识别 `Language/xx_XX` 格式语言标识，支持三段式 BCP47 标签（微信、支付宝等常见格式）
+- **UA 冻结防御**：`ctx.highEntropyData.fullVersionList` 可用时优先使用 Client Hints 精确版本号（Chrome、Edge、Opera、Vivaldi）
+- **新增 `EnvOption` 字段**：`versionMajor`（浏览器版本主号）、`connectionType`（网络类型）
 
 ### Patch Changes
 
-- 新增 detectEngine / detectDevice 独立导出；修复微信等 App UA 中 Language/xx_XX 格式语言检测；移除 Playground 无意义的重新检测按钮
+- 新增独立检测器导出：`detectEngine()`、`detectDevice()`
+- 移除 Playground 无意义的重新检测按钮
 
-## 1.4.0-beta.0
+### 破坏性变更
 
-### Minor Changes
-
-- Arc/Brave 浏览器检测、visionOS/tvOS OS 检测、Console/XR 设备类型、9 种新 Bot、detectBrowser/detectOS/satisfies 独立导出、versionMajor/connectionType 新字段、Playground 重设计。移除 DetectStrategy、strategy 选项和 confidence 字段。
+- 移除 `DetectStrategy`、`strategy` 选项及 `confidence` 字段
 
 ## 1.3.1
 
