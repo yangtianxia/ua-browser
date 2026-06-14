@@ -1,5 +1,20 @@
 # ua-browser
 
+## 1.4.1
+
+### Patch Changes
+
+- Fixed Firefox Nightly detection — now uses the `a1` version suffix in the UA string instead of defunct environment variable checks
+- Fixed Pinterest Bot false positives — narrowed `/Pinterest/` to `/Pinterestbot/i` to avoid matching the Pinterest app
+- Fixed HarmonyOS version mapping — added Android 14 → HarmonyOS 4 entry
+- Fixed language detection missing single-segment codes (e.g. `en`, `zh`) — added ISO 639-1 allowlist to avoid matching architecture tokens
+- OS detection now uses explicit `priority` fields instead of relying on list order
+- `parseHeaders` now parses `Sec-CH-UA-Full-Version-List` — SSR can return the real browser full version
+- `parseHeaders` detects Brave browser from the low-entropy `Sec-CH-UA` brand header
+- Added `Brave` to `BRAND_TO_BROWSER` to cover the `highEntropyData.fullVersionList` path
+- Removed unimplemented `Wechat Miniapp` type definition
+- Removed unsafe generic `as BrowserName` cast
+
 ## 1.4.0
 
 ### Minor Changes
