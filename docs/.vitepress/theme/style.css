@@ -2,7 +2,11 @@
   --vp-c-brand-1: #0d6edf;
   --vp-c-brand-2: #1685fb;
   --vp-c-brand-3: #1685fb;
-  --vp-c-brand-soft: rgba(22, 133, 251, 0.12);
+  --vp-c-brand-soft: rgba(22, 133, 251, 0.16);
+
+  /* Widen the overall layout so left sidebar + content + right outline
+     all fit without overlapping at typical laptop/desktop widths. */
+  --vp-layout-max-width: 1440px;
 }
 
 .dark {
@@ -37,5 +41,22 @@
 @media (max-width: 768px) {
   .pg-wrap {
     padding: 18px 12px 24px;
+  }
+}
+
+/* Prevent wide tables from overflowing the content column and
+   pushing the right outline off-screen or into the left sidebar. */
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* At exactly the 1280px breakpoint the three-column layout can be
+   very tight. Give the content column a sensible max-width so it
+   doesn't bleed under either sidebar. */
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .content-container {
+    max-width: 752px;
   }
 }

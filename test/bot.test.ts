@@ -53,6 +53,19 @@ describe('detectBot', () => {
       expect(r.botName).toBe('Twitterbot')
     })
 
+    it('detects PinterestBot crawler', () => {
+      const ua = 'Mozilla/5.0 (compatible; Pinterestbot/1.0; +http://www.pinterest.com/bot.html)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('PinterestBot')
+    })
+
+    it('Pinterest app is not a bot', () => {
+      const ua = 'Pinterest/7.0 (iPhone; iOS 14.0; Scale/2.00)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(false)
+    })
+
     it('detects AhrefsBot', () => {
       const ua = 'Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)'
       const r = detectBot(ua)

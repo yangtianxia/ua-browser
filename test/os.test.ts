@@ -97,6 +97,12 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('4')
   })
 
+  it('HarmonyOS with Android 14 base → HarmonyOS 4', () => {
+    const r = detectOs(UA.harmonyOs.android14)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('4')
+  })
+
   it('HarmonyOS Next (5.0+, no Android token) → HarmonyOS 5.0.0', () => {
     const r = detectOs(UA.harmonyOs.next)
     expect(r.os).toBe('HarmonyOS')

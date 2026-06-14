@@ -22,6 +22,23 @@ Detect browser, OS, device type, rendering engine, CPU architecture, bots, headl
 - **TypeScript** — full type definitions with precise literal union types (`BrowserName`, `OsName`, etc.)
 - **Tree-shakeable** — named exports + `sideEffects: false`, unused code eliminated by Vite / Rollup / webpack 5+
 
+## Why ua-browser
+
+UA strings lie — a phone in desktop mode, a headless browser, or an AI crawler can all masquerade as an ordinary user. ua-browser combines hardware signals and Client Hints to stay accurate when the UA string can't be trusted.
+
+| Capability | ua-browser | ua-parser-js | bowser | detect-browser |
+| :-- | :--: | :--: | :--: | :--: |
+| UA string parsing | ✅ | ✅ | ✅ | ✅ |
+| Zero dependencies | ✅ | ✅ | ✅ | ✅ |
+| TypeScript native | ✅ | ✅ | ✅ | ✅ |
+| Tree-shakeable | ✅ | ❌ | ✅ | ❌ |
+| Hardware-signal device detection (accurate in desktop mode) | ✅ | ❌ | ❌ | ❌ |
+| CPU architecture (Apple Silicon vs Intel) | ✅ | ❌ | ❌ | ❌ |
+| SSR Client Hints | ✅ | ❌ | ❌ | ❌ |
+| Headless browser detection | ✅ | ❌ | ❌ | ❌ |
+| AI bot recognition (40+ rules) | ✅ | ❌ | ❌ | ❌ |
+| Extended device types (TV / Console / XR) | ✅ | ❌ | ❌ | ❌ |
+
 ## Installation
 
 ```sh
@@ -78,6 +95,8 @@ if (result.device === 'Mobile') {
   // redirect to mobile version
 }
 ```
+
+> **Note**: `detect()` uses the Client Hints high-entropy API (`getHighEntropyValues`), which is only available in **HTTPS or localhost** contexts. On plain HTTP pages it degrades silently — browser version and OS version fall back to the frozen UA string values (e.g. Chrome reports `149.0.0.0`, macOS 26+ reports `10.15.7`).
 
 ### Browser (sync: `uaBrowser`)
 
@@ -222,6 +241,28 @@ Highlights:
 - **OS** — Windows, macOS, Android, iOS, visionOS, tvOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
 - **Bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot; messaging bots (Slack, Discord, Telegram, WhatsApp) and more
 - **Devices** — Mobile, Tablet, PC, TV (Samsung Smart TV, HbbTV), Console (PS5, Xbox, Switch), XR (Vision Pro, Quest)
+
+## FAQ
+
+**How is ua-browser different from ua-parser-js?**
+
+`ua-parser-js` focuses on parsing the UA string itself and has no hardware-signal collection. It misidentifies device type when a phone is in desktop mode or when the UA is spoofed. ua-browser adds WebGL renderer, Client Hints, CSS `safe-area-inset`, and sensor APIs to detect the actual hardware — plus 40+ AI bot rules and headless browser detection that `ua-parser-js` does not include.
+
+**Does it work in Next.js / Nuxt / other SSR frameworks?**
+
+Yes. `parseUA(ua)` is a pure function with no browser API dependencies — it runs in Node.js, Deno, and Edge Runtime as-is. Pair `parseHeaders()` with `ACCEPT_CH` to leverage Client Hints for precise architecture and platform data on the server.
+
+**Can it detect mobile devices when the user has enabled desktop mode?**
+
+Yes, when you use `uaBrowser.detect()` or `getEnvContext()`. These APIs collect CSS `safe-area-inset`, the Vibration API, and device pixel ratio to identify the actual hardware, independent of what the UA string declares.
+
+**How do I detect GPT, Claude, or other AI crawler requests?**
+
+Check the `isBot` and `botName` fields on the return value. Built-in rules cover GPTBot, ClaudeBot, PerplexityBot, CCBot, and messaging link-preview bots (Slack, Discord, Telegram, WhatsApp).
+
+**What is the bundle size?**
+
+Zero runtime dependencies. The bundle is tiny after gzip; tree-shaking named exports makes it smaller still.
 
 ## License
 

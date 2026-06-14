@@ -21,6 +21,23 @@
 - **TypeScript** — 完整类型定义，`BrowserName`、`OsName` 等均为精确字面量联合类型
 - **Tree-shakeable** — 所有功能按需导入，不引入多余代码
 
+## 为什么选 ua-browser
+
+UA 字符串会撒谎 —— 开了桌面模式的手机、无头浏览器、AI 爬虫都可能伪装成普通用户。ua-browser 额外引入硬件信号与 Client Hints，在 UA 失真时依然准确。
+
+| 能力 | ua-browser | ua-parser-js | bowser | detect-browser |
+| :-- | :--: | :--: | :--: | :--: |
+| UA 字符串解析 | ✅ | ✅ | ✅ | ✅ |
+| 零依赖 | ✅ | ✅ | ✅ | ✅ |
+| TypeScript 原生 | ✅ | ✅ | ✅ | ✅ |
+| Tree-shakeable | ✅ | ❌ | ✅ | ❌ |
+| 硬件信号设备检测（桌面模式下仍准确）| ✅ | ❌ | ❌ | ❌ |
+| CPU 架构（Apple Silicon / Intel 区分）| ✅ | ❌ | ❌ | ❌ |
+| SSR Client Hints | ✅ | ❌ | ❌ | ❌ |
+| 无头浏览器检测 | ✅ | ❌ | ❌ | ❌ |
+| AI 爬虫识别 | ✅ 40+ | ❌ | ❌ | ❌ |
+| 设备类型（TV / Console / XR）| ✅ | ❌ | ❌ | ❌ |
+
 ## 安装
 
 ```sh
@@ -62,7 +79,25 @@ console.log(info)
 
 ## 使用
 
-### 浏览器环境
+### 浏览器环境（推荐：`detect`）
+
+使用 `detect()` 获得精准设备与架构信息 —— 在 UA 解析的基础上额外采集硬件信号：
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+const result = await uaBrowser.detect()
+console.log(result.device) // 'Mobile' —— 即使开了桌面模式也正确
+console.log(result.arch)   // 'arm64' 或 'x86_64'
+
+if (result.device === 'Mobile') {
+  // 跳转移动版
+}
+```
+
+> **注意**：`detect()` 内部调用 Client Hints 高熵 API（`getHighEntropyValues`），该 API 仅在 **HTTPS 或 localhost** 环境下可用。HTTP 页面中调用时会静默降级，浏览器版本和 OS 版本将退回 UA 字符串的冻结值（如 Chrome 版本显示为 `149.0.0.0`，macOS 26+ 显示为 `10.15.7`）。
+
+### 浏览器环境（同步：`uaBrowser`）
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -204,6 +239,28 @@ import {
 - **操作系统** — Windows、macOS、Android、iOS、visionOS、tvOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
 - **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot；消息应用 Bot（Slack、Discord、Telegram、WhatsApp）等
 - **设备** — Mobile、Tablet、PC、TV（含三星 Smart TV、HbbTV 标准）、Console（PS5、Xbox、Switch）、XR（Vision Pro、Quest）
+
+## 常见问题
+
+**和 ua-parser-js 有什么区别？**
+
+`ua-parser-js` 专注于 UA 字符串本身的解析，不具备硬件信号采集能力；在手机开启桌面模式或 UA 被篡改时会给出错误结果。ua-browser 额外引入 WebGL 渲染器、Client Hints、CSS `safe-area-inset` 等多维信号，并内置 40+ AI 爬虫识别规则和无头浏览器检测，`ua-parser-js` 均不支持。
+
+**在 Next.js / Nuxt 等 SSR 框架里能用吗？**
+
+可以。`parseUA(ua)` 是纯函数，无任何浏览器 API 依赖，可直接在 Node.js / Edge Runtime 中使用。搭配 `parseHeaders()` 和 `ACCEPT_CH` 还可在服务端利用 Client Hints 获取精准的架构与平台信息。
+
+**手机开了"请求桌面网站"，还能正确识别设备类型吗？**
+
+可以，但需要使用 `uaBrowser.detect()` 或手动调用 `getEnvContext()`。这两种方式会采集 CSS `safe-area-inset`、振动 API、设备像素比等硬件信号，不依赖 UA 字符串里的设备声明。
+
+**如何识别 GPT、Claude 等 AI 爬虫的抓取请求？**
+
+读取返回值的 `isBot` 和 `botName` 字段即可。库内置了 GPTBot、ClaudeBot、PerplexityBot、CCBot 等规则，同时也覆盖 Slack、Discord、Telegram 等消息应用的链接预览 Bot。
+
+**包体积有多大？**
+
+零运行时依赖，gzip 后极小；按需引入（named exports + tree-shaking）体积更小。
 
 ## License
 

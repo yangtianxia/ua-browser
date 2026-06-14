@@ -1,3 +1,8 @@
+---
+title: Support List
+description: ua-browser built-in support list — 70+ browsers, 20+ operating systems, 40+ AI bot rules including GPTBot, ClaudeBot, PerplexityBot, WeChat, DingTalk, and more.
+---
+
 # Support List
 
 All built-in definitions come from `src/constants/` and are strictly consistent with runtime behavior.

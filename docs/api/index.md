@@ -1,3 +1,8 @@
+---
+title: API 参考
+description: ua-browser 完整 API 文档，包括 parseUA、uaBrowser.detect、getEnvContext、parseHeaders、satisfies 等所有导出函数。
+---
+
 # API 参考
 
 ## `uaBrowser()` {#uabrowser}

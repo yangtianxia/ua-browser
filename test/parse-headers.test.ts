@@ -72,6 +72,41 @@ describe('parseHeaders', () => {
     expect(r.os).toBe('Android')
   })
 
+  it('Brave via Sec-CH-UA brand', () => {
+    const r = parseHeaders({
+      'user-agent': UA.chrome.windows,
+      'sec-ch-ua': '"Chromium";v="124", "Brave";v="124", "Not-A.Brand";v="99"',
+    })
+    expect(r.browser).toBe('Brave')
+  })
+
+  it('Chrome UA with no Brave brand stays Chrome', () => {
+    const r = parseHeaders({
+      'user-agent': UA.chrome.windows,
+      'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    })
+    expect(r.browser).toBe('Chrome')
+  })
+
+  it('Chrome full version from Sec-CH-UA-Full-Version-List', () => {
+    const r = parseHeaders({
+      'user-agent': UA.chrome.windows,
+      'sec-ch-ua-full-version-list': '"Chromium";v="149.0.7827.102", "Google Chrome";v="149.0.7827.102", "Not A(Brand";v="8.0.0.0"',
+    })
+    expect(r.browser).toBe('Chrome')
+    expect(r.version).toBe('149.0.7827.102')
+    expect(r.versionMajor).toBe(149)
+  })
+
+  it('Edge full version from Sec-CH-UA-Full-Version-List', () => {
+    const r = parseHeaders({
+      'user-agent': UA.edge.chromium,
+      'sec-ch-ua-full-version-list': '"Chromium";v="124.0.6367.82", "Microsoft Edge";v="124.0.2478.51", "Not-A.Brand";v="99.0.0.0"',
+    })
+    expect(r.browser).toBe('Edge')
+    expect(r.version).toBe('124.0.2478.51')
+  })
+
   it('empty headers returns unknown results', () => {
     const r = parseHeaders({})
     expect(r.browser).toBe('unknown')
