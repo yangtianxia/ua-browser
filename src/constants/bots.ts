@@ -68,7 +68,7 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'Facebookbot',        detect: /(facebookexternalhit|FacebookBot)/, category: 'social' },
   { name: 'Twitterbot',         detect: /Twitterbot/,                        category: 'social' },
   { name: 'LinkedInBot',        detect: /LinkedInBot/,                       category: 'social' },
-  { name: 'PinterestBot',       detect: /Pinterest/,                         category: 'social' },
+  { name: 'PinterestBot',       detect: /Pinterestbot/i,                     category: 'social' },
   // Messaging link preview bots
   { name: 'Slackbot',           detect: /Slackbot/,                         category: 'link-preview' },
   { name: 'Discordbot',         detect: /Discordbot/,                       category: 'link-preview' },

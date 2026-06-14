@@ -1,3 +1,8 @@
+---
+title: API Reference
+description: Full ua-browser API docs — parseUA, uaBrowser.detect, getEnvContext, parseHeaders, satisfies, and all named exports with TypeScript signatures.
+---
+
 # API Reference
 
 ## `uaBrowser()` {#uabrowser}

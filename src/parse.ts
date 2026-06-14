@@ -35,6 +35,7 @@ const BRAND_TO_BROWSER: ReadonlyArray<[string, BrowserName]> = [
   ['Microsoft Edge', 'Edge'],
   ['Opera',          'Opera'],
   ['Vivaldi',        'Vivaldi'],
+  ['Brave',          'Brave'],
   ['Google Chrome',  'Chrome'],
   ['Chromium',       'Chromium'],
 ]
@@ -143,6 +144,15 @@ function normalizeBCP47(raw: string): string {
   }).join('-')
 }
 
+// ISO 639-1 whitelist — prevents false-positives on non-language UA tokens (arm, wv, rv…).
+const ISO_639_1 = new Set([
+  'af','am','ar','az','be','bg','bn','bs','ca','cs','cy','da','de','el','en',
+  'es','et','eu','fa','fi','fr','ga','gl','gu','he','hi','hr','hu','hy','id',
+  'is','it','ja','ka','kk','km','kn','ko','lt','lv','mk','ml','mn','mr','ms',
+  'mt','my','nb','ne','nl','no','pa','pl','pt','ro','ru','si','sk','sl','sq',
+  'sr','sv','sw','ta','te','th','tl','tr','uk','ur','uz','vi','zh','zu',
+])
+
 function languageFromUA(ua: string): string {
   // WeChat / many app UAs: "Language/zh_CN", "Language/zh-Hans-CN", etc.
   const kwMatch = /\bLanguage\/([a-zA-Z]{2,3}(?:[-_][a-zA-Z]{2,4}){1,2})\b/i.exec(ua)
@@ -156,6 +166,14 @@ function languageFromUA(ua: string): string {
     const parts = m[1].replace(/_/g, '-').split('-')
     if (parts.length >= 2) return normalizeBCP47(m[1])
   }
+
+  // Bare 2-letter codes: "; en;" in older Android OEM UAs.
+  // Whitelisted against ISO 639-1 to avoid matching architecture tokens (arm, wv…).
+  const bare = /[;(]\s*([a-z]{2,3})\s*[;)]/g
+  while ((m = bare.exec(ua)) !== null) {
+    if (ISO_639_1.has(m[1])) return m[1]
+  }
+
   return 'unknown'
 }
 
@@ -243,25 +261,9 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     version = opVer?.[1] ?? 'unknown'
   }
 
-  // Generic "SomethingBrowser/x.y" catch-all: Chrome-based third-party browsers
-  // that embed their own token alongside Chrome
-  if (browser === 'Chrome' && /\S+Browser\//.test(ua)) {
-    const m = /(\S+Browser)\/([\d.]+)/.exec(ua)
-    if (m) {
-      browser = m[1] as BrowserName
-      version = m[2]
-    }
-  }
-
-  // Firefox Nightly detection — only meaningful in a real browser environment.
-  if (browser === 'Firefox' && nav) {
-    try {
-      if (typeof clientInformation !== 'undefined' || typeof u2f === 'undefined') {
-        browser = 'Firefox Nightly'
-      }
-    } catch {
-      // globals not accessible — leave as Firefox
-    }
+  // Firefox Nightly: version string carries an 'a1' pre-release suffix (e.g. Firefox/128.0a1).
+  if (browser === 'Firefox' && /Firefox\/[\d.]+a\d/.test(ua)) {
+    browser = 'Firefox Nightly'
   }
 
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
@@ -317,7 +319,8 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
 
   const { engine, engineVersion } = detectEngine(ua, browser, version)
 
-  const versionMajor = parseInt(version.split('.')[0] ?? '0', 10) || 0
+  const major = parseInt(version.split('.')[0] ?? '', 10)
+  const versionMajor = Number.isNaN(major) ? 0 : major
   const connectionType = (options.ctx ?? options.nav)?.connection?.effectiveType ?? 'unknown'
 
   // Recompute osVersionName after any Windows 11 override in options.

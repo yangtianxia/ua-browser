@@ -1,5 +1,20 @@
 # ua-browser
 
+## 1.4.1
+
+### Patch Changes
+
+- 修复 Firefox Nightly 检测逻辑（改为识别 UA 中 `a1` 后缀，移除已失效的环境变量判断）
+- 修复 Pinterest Bot 假正例（`/Pinterest/` 收窄为 `/Pinterestbot/i`，避免误判 Pinterest 应用）
+- 修复 HarmonyOS 版本映射，补全 Android 14 → HarmonyOS 4 的对应关系
+- 修复语言检测遗漏单段代码（如 `en`、`zh`），新增 ISO 639-1 白名单避免误匹配架构 token
+- OS 检测改为显式 `priority` 字段，消除对列表顺序的隐式依赖
+- `parseHeaders` 新增解析 `Sec-CH-UA-Full-Version-List`，SSR 场景可获取真实浏览器完整版本
+- `parseHeaders` 从低熵 `Sec-CH-UA` 头识别 Brave 浏览器品牌
+- `BRAND_TO_BROWSER` 加入 Brave 条目，覆盖 `highEntropyData.fullVersionList` 路径
+- 移除从未实现的 `Wechat Miniapp` 类型定义
+- 移除不安全的通用 `as BrowserName` 转换逻辑
+
 ## 1.4.0
 
 ### Minor Changes

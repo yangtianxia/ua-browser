@@ -51,7 +51,6 @@ export type BrowserName =
   | 'Quark'
   | 'Qiyu'
   | 'Wechat'
-  | 'Wechat Miniapp'
   | 'WechatWork'
   | 'Taobao'
   | 'Alipay'

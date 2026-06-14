@@ -63,13 +63,29 @@ export function parseHeaders(headers: Record<string, string | string[] | undefin
   const platformVersion = unquote(get('sec-ch-ua-platform-version'))
   const platform = unquote(get('sec-ch-ua-platform')) ?? ''
 
+  // Sec-CH-UA-Full-Version-List: "Chromium";v="149.0.7827.102", "Google Chrome";v="149.0.7827.102", ...
+  const fullVersionListRaw = get('sec-ch-ua-full-version-list')
+  const fullVersionList: Array<{ brand: string; version: string }> = []
+  if (fullVersionListRaw) {
+    const re = /"([^"]+)";v="([^"]+)"/g
+    let m
+    while ((m = re.exec(fullVersionListRaw)) !== null) {
+      fullVersionList.push({ brand: m[1], version: m[2] })
+    }
+  }
+
   const highEntropyData: UAHighEntropyValues = {}
   if (architecture !== undefined) highEntropyData.architecture = architecture
   if (bitness !== undefined) highEntropyData.bitness = bitness
   if (model !== undefined) highEntropyData.model = model
   if (platformVersion !== undefined) highEntropyData.platformVersion = platformVersion
+  if (fullVersionList.length > 0) highEntropyData.fullVersionList = fullVersionList
 
   const isMobile = get('sec-ch-ua-mobile') === '?1'
+
+  // Brave includes "Brave" in the low-entropy Sec-CH-UA header by default (no Accept-CH needed).
+  const secCHUA = get('sec-ch-ua') ?? ''
+  const hasBrave = /"Brave"/.test(secCHUA)
 
   const windowsVersion = platform === 'Windows'
     ? deriveWindowsVersion(platformVersion)
@@ -82,6 +98,7 @@ export function parseHeaders(headers: Record<string, string | string[] | undefin
     maxTouchPoints: isMobile ? 1 : 0,
     highEntropyData: Object.keys(highEntropyData).length > 0 ? highEntropyData : undefined,
     windowsVersion,
+    hasBrave,
   }
 
   return parseUA(ua, { ctx })

@@ -30,11 +30,12 @@ function lookupVersionName(map: Record<string, string>, version: string): string
  */
 export function detectOs(ua: string, windowsVersion?: string | null): OsResult {
   let matchedDef: (typeof OS_DEFS)[number] | null = null
+  let bestPriority = -1
 
-  // Iterate in array order; later entries have higher priority (same as BROWSER_DEFS)
   for (const def of OS_DEFS) {
-    if (def.detect.test(ua)) {
+    if (def.detect.test(ua) && def.priority > bestPriority) {
       matchedDef = def
+      bestPriority = def.priority
     }
   }
 

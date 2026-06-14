@@ -1,3 +1,8 @@
+---
+title: 类型定义
+description: ua-browser TypeScript 类型定义，BrowserName、OsName、DeviceName、BotName 等精确字面量联合类型。
+---
+
 # 类型定义
 
 ## EnvOption

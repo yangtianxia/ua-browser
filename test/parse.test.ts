@@ -110,6 +110,14 @@ describe('parseUA — full pipeline', () => {
     expect(r.os).toBe('Windows')
   })
 
+  it('Firefox Nightly — a1 suffix', () => {
+    const r = parseUA(UA.firefox.nightly)
+    expect(r.browser).toBe('Firefox Nightly')
+    expect(r.version).toBe('128.0')
+    expect(r.versionMajor).toBe(128)
+    expect(r.engine).toBe('Gecko')
+  })
+
   it('IE11 on Windows 7', () => {
     const r = parseUA(UA.ie.ie11)
     expect(r.browser).toBe('IE')
@@ -422,6 +430,16 @@ describe('parseUA — UA-only platform / language / arch inference', () => {
   it('standard desktop UA → language unknown (no locale in UA)', () => {
     expect(parseUA(UA.chrome.windows).language).toBe('unknown')
     expect(parseUA(UA.safari.desktop).language).toBe('unknown')
+  })
+
+  it('bare language code "; en;" in older Android OEM UA', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 4.4.2; en; MX4 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.0.0 Mobile Safari/537.36'
+    expect(parseUA(ua).language).toBe('en')
+  })
+
+  it('architecture token "arm" between semicolons is not matched as language', () => {
+    const ua = 'Mozilla/5.0 (Linux; Android 4.1.2; arm; Tablet Build/ID) AppleWebKit/537.36'
+    expect(parseUA(ua).language).toBe('unknown')
   })
 
   it('WeChat UA with Language/zh_CN → language zh-CN', () => {

@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: uaBrowser
-  text: Browser Environment Detection
-  tagline: Detect browser, OS, and device type from User Agent strings. Node.js support. Zero dependencies.
+  text: Browser Detection Beyond UA Strings
+  tagline: UA strings lie. ua-browser combines hardware signals and Client Hints to stay accurate when the UA string can't be trusted. Zero dependencies. Browser and Node.js.
   actions:
     - theme: brand
       text: Get Started
@@ -17,27 +17,27 @@ hero:
       link: https://github.com/yangtianxia/ua-browser
 
 features:
-  - icon: 🔍
-    title: Comprehensive Detection
-    details: Browser name, version, rendering engine, OS, device type, CPU architecture — all in one parse.
+  - icon: 🛰️
+    title: Hardware Signal Detection
+    details: WebGL renderer, CSS safe-area-inset, device pixel ratio, Vibration API — correctly identifies phones in desktop mode and distinguishes Apple Silicon from Intel Mac.
+
+  - icon: 🔑
+    title: Client Hints Support
+    details: In the browser, getHighEntropyValues returns real version and arch data. Server-side, parseHeaders reads Sec-CH-UA-* headers for precise detection without guesswork.
 
   - icon: 🤖
-    title: Bot Recognition
-    details: Detects 18+ major crawlers (Googlebot, Bingbot, GPTBot, ClaudeBot, etc.) with a generic fallback.
+    title: AI Bot Recognition
+    details: 40+ built-in bot rules covering GPTBot, ClaudeBot, PerplexityBot, CCBot, and messaging link-preview bots (Slack, Discord, Telegram, WhatsApp).
 
   - icon: 👻
-    title: Headless Detection
-    details: Identifies HeadlessChrome, PhantomJS, Electron, Playwright, jsdom, and Selenium environments.
+    title: Headless Browser Detection
+    details: Identifies HeadlessChrome, Playwright, Puppeteer, Electron, jsdom, and Selenium environments to block non-human traffic.
 
   - icon: 🌲
     title: Tree-shakeable
-    details: Import only the detectors you need. Named exports keep your bundle lean.
+    details: All features are named exports. Import only what you need — Vite, Rollup, and webpack 5+ eliminate unused code automatically.
 
   - icon: ⚡
-    title: Zero Dependencies
-    details: No runtime dependencies. Works in browser and Node.js. ~5KB gzipped.
-
-  - icon: 🔒
-    title: Type-safe
-    details: Full TypeScript definitions with precise literal union types for all return values.
+    title: Zero Dependencies · Tiny Bundle
+    details: No runtime dependencies. Tiny after gzip. Works in browser and Node.js. Full TypeScript support with precise literal union types.
 ---

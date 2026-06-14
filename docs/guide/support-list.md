@@ -1,3 +1,8 @@
+---
+title: 内置支持列表
+description: ua-browser 内置 70+ 浏览器、20+ 操作系统、40+ AI 爬虫规则的完整支持列表，含 GPTBot、ClaudeBot、微信、钉钉等。
+---
+
 # 内置支持列表
 
 所有内置定义均来自源码 `src/constants/`，与运行时行为严格一致。

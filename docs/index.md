@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: uaBrowser
-  text: 浏览器环境检测
-  tagline: 通过 User Agent 检测浏览器、系统及设备类型，支持 Node.js，零依赖
+  text: 超越 UA 字符串的浏览器检测
+  tagline: UA 字符串会撒谎。ua-browser 结合硬件信号与 Client Hints，在 UA 失真时依然准确。零依赖，支持浏览器与 Node.js。
   actions:
     - theme: brand
       text: 快速开始
@@ -17,27 +17,27 @@ hero:
       link: https://github.com/yangtianxia/ua-browser
 
 features:
-  - icon: 🔍
-    title: 全面检测
-    details: 浏览器名称、版本、渲染内核、操作系统、设备类型、CPU 架构，一次解析全部获取
+  - icon: 🛰️
+    title: 硬件信号检测
+    details: WebGL 渲染器、CSS safe-area-inset、设备像素比、振动 API——开了桌面模式的手机、Apple Silicon vs Intel，都能正确识别。
+
+  - icon: 🔑
+    title: Client Hints 支持
+    details: 浏览器端通过 getHighEntropyValues 获取真实版本与架构；服务端通过 parseHeaders 读取 Sec-CH-UA-* 头，精准检测无需猜测。
 
   - icon: 🤖
-    title: 爬虫识别
-    details: 内置 18 种主流爬虫（Googlebot、Bingbot、Bytespider 等）检测，支持通用兜底
+    title: AI 爬虫识别
+    details: 内置 40+ 爬虫规则，涵盖 GPTBot、ClaudeBot、PerplexityBot、CCBot，以及 Slack、Discord、Telegram 等消息预览 Bot。
 
   - icon: 👻
-    title: 无头检测
-    details: 识别 HeadlessChrome、PhantomJS、Electron、Playwright 等自动化环境
+    title: 无头浏览器检测
+    details: 识别 HeadlessChrome、Playwright、Puppeteer、Electron、jsdom 等自动化环境，有效拦截非人类流量。
 
   - icon: 🌲
     title: Tree-shakeable
-    details: 支持命名导出，按需引入单个检测器，不引入无用代码
+    details: 所有功能命名导出，按需引入单个检测器，Vite / Rollup / webpack 5+ 自动 tree-shake，不引入无用代码。
 
   - icon: ⚡
-    title: 零依赖
-    details: 无任何运行时依赖，浏览器与 Node.js 环境均可使用，gzip 后约 5KB
-
-  - icon: 🔒
-    title: 类型安全
-    details: 完整 TypeScript 类型定义，所有返回值均为字面量联合类型
+    title: 零依赖 · 极小体积
+    details: 无任何运行时依赖，gzip 后极小，浏览器与 Node.js 双环境可用，TypeScript 原生支持。
 ---

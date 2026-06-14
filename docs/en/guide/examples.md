@@ -1,12 +1,33 @@
+---
+title: Examples
+description: Real-world ua-browser examples — device detection, AI bot recognition, SSR detection, headless browser blocking, Windows 10/11 detection.
+---
+
 # Examples
 
 ## Device Redirect
 
-Redirect users to the appropriate version based on device type:
+### Accurate redirect (recommended)
+
+The synchronous `uaBrowser()` call cannot detect phones in desktop mode. Use `detect()` to identify the real device via hardware signals (CSS safe-area, device pixel ratio, etc.):
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
+// detect() correctly identifies mobile even when the user has enabled desktop mode
+const result = await uaBrowser.detect()
+
+if (result.device === 'Mobile' || result.device === 'Tablet') {
+  window.location.href = 'https://m.example.com'
+}
+```
+
+### Quick redirect (when accuracy is not critical)
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// Sync, no waiting — but a phone in desktop mode is detected as 'PC'
 const { device } = uaBrowser()
 
 if (device === 'Mobile' || device === 'Tablet') {
@@ -16,24 +37,58 @@ if (device === 'Mobile' || device === 'Tablet') {
 
 ---
 
-## Block Bot Requests
+## Getting the Real Browser Version
 
-Filter crawler traffic in server-side middleware:
+Chrome 109+ freezes the UA minor version to `0.0.0` (e.g. `149.0.0.0`). Use `detect()` when you need the real version:
+
+```typescript
+import uaBrowser from 'ua-browser'
+
+// ❌ Sync: version = '149.0.0.0' (frozen UA value)
+const sync = uaBrowser()
+console.log(sync.version) // '149.0.0.0'
+
+// ✅ Async: version = '149.0.7827.102' (real value from Client Hints)
+const result = await uaBrowser.detect()
+console.log(result.version)      // '149.0.7827.102'
+console.log(result.versionMajor) // 149
+
+// Load polyfills based on actual version
+if (result.browser === 'Safari' && result.versionMajor < 16) {
+  await import('./polyfills/safari-legacy.js')
+}
+```
+
+> **Note**: `detect()` requires HTTPS or localhost. On plain HTTP it falls back to frozen UA values.
+
+---
+
+## AI Crawler Recognition
+
+40+ built-in bot rules let you filter crawlers precisely in server middleware:
 
 ```typescript
 import { parseUA } from 'ua-browser'
 
 // Express / Koa middleware
-function blockBots(req, res, next) {
+function handleBots(req, res, next) {
   const ua = req.headers['user-agent'] ?? ''
-  const { isBot, botName } = parseUA(ua)
+  const { isBot, botName, botCategory } = parseUA(ua)
 
-  if (isBot) {
-    console.log(`Bot blocked: ${botName}`)
-    return res.status(403).end()
+  if (!isBot) return next()
+
+  // AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.)
+  if (botCategory === 'ai-llm') {
+    return res.status(200).json({ allowed: false, reason: 'ai-crawler' })
   }
 
-  next()
+  // Allow search engine crawlers through
+  if (botCategory === 'search-engine') {
+    return next()
+  }
+
+  console.log(`Bot blocked: ${botName} (${botCategory})`)
+  return res.status(403).end()
 }
 ```
 
@@ -41,46 +96,27 @@ function blockBots(req, res, next) {
 
 ## Block Headless Browsers
 
-Prevent automated script access:
+Playwright and Puppeteer's default UAs are identical to real Chrome — use `isHeadless` to detect them:
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
 const { isHeadless, isBot } = uaBrowser()
 
-if (isHeadless || isBot) {
+if (isHeadless) {
+  // Automated script / scraper
   document.body.innerHTML = 'Access denied.'
 }
 ```
 
 ---
 
-## Load Browser-specific Polyfills
-
-Load polyfills or fallbacks for specific browsers:
-
-```typescript
-import uaBrowser from 'ua-browser'
-
-const { browser, version } = uaBrowser()
-
-if (browser === 'IE') {
-  await import('./polyfills/ie.js')
-} else if (browser === 'Safari' && parseInt(version) < 14) {
-  await import('./polyfills/safari-legacy.js')
-}
-```
-
----
-
-## SSR / Node.js — Parse Request UA
-
-Return differentiated content based on UA in server-side rendering:
+## SSR: Server-side Differential Rendering
 
 ```typescript
 import { parseUA } from 'ua-browser'
 
-// Next.js / Nuxt SSR
+// Next.js getServerSideProps
 export async function getServerSideProps({ req }) {
   const ua = req.headers['user-agent'] ?? ''
   const { device, os, browser } = parseUA(ua)
@@ -88,7 +124,7 @@ export async function getServerSideProps({ req }) {
   return {
     props: {
       isMobile: device === 'Mobile',
-      isIOS: os === 'iOS',
+      isIOS:    os === 'iOS',
       isWeChat: browser === 'Wechat',
     },
   }
@@ -97,9 +133,37 @@ export async function getServerSideProps({ req }) {
 
 ---
 
+## SSR: Accurate Detection with Client Hints
+
+Combine `Sec-CH-UA-*` headers in Express / Next.js to get real version, arch, and OS version:
+
+```typescript
+import { parseHeaders, ACCEPT_CH } from 'ua-browser'
+
+// First response: tell the browser to start sending Client Hints
+app.use((_req, res, next) => {
+  res.setHeader('Accept-CH', ACCEPT_CH)
+  next()
+})
+
+// Subsequent requests: get real version and architecture
+app.get('/api/info', (req, res) => {
+  const result = parseHeaders(req.headers)
+  res.json({
+    browser:   result.browser,
+    version:   result.version,   // '149.0.7827.102' (not the frozen UA value)
+    os:        result.os,
+    osVersion: result.osVersion, // '26.5.1' (real macOS version)
+    arch:      result.arch,      // 'x86_64' (from Sec-CH-UA-Arch)
+  })
+})
+```
+
+---
+
 ## Accurate Windows 10 / 11 Detection
 
-Windows 10 and 11 share the same UA string. Use `navigator.userAgentData` to distinguish them:
+Windows 10 and 11 share the same UA string — use `navigator.userAgentData` to tell them apart:
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
@@ -124,12 +188,15 @@ import type { EnvOption } from 'ua-browser'
 
 export function useBrowser() {
   const info = ref<EnvOption | null>(null)
+  const loading = ref(true)
 
-  onMounted(() => {
-    info.value = uaBrowser()
+  onMounted(async () => {
+    // detect() for accurate version, device, and arch
+    info.value = await uaBrowser.detect()
+    loading.value = false
   })
 
-  return { info }
+  return { info, loading }
 }
 ```
 
@@ -137,12 +204,13 @@ export function useBrowser() {
 <script setup lang="ts">
 import { useBrowser } from '@/composables/useBrowser'
 
-const { info } = useBrowser()
+const { info, loading } = useBrowser()
 </script>
 
 <template>
-  <div v-if="info">
-    {{ info.browser }} {{ info.version }} on {{ info.os }}
+  <div v-if="!loading && info">
+    {{ info.browser }} {{ info.version }} · {{ info.os }} {{ info.osVersion }}
+    <span v-if="info.arch !== 'unknown'">({{ info.arch }})</span>
   </div>
 </template>
 ```
@@ -161,7 +229,8 @@ export function useBrowser(): EnvOption | null {
   const [info, setInfo] = useState<EnvOption | null>(null)
 
   useEffect(() => {
-    setInfo(uaBrowser())
+    // detect() collects hardware signals asynchronously
+    uaBrowser.detect().then(setInfo)
   }, [])
 
   return info
@@ -176,66 +245,11 @@ export function BrowserInfo() {
   if (!info) return null
 
   return (
-    <p>{info.browser} {info.version} on {info.os}</p>
+    <p>
+      {info.browser} {info.version} · {info.os} {info.osVersion}
+      {info.arch !== 'unknown' && ` (${info.arch})`}
+    </p>
   )
-}
-```
-
----
-
-## High-Accuracy Architecture Detection (getEnvContext)
-
-Collect WebGL renderer, Client Hints, and other signals to distinguish Apple Silicon from Intel Mac:
-
-```typescript
-import { getEnvContext, parseUA } from 'ua-browser'
-
-const ctx = await getEnvContext()
-const result = parseUA(navigator.userAgent, { ctx })
-
-console.log(result.arch) // 'arm64' (Apple Silicon) or 'x86_64'
-```
-
----
-
-## SSR Precise Detection (parseHeaders + Client Hints)
-
-Use HTTP Client Hints for accurate detection in Express / Next.js and similar server-side frameworks:
-
-```typescript
-import { parseHeaders, ACCEPT_CH } from 'ua-browser'
-
-// First response: tell the browser to send Client Hints
-app.use((req, res, next) => {
-  res.setHeader('Accept-CH', ACCEPT_CH)
-  next()
-})
-
-// Subsequent requests: precise arch / OS detection
-app.get('/api/info', (req, res) => {
-  const result = parseHeaders(req.headers)
-  res.json({
-    browser: result.browser,
-    os:      result.os,
-    arch:    result.arch, // 'x86_64' (from Sec-CH-UA-Arch)
-  })
-})
-```
-
----
-
-## Use Standalone Detectors
-
-Import only the detector you need to minimize bundle size:
-
-```typescript
-import { detectArch } from 'ua-browser'
-
-const arch = detectArch(navigator.userAgent)
-// 'x86_64' | 'arm64' | 'arm' | 'x86' | 'unknown'
-
-if (arch === 'arm64') {
-  console.log('Apple Silicon / ARM device')
 }
 ```
 
@@ -243,16 +257,37 @@ if (arch === 'arm64') {
 
 ## Analytics Reporting
 
-Collect and report user environment data:
+Report real version and arch, not frozen UA values:
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-const { browser, version, os, device, arch } = uaBrowser()
+// detect() for accurate data
+const { browser, version, versionMajor, os, osVersion, device, arch } =
+  await uaBrowser.detect()
 
 fetch('/api/analytics', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ browser, version, os, device, arch }),
+  body: JSON.stringify({ browser, version, versionMajor, os, osVersion, device, arch }),
 })
+```
+
+---
+
+## Tree-shakeable Individual Detectors
+
+Import only the detection you need to keep your bundle lean:
+
+```typescript
+import { detectBot, detectArch } from 'ua-browser'
+
+const ua = navigator.userAgent
+
+// Bot detection only
+const { isBot, botName, botCategory } = detectBot(ua)
+
+// Arch detection only (UA-based, no Client Hints)
+const arch = detectArch(ua)
+// 'x86_64' | 'arm64' | 'arm' | 'x86' | 'unknown'
 ```

@@ -2,6 +2,8 @@ import type { OsName } from '../types.js'
 
 export interface OsDef {
   name: OsName
+  /** Higher priority wins when multiple entries match the same UA. */
+  priority: number
   detect: RegExp
   /** Capture-group regex(es) for OS version extraction. Tried in order; null = no version. */
   versionPattern: RegExp | RegExp[] | null
@@ -11,46 +13,39 @@ export interface OsDef {
   versionNames?: Record<string, string>
 }
 
-// Detection uses last-match-wins: entries that appear later override earlier matches.
-// More specific OS entries must come AFTER the generic ones they supersede.
+// Priority 10: broad patterns that act as catch-alls (Linux, Windows).
+// Priority 20: standard OS entries with specific-enough patterns.
+// Priority 30: entries that must override a lower-priority match on the same UA
+//              (Chrome OS over Linux; visionOS/tvOS over iOS; HarmonyOS/OpenHarmony over Android;
+//               Windows Phone over Windows).
 export const OS_DEFS: readonly OsDef[] = [
-  { name: 'WebOS',          detect: /hpwOS/,                          versionPattern: /hpwOS\/([\d.]+)/ },
-  { name: 'Symbian',        detect: /Symbian/,                        versionPattern: null },
-  { name: 'MeeGo',          detect: /MeeGo/,                          versionPattern: null },
-  { name: 'BlackBerry',     detect: /(BlackBerry|RIM)/,               versionPattern: null },
-  { name: 'FreeBSD',        detect: /FreeBSD/,                        versionPattern: null },
-  { name: 'Debian',         detect: /Debian/,                         versionPattern: /Debian\/([\d.]+)/ },
-  { name: 'Ubuntu',         detect: /Ubuntu/,                         versionPattern: null },
-  // Linux must come before Chrome OS: Chrome OS UAs contain "X11", so Linux matches first,
-  // then Chrome OS overrides it.
-  { name: 'Linux',          detect: /(Linux|X11)/,                    versionPattern: null },
-  { name: 'Chrome OS',      detect: /CrOS/,                           versionPattern: null },
-  { name: 'Tizen',          detect: /Tizen/,                          versionPattern: /Tizen ([\d.]+)/ },
-  { name: 'iOS',            detect: /like Mac OS X/,                  versionPattern: /OS ([\d_]+) like/ },
-  { name: 'MacOS',          detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/,
+  { name: 'WebOS',          priority: 20, detect: /hpwOS/,                          versionPattern: /hpwOS\/([\d.]+)/ },
+  { name: 'Symbian',        priority: 20, detect: /Symbian/,                        versionPattern: null },
+  { name: 'MeeGo',          priority: 20, detect: /MeeGo/,                          versionPattern: null },
+  { name: 'BlackBerry',     priority: 20, detect: /(BlackBerry|RIM)/,               versionPattern: null },
+  { name: 'FreeBSD',        priority: 20, detect: /FreeBSD/,                        versionPattern: null },
+  { name: 'Debian',         priority: 20, detect: /Debian/,                         versionPattern: /Debian\/([\d.]+)/ },
+  { name: 'Ubuntu',         priority: 20, detect: /Ubuntu/,                         versionPattern: null },
+  { name: 'Linux',          priority: 10, detect: /(Linux|X11)/,                    versionPattern: null },
+  { name: 'Chrome OS',      priority: 30, detect: /CrOS/,                           versionPattern: null },
+  { name: 'Tizen',          priority: 20, detect: /Tizen/,                          versionPattern: /Tizen ([\d.]+)/ },
+  { name: 'iOS',            priority: 20, detect: /like Mac OS X/,                  versionPattern: /OS ([\d_]+) like/ },
+  { name: 'MacOS',          priority: 20, detect: /Macintosh/,                      versionPattern: /Mac OS X -?([\d_.]+)/,
     versionNames: {
       '10.9': 'Mavericks', '10.10': 'Yosemite', '10.11': 'El Capitan',
       '10.12': 'Sierra', '10.13': 'High Sierra', '10.14': 'Mojave',
       '10.15': 'Catalina', '11': 'Big Sur', '12': 'Monterey',
       '13': 'Ventura', '14': 'Sonoma', '15': 'Sequoia',
     } },
-  // visionOS / tvOS must come AFTER iOS: their UAs also contain "like Mac OS X",
-  // so they need to override iOS via the last-match-wins iteration.
-  { name: 'visionOS',       detect: /visionOS/,                       versionPattern: /visionOS ([\d_]+)/ },
-  { name: 'tvOS',           detect: /Apple TV/,                       versionPattern: /OS ([\d_]+) like/ },
-  { name: 'Android',        detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
-  // HarmonyOS must come after Android: HarmonyOS UAs include "Android", so Android matches
-  // first, then HarmonyOS overrides it. versionPattern tries direct extraction first (5.0+
-  // pure HarmonyOS UAs don't have Android token), then falls back to Android version + lookup.
-  { name: 'HarmonyOS',      detect: /HarmonyOS/,
+  { name: 'visionOS',       priority: 30, detect: /visionOS/,                       versionPattern: /visionOS ([\d_]+)/ },
+  { name: 'tvOS',           priority: 30, detect: /Apple TV/,                       versionPattern: /OS ([\d_]+) like/ },
+  { name: 'Android',        priority: 20, detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
+  { name: 'HarmonyOS',      priority: 30, detect: /HarmonyOS/,
     versionPattern: [/HarmonyOS[\s/]([\d.]+)/, /Android ([\d.]+)[;)]/],
-    versionLookup: { '10': '2', '11': '3', '12': '3', '13': '4' } },
-  // OpenHarmony (open-source base) must come after HarmonyOS to override any earlier match.
-  { name: 'OpenHarmony',    detect: /OpenHarmony/,                    versionPattern: /OpenHarmony[\s/]([\d.]+)/ },
-  { name: 'KaiOS',          detect: /KAIOS/,                          versionPattern: /KAIOS\/([\d.]+)/ },
-  // Windows must come before Windows Phone: Windows Phone UAs contain "Windows", so Windows
-  // matches first, then Windows Phone overrides it.
-  { name: 'Windows',        detect: /Windows/,                        versionPattern: /Windows NT ([\d.]+)/,
+    versionLookup: { '10': '2', '11': '3', '12': '3', '13': '4', '14': '4' } },
+  { name: 'OpenHarmony',    priority: 30, detect: /OpenHarmony/,                    versionPattern: /OpenHarmony[\s/]([\d.]+)/ },
+  { name: 'KaiOS',          priority: 30, detect: /KAIOS/,                          versionPattern: /KAIOS\/([\d.]+)/ },
+  { name: 'Windows',        priority: 10, detect: /Windows/,                        versionPattern: /Windows NT ([\d.]+)/,
     versionLookup: {
       '10': '10', '6.4': '10', '6.3': '8.1', '6.2': '8',
       '6.1': '7', '6.0': 'Vista', '5.2': 'XP', '5.1': 'XP', '5.0': '2000'
@@ -59,5 +54,5 @@ export const OS_DEFS: readonly OsDef[] = [
       '7': 'Windows 7', '8': 'Windows 8', '8.1': 'Windows 8.1',
       '10': 'Windows 10', '11': 'Windows 11',
     } },
-  { name: 'Windows Phone',  detect: /(IEMobile|Windows Phone)/,       versionPattern: /Windows Phone(?: OS)? ([\d.]+)/ },
+  { name: 'Windows Phone',  priority: 30, detect: /(IEMobile|Windows Phone)/,       versionPattern: /Windows Phone(?: OS)? ([\d.]+)/ },
 ] as const

@@ -1,3 +1,8 @@
+---
+title: Type Definitions
+description: ua-browser TypeScript types — BrowserName, OsName, DeviceName, BotName, EnvOption, and all literal union types with full definitions.
+---
+
 # Type Definitions
 
 ## EnvOption
