@@ -208,6 +208,7 @@ As of v1.1.0, a four-layer priority chain is used. Earlier layers take precedenc
 | PetalBot | `PetalBot` | Huawei |
 | Applebot-Extended | `Applebot-Extended` | Apple (AI training; UA also contains Applebot, matched first) |
 | Applebot | `Applebot` | Apple |
+| AdsBot-Google | `AdsBot` | Google Ads |
 
 ### AI / LLM Crawlers
 
@@ -216,10 +217,14 @@ As of v1.1.0, a four-layer priority chain is used. Earlier layers take precedenc
 | GPTBot | `GPTBot` | OpenAI |
 | OAI-SearchBot | `OAI-SearchBot` | OpenAI (real-time search) |
 | ChatGPT-User | `ChatGPT-User` | OpenAI (ChatGPT browsing plugin) |
-| ClaudeBot | `ClaudeBot` | Anthropic |
+| ClaudeBot | `ClaudeBot` | Anthropic (training crawler) |
+| Claude-User | `Claude-User` | Anthropic (user-triggered real-time browsing) |
+| Claude-SearchBot | `Claude-SearchBot` | Anthropic (search indexing) |
 | PerplexityBot | `PerplexityBot` | Perplexity AI |
+| MistralAI-User | `MistralAI-User` | Mistral (Le Chat real-time retrieval) |
+| DeepSeekBot | `DeepSeekBot` | DeepSeek |
+| XAI-Crawler | `XAI-Crawler` | xAI (Grok) |
 | CCBot | `CCBot` | Common Crawl |
-| AdsBot-Google | `AdsBot` | Google Ads |
 | Google-Extended | `Google-Extended` | Google (AI training; blockable via robots.txt) |
 | meta-externalagent | `Meta-ExternalAgent` | Meta AI |
 | Amazonbot | `Amazonbot` | Amazon (Alexa AI) |

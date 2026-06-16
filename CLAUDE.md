@@ -18,7 +18,11 @@ Run a single test file: `pnpm test browser` (Vitest matches by filename substrin
 - All PRs target `dev`, never `main` directly
 - Branch names: `feat/xxx`, `fix/xxx`, `docs/xxx` — no `claude` or `ai` in the name
 - Never push directly to `dev` or `main`
-- Releases: `npx changeset` → `npx changeset version` → PR from `dev` to `main`
+- Releases: manually update the following, then PR from `dev` to `main`:
+  1. `package.json` — bump `version`
+  2. `CHANGELOG.md` — Chinese release notes
+  3. `CHANGELOG.en.md` — English release notes
+  4. Relevant `docs/` pages and `README.md` / `README.en.md` if the change affects public API or features
 
 ## Architecture
 
