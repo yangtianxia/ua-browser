@@ -10,6 +10,7 @@
 - Added `XAI-Crawler` detection (xAI / Grok crawler)
 - Fixed `AdsBot` category: `ai-llm` → `search-engine` (Google Ads crawler, unrelated to AI/LLM)
 
+
 ## 1.4.1
 
 ### Patch Changes
