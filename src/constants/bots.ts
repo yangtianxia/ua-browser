@@ -30,6 +30,8 @@ export type BotName =
   | 'OAI-SearchBot'
   | 'ChatGPT-User'
   | 'ClaudeBot'
+  | 'Claude-User'
+  | 'Claude-SearchBot'
   | 'PerplexityBot'
   | 'CCBot'
   | 'AdsBot'
@@ -38,6 +40,9 @@ export type BotName =
   | 'Amazonbot'
   | 'Diffbot'
   | 'cohere-ai'
+  | 'MistralAI-User'
+  | 'DeepSeekBot'
+  | 'XAI-Crawler'
   | 'YouBot'
   | 'UptimeRobot'
   | 'ia_archiver'
@@ -85,14 +90,19 @@ export const BOT_DEFS: readonly BotDef[] = [
   { name: 'OAI-SearchBot',      detect: /OAI-SearchBot/,                    category: 'ai-llm' },
   { name: 'ChatGPT-User',       detect: /ChatGPT-User/,                     category: 'ai-llm' },
   { name: 'ClaudeBot',          detect: /ClaudeBot/,                        category: 'ai-llm' },
+  { name: 'Claude-User',        detect: /Claude-User/,                      category: 'ai-llm' },
+  { name: 'Claude-SearchBot',   detect: /Claude-SearchBot/,                 category: 'ai-llm' },
   { name: 'PerplexityBot',      detect: /PerplexityBot/,                    category: 'ai-llm' },
   { name: 'CCBot',              detect: /CCBot/,                            category: 'ai-llm' },
-  { name: 'AdsBot',             detect: /AdsBot-Google/,                    category: 'ai-llm' },
+  { name: 'AdsBot',             detect: /AdsBot-Google/,                    category: 'search-engine' },
   { name: 'Google-Extended',    detect: /Google-Extended/,                  category: 'ai-llm' },
   { name: 'Meta-ExternalAgent', detect: /meta-externalagent/i,              category: 'ai-llm' },
   { name: 'Amazonbot',          detect: /Amazonbot/,                        category: 'ai-llm' },
   { name: 'Diffbot',            detect: /Diffbot/,                          category: 'ai-llm' },
   { name: 'cohere-ai',          detect: /cohere-ai/,                        category: 'ai-llm' },
+  { name: 'MistralAI-User',    detect: /MistralAI-User/,                   category: 'ai-llm' },
+  { name: 'DeepSeekBot',       detect: /DeepSeekBot/,                      category: 'ai-llm' },
+  { name: 'XAI-Crawler',       detect: /XAI-Crawler/,                      category: 'ai-llm' },
   { name: 'YouBot',             detect: /YouBot/,                           category: 'ai-llm' },
   // Monitoring / archiving
   { name: 'UptimeRobot',        detect: /UptimeRobot/,                      category: 'monitoring' },
