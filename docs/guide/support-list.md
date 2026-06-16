@@ -209,6 +209,7 @@ v1.1.0 起采用四层优先级检测链，前层成功则跳过后层：
 | PetalBot | `PetalBot` | 华为 |
 | Applebot-Extended | `Applebot-Extended` | Apple（AI 训练，UA 同时含 Applebot，优先匹配此项） |
 | Applebot | `Applebot` | Apple |
+| AdsBot-Google | `AdsBot` | Google Ads |
 
 ### AI / LLM 爬虫
 
@@ -217,10 +218,14 @@ v1.1.0 起采用四层优先级检测链，前层成功则跳过后层：
 | GPTBot | `GPTBot` | OpenAI |
 | OAI-SearchBot | `OAI-SearchBot` | OpenAI（实时搜索） |
 | ChatGPT-User | `ChatGPT-User` | OpenAI（ChatGPT 浏览插件） |
-| ClaudeBot | `ClaudeBot` | Anthropic |
+| ClaudeBot | `ClaudeBot` | Anthropic（训练爬虫） |
+| Claude-User | `Claude-User` | Anthropic（用户触发实时浏览） |
+| Claude-SearchBot | `Claude-SearchBot` | Anthropic（搜索索引） |
 | PerplexityBot | `PerplexityBot` | Perplexity AI |
+| MistralAI-User | `MistralAI-User` | Mistral（Le Chat 实时网页检索） |
+| DeepSeekBot | `DeepSeekBot` | DeepSeek |
+| XAI-Crawler | `XAI-Crawler` | xAI（Grok） |
 | CCBot | `CCBot` | Common Crawl |
-| AdsBot-Google | `AdsBot` | Google Ads |
 | Google-Extended | `Google-Extended` | Google（AI 训练，可通过 robots.txt 屏蔽） |
 | meta-externalagent | `Meta-ExternalAgent` | Meta AI |
 | Amazonbot | `Amazonbot` | Amazon（Alexa AI） |

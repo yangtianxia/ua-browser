@@ -1,5 +1,15 @@
 # ua-browser
 
+## 1.4.2
+
+### Patch Changes
+
+- 新增 `Claude-User`、`Claude-SearchBot` 检测（Anthropic 实时浏览与搜索索引爬虫）
+- 新增 `MistralAI-User` 检测（Mistral Le Chat 实时网页检索）
+- 新增 `DeepSeekBot` 检测（DeepSeek AI 爬虫）
+- 新增 `XAI-Crawler` 检测（xAI / Grok 爬虫）
+- 修正 `AdsBot` 分类：`ai-llm` → `search-engine`（Google 广告爬虫，与 AI/LLM 无关）
+
 ## 1.4.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # ua-browser
 
+## 1.4.2
+
+### Patch Changes
+
+- Added `Claude-User` and `Claude-SearchBot` detection (Anthropic real-time browsing and search indexing crawlers)
+- Added `MistralAI-User` detection (Mistral Le Chat real-time web retrieval)
+- Added `DeepSeekBot` detection (DeepSeek AI crawler)
+- Added `XAI-Crawler` detection (xAI / Grok crawler)
+- Fixed `AdsBot` category: `ai-llm` → `search-engine` (Google Ads crawler, unrelated to AI/LLM)
+
 ## 1.4.1
 
 ### Patch Changes

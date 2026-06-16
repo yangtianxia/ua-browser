@@ -87,6 +87,13 @@ describe('detectBot', () => {
       expect(r.botName).toBe('ClaudeBot')
     })
 
+    it('detects Claude-SearchBot', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; Claude-SearchBot/1.0; +https://www.anthropic.com/claude-search'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Claude-SearchBot')
+    })
+
     it('detects PerplexityBot', () => {
       const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; PerplexityBot/1.0; +https://docs.perplexity.ai/docs/perplexitybot'
       const r = detectBot(ua)
@@ -129,6 +136,13 @@ describe('detectBot', () => {
       expect(r.botName).toBe('ChatGPT-User')
     })
 
+    it('detects Claude-User', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; Claude-User/1.0; +https://www.anthropic.com/claude-user'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('Claude-User')
+    })
+
     it('detects Meta-ExternalAgent', () => {
       const ua = 'meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)'
       const r = detectBot(ua)
@@ -155,6 +169,27 @@ describe('detectBot', () => {
       const r = detectBot(ua)
       expect(r.isBot).toBe(true)
       expect(r.botName).toBe('cohere-ai')
+    })
+
+    it('detects MistralAI-User', () => {
+      const ua = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; MistralAI-User/1.0; +https://docs.mistral.ai/robots)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('MistralAI-User')
+    })
+
+    it('detects DeepSeekBot', () => {
+      const ua = 'Mozilla/5.0 (compatible; DeepSeekBot/1.0; +https://www.deepseek.com/)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('DeepSeekBot')
+    })
+
+    it('detects XAI-Crawler', () => {
+      const ua = 'Mozilla/5.0 (compatible; XAI-Crawler/1.0; +https://x.ai/xai-crawler)'
+      const r = detectBot(ua)
+      expect(r.isBot).toBe(true)
+      expect(r.botName).toBe('XAI-Crawler')
     })
 
     it('detects YouBot', () => {
