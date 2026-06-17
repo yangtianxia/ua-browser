@@ -77,8 +77,23 @@ description: ua-browser 内置 70+ 浏览器、20+ 操作系统、40+ AI 爬虫�
 | 小红书 | `Xiaohongshu` | 596 |
 | 飞书 / Lark | `Feishu` | 597 |
 | 今日头条 | `Toutiao` | 598 |
-| 京东（拼购） | `JD` | 599 |
+| 京东（拼购 / 主 app） | `JD` | 599 |
 | 美团 | `Meituan` | 600 |
+| 拼多多 | `Pinduoduo` | 601 |
+| 天猫 | `Tmall` | 602 |
+| 饿了么 | `Eleme` | 603 |
+| 闲鱼 | `Xianyu` | 604 |
+| 知乎 | `Zhihu` | 605 |
+| 网易云音乐 | `NetEaseMusic` | 606 |
+| 网易新闻 | `NetEaseNews` | 607 |
+| 腾讯视频 | `TencentVideo` | 608 |
+| 优酷 | `Youku` | 609 |
+| 携程 | `Ctrip` | 610 |
+| 微信读书 | `WeRead` | 611 |
+| 大众点评 | `Dianping` | 612 |
+| 马蜂窝 | `Mafengwo` | 613 |
+| 猫眼 | `Maoyan` | 614 |
+| WPS Office | `WPSOffice` | 615 |
 
 ---
 

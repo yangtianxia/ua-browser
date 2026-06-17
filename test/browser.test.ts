@@ -216,6 +216,132 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('1.0')
     })
 
+    it('detects JD main app on Android (jdapp token)', () => {
+      const r = detectBrowser(UA.jdApp.android)
+      expect(r.browser).toBe('JD')
+      expect(r.version).toBe('11.4.4')
+    })
+
+    it('detects JD main app on iOS (jdapp token)', () => {
+      const r = detectBrowser(UA.jdApp.ios)
+      expect(r.browser).toBe('JD')
+      expect(r.version).toBe('11.4.4')
+    })
+
+    it('detects Pinduoduo', () => {
+      const r = detectBrowser(UA.pinduoduo.mobile)
+      expect(r.browser).toBe('Pinduoduo')
+      expect(r.version).toBe('6.42.0')
+    })
+
+    it('detects Tmall (AliApp TM)', () => {
+      const r = detectBrowser(UA.tmall.mobile)
+      expect(r.browser).toBe('Tmall')
+      expect(r.version).toBe('10.32.10')
+    })
+
+    it('detects Eleme (AliApp EM)', () => {
+      const r = detectBrowser(UA.eleme.mobile)
+      expect(r.browser).toBe('Eleme')
+      expect(r.version).toBe('8.5.13')
+    })
+
+    it('detects Xianyu (AliApp IDLEFISH)', () => {
+      const r = detectBrowser(UA.xianyu.mobile)
+      expect(r.browser).toBe('Xianyu')
+      expect(r.version).toBe('7.10.8')
+    })
+
+    it('detects Zhihu on Android', () => {
+      const r = detectBrowser(UA.zhihu.android)
+      expect(r.browser).toBe('Zhihu')
+      expect(r.version).toBe('9.46.0')
+    })
+
+    it('detects Zhihu on iOS (osee2unifiedRelease token)', () => {
+      const r = detectBrowser(UA.zhihu.ios)
+      expect(r.browser).toBe('Zhihu')
+      expect(r.version).toBe('9.46.0')
+    })
+
+    it('detects NetEase Cloud Music', () => {
+      const r = detectBrowser(UA.netEaseMusic.mobile)
+      expect(r.browser).toBe('NetEaseMusic')
+      expect(r.version).toBe('8.10.0')
+    })
+
+    it('detects NetEase News on Android (NTESnr token)', () => {
+      const r = detectBrowser(UA.netEaseNews.android)
+      expect(r.browser).toBe('NetEaseNews')
+      expect(r.version).toBe('79.4')
+    })
+
+    it('detects NetEase News on iOS (NTESnr token)', () => {
+      const r = detectBrowser(UA.netEaseNews.ios)
+      expect(r.browser).toBe('NetEaseNews')
+      expect(r.version).toBe('79.4')
+    })
+
+    it('detects Tencent Video (qqlive)', () => {
+      const r = detectBrowser(UA.tencentVideo.mobile)
+      expect(r.browser).toBe('TencentVideo')
+      expect(r.version).toBe('8.10.65')
+    })
+
+    it('detects Youku', () => {
+      const r = detectBrowser(UA.youku.mobile)
+      expect(r.browser).toBe('Youku')
+      expect(r.version).toBe('10.0.5')
+    })
+
+    it('detects Ctrip', () => {
+      const r = detectBrowser(UA.ctrip.mobile)
+      expect(r.browser).toBe('Ctrip')
+      expect(r.version).toBe('8.59.0')
+    })
+
+    it('detects WeRead (WeRead token)', () => {
+      const r = detectBrowser(UA.weRead.mobile)
+      expect(r.browser).toBe('WeRead')
+      expect(r.version).toBe('7.2.5')
+    })
+
+    it('detects WeRead legacy (wxread token)', () => {
+      const r = detectBrowser(UA.weRead.legacy)
+      expect(r.browser).toBe('WeRead')
+      expect(r.version).toBe('6.8.0')
+    })
+
+    it('detects Dianping', () => {
+      const r = detectBrowser(UA.dianping.mobile)
+      expect(r.browser).toBe('Dianping')
+      expect(r.version).toBe('12.10.5')
+    })
+
+    it('detects Mafengwo', () => {
+      const r = detectBrowser(UA.mafengwo.mobile)
+      expect(r.browser).toBe('Mafengwo')
+      expect(r.version).toBe('10.5.5')
+    })
+
+    it('detects Maoyan', () => {
+      const r = detectBrowser(UA.maoyan.mobile)
+      expect(r.browser).toBe('Maoyan')
+      expect(r.version).toBe('9.51.0')
+    })
+
+    it('detects WPS Office on Android', () => {
+      const r = detectBrowser(UA.wpsOffice.android)
+      expect(r.browser).toBe('WPSOffice')
+      expect(r.version).toBe('13.27')
+    })
+
+    it('detects WPS Office on iOS', () => {
+      const r = detectBrowser(UA.wpsOffice.ios)
+      expect(r.browser).toBe('WPSOffice')
+      expect(r.version).toBe('13.27')
+    })
+
     it('detects QQ app', () => {
       const r = detectBrowser(UA.qq.qq)
       expect(r.browser).toBe('QQ')

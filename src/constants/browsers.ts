@@ -84,6 +84,21 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   { name: 'Xiaohongshu',   priority: 596, detect: /Xiaohongshu\//,        versionPattern: /Xiaohongshu\/([\d.]+)/ },
   { name: 'Feishu',        priority: 597, detect: /(Lark|Feishu)\//,      versionPattern: [/Lark\/([\d.]+)/, /Feishu\/([\d.]+)/] },
   { name: 'Toutiao',       priority: 598, detect: /NewsArticle\//,        versionPattern: /NewsArticle\/([\d.]+)/ },
-  { name: 'JD',            priority: 599, detect: /jdpingou\//,           versionPattern: /jdpingou\/([\d.]+)/ },
-  { name: 'Meituan',       priority: 600, detect: /MeituanHybrid\//,      versionPattern: /MeituanHybrid\/([\d.]+)/ }
+  { name: 'JD',            priority: 599, detect: /(jdpingou\/|jdapp;)/,  versionPattern: [/jdpingou\/([\d.]+)/, /jdapp;[^;]+;([\d.]+)/] },
+  { name: 'Meituan',       priority: 600, detect: /MeituanHybrid\//,      versionPattern: /MeituanHybrid\/([\d.]+)/ },
+  { name: 'Pinduoduo',     priority: 601, detect: /Pinduoduo\//,          versionPattern: /Pinduoduo\/([\d.]+)/ },
+  { name: 'Tmall',         priority: 602, detect: /AliApp\(TM/,           versionPattern: /AliApp\(TM\/([\d.]+)/ },
+  { name: 'Eleme',         priority: 603, detect: /AliApp\(EM/,           versionPattern: /AliApp\(EM\/([\d.]+)/ },
+  { name: 'Xianyu',        priority: 604, detect: /AliApp\(IDLEFISH/,     versionPattern: /AliApp\(IDLEFISH\/([\d.]+)/ },
+  { name: 'Zhihu',         priority: 605, detect: /(Zhihu\/|osee2unifiedRelease\/)/, versionPattern: [/Zhihu\/([\d.]+)/, /osee2unifiedRelease\/([\d.]+)/] },
+  { name: 'NetEaseMusic',  priority: 606, detect: /NeteaseMusic\//,       versionPattern: /NeteaseMusic\/([\d.]+)/ },
+  { name: 'NetEaseNews',   priority: 607, detect: /NTESnr\//,             versionPattern: /NTESnr\/([\d.]+)/ },
+  { name: 'TencentVideo',  priority: 608, detect: /qqlive\//,             versionPattern: /qqlive\/([\d.]+)/ },
+  { name: 'Youku',         priority: 609, detect: /Youku(?:HD|App)?\/[\d.]/, versionPattern: /Youku(?:HD|App)?\/([\d.]+)/ },
+  { name: 'Ctrip',         priority: 610, detect: /Ctrip\//,              versionPattern: /Ctrip\/([\d.]+)/ },
+  { name: 'WeRead',        priority: 611, detect: /(WeRead|wxread)\//,    versionPattern: [/WeRead\/([\d.]+)/, /wxread\/([\d.]+)/] },
+  { name: 'Dianping',      priority: 612, detect: /Dianping\//,           versionPattern: /Dianping\/([\d.]+)/ },
+  { name: 'Mafengwo',      priority: 613, detect: /Mafengwo\//,           versionPattern: /Mafengwo\/([\d.]+)/ },
+  { name: 'Maoyan',        priority: 614, detect: /MaoyanApp\//,          versionPattern: /MaoyanApp\/([\d.]+)/ },
+  { name: 'WPSOffice',     priority: 615, detect: /(wps_android|wps_ios|WPSOffice)\//i, versionPattern: [/wps_(?:android|ios)\/([\d.]+)/i, /WPSOffice\/([\d.]+)/i] }
 ] as const

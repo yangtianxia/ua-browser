@@ -1,5 +1,14 @@
 # ua-browser
 
+## 1.4.3
+
+### Patch Changes
+
+- Added 15 app webview detections: Pinduoduo (`Pinduoduo`), Tmall (`Tmall`), Eleme (`Eleme`), Xianyu (`Xianyu`), Zhihu (`Zhihu`), NetEase Cloud Music (`NetEaseMusic`), NetEase News (`NetEaseNews`), Tencent Video (`TencentVideo`), Youku (`Youku`), Ctrip (`Ctrip`), WeRead (`WeRead`), Dianping (`Dianping`), Mafengwo (`Mafengwo`), Maoyan (`Maoyan`), WPS Office (`WPSOffice`)
+- Extended JD detection: in addition to the original `jdpingou` (JingXi), added support for the main app `jdapp` token
+- `WeRead` now matches the legacy `wxread/` token; `Zhihu` now matches the iOS `osee2unifiedRelease/` token
+- `NetEaseNews` uses the more specific `NTESnr/` token to reduce false positives against other "News" apps
+
 ## 1.4.2
 
 ### Patch Changes
