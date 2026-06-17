@@ -77,8 +77,23 @@ Detection priority runs from lowest to highest. When multiple rules match the sa
 | Xiaohongshu (RedNote) | `Xiaohongshu` | 596 |
 | Feishu / Lark | `Feishu` | 597 |
 | Toutiao (Today's Headlines) | `Toutiao` | 598 |
-| JD (Pingou) | `JD` | 599 |
+| JD (Pingou / main app) | `JD` | 599 |
 | Meituan | `Meituan` | 600 |
+| Pinduoduo | `Pinduoduo` | 601 |
+| Tmall | `Tmall` | 602 |
+| Eleme | `Eleme` | 603 |
+| Xianyu | `Xianyu` | 604 |
+| Zhihu | `Zhihu` | 605 |
+| NetEase Cloud Music | `NetEaseMusic` | 606 |
+| NetEase News | `NetEaseNews` | 607 |
+| Tencent Video | `TencentVideo` | 608 |
+| Youku | `Youku` | 609 |
+| Ctrip | `Ctrip` | 610 |
+| WeRead | `WeRead` | 611 |
+| Dianping | `Dianping` | 612 |
+| Mafengwo | `Mafengwo` | 613 |
+| Maoyan | `Maoyan` | 614 |
+| WPS Office | `WPSOffice` | 615 |
 
 ---
 

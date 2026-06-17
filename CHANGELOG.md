@@ -1,5 +1,14 @@
 # ua-browser
 
+## 1.4.3
+
+### Patch Changes
+
+- 新增 15 项 App Webview 检测：拼多多 (`Pinduoduo`)、天猫 (`Tmall`)、饿了么 (`Eleme`)、闲鱼 (`Xianyu`)、知乎 (`Zhihu`)、网易云音乐 (`NetEaseMusic`)、网易新闻 (`NetEaseNews`)、腾讯视频 (`TencentVideo`)、优酷 (`Youku`)、携程 (`Ctrip`)、微信读书 (`WeRead`)、大众点评 (`Dianping`)、马蜂窝 (`Mafengwo`)、猫眼 (`Maoyan`)、WPS Office (`WPSOffice`)
+- 扩展京东检测：除原有 `jdpingou`（京喜）外，新增主 app `jdapp` token 支持
+- `WeRead` 兼容旧版本 `wxread/` token，`Zhihu` 兼容 iOS `osee2unifiedRelease/` token
+- `NetEaseNews` 选用更专属的 `NTESnr/` token，降低与其他 News 类 app 的误命中风险
+
 ## 1.4.2
 
 ### Patch Changes

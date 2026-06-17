@@ -48,10 +48,14 @@ type BrowserName =
   | '360' | '360EE' | '360SE' | 'UC' | 'QQBrowser' | 'QQ' | 'Baidu'
   | 'Maxthon' | 'Sogou' | 'Liebao' | '2345Explorer' | '115Browser'
   | 'TheWorld' | 'XiaoMi' | 'Vivo' | 'Huawei' | 'OPPO' | 'Quark'
-  | 'Qiyu' | 'Wechat' | 'Wechat Miniapp' | 'WechatWork' | 'Taobao'
+  | 'Qiyu' | 'Wechat' | 'WechatWork' | 'Taobao'
   | 'Alipay' | 'Weibo' | 'Douban' | 'Suning' | 'iQiYi' | 'DingTalk'
   | 'Douyin' | 'Bilibili' | 'Kuaishou' | 'Xiaohongshu' | 'Feishu'
-  | 'Toutiao' | 'JD' | 'Meituan' | 'unknown'
+  | 'Toutiao' | 'JD' | 'Meituan'
+  | 'Pinduoduo' | 'Tmall' | 'Eleme' | 'Xianyu' | 'Zhihu'
+  | 'NetEaseMusic' | 'NetEaseNews' | 'TencentVideo' | 'Youku'
+  | 'Ctrip' | 'WeRead' | 'Dianping' | 'Mafengwo' | 'Maoyan' | 'WPSOffice'
+  | 'unknown'
 ```
 
 > **Arc**: UA contains the `Arc/X.X.X` token — pure UA detection. **Brave**: UA is identical to Chrome; only detectable in browser environments via `navigator.brave.isBrave()` (requires `uaBrowser.detect()` or passing `ctx`).

@@ -187,6 +187,60 @@ export const UA = {
   meituan: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MeituanHybrid/1.0'
   },
+  // Additional app webviews
+  jdApp: {
+    android: 'Mozilla/5.0 (Linux; U; Android 12; zh-cn; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.0.0 Mobile Safari/537.36 jdapp;android;11.4.4;network/wifi;model/SM-G991B',
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 jdapp;iPhone;11.4.4;17.4;network/wifi'
+  },
+  pinduoduo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Pinduoduo/6.42.0'
+  },
+  tmall: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 AliApp(TM/10.32.10) WindVane/8.6.0'
+  },
+  eleme: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 AliApp(EM/8.5.13) WindVane/8.6.0'
+  },
+  xianyu: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 AliApp(IDLEFISH/7.10.8) WindVane/8.6.0'
+  },
+  zhihu: {
+    android: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.105 Mobile Safari/537.36 Zhihu/9.46.0',
+    ios: 'osee2unifiedRelease/9.46.0 osee2unifiedReleaseVersion/9.46.0 Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+  },
+  netEaseMusic: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 NeteaseMusic/8.10.0'
+  },
+  netEaseNews: {
+    android: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 NewsApp/79.4 NTESnr/79.4 NetType/wifi-strong',
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 NewsApp/79.4 NTESnr/79.4'
+  },
+  tencentVideo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 qqlive/8.10.65'
+  },
+  youku: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 YoukuApp/10.0.5'
+  },
+  ctrip: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Ctrip/8.59.0'
+  },
+  weRead: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 WeRead/7.2.5',
+    legacy: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 wxread/6.8.0'
+  },
+  dianping: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Dianping/12.10.5'
+  },
+  mafengwo: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Mafengwo/10.5.5'
+  },
+  maoyan: {
+    mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MaoyanApp/9.51.0'
+  },
+  wpsOffice: {
+    android: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 wps_android/13.27/cn.wps.moffice_eng/13.27.0',
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 wps_ios/13.27/cn.wps.moffice_i18n/13.27.0'
+  },
   // Apple platform variants
   visionOS: {
     v1: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1 visionOS/1.0'

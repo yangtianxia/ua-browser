@@ -237,7 +237,7 @@ import {
 Over 70 browsers, 20 operating systems, and 40+ bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
 
 Highlights:
-- **Browsers** — Chrome, Safari, Arc, Brave, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu and more
+- **Browsers** — Chrome, Safari, Arc, Brave, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu, Zhihu, Pinduoduo, JD, NetEase Music, WPS Office and more
 - **OS** — Windows, macOS, Android, iOS, visionOS, tvOS, HarmonyOS, OpenHarmony, Tizen, KaiOS and more
 - **Bots** — GPTBot, ClaudeBot, PerplexityBot, CCBot; messaging bots (Slack, Discord, Telegram, WhatsApp) and more
 - **Devices** — Mobile, Tablet, PC, TV (Samsung Smart TV, HbbTV), Console (PS5, Xbox, Switch), XR (Vision Pro, Quest)
