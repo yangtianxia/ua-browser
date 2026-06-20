@@ -8,7 +8,7 @@ layout: page
 
 # Playground
 
-Enter any User Agent string and see the parsed result in real time. Use the presets or click "Current Browser" to detect automatically.
+Your current browser is detected the moment you open this page. Switch to "API Testing" to pick a preset or paste any UA string and instantly see the full parse result.
 
 </div>
 

@@ -33,6 +33,13 @@ getEnvContext(): Promise<EnvContext>
 | 网络 | `connection.effectiveType`、`connection.saveData` |
 | 音频 | 采样率 |
 | 字体 | 操作系统专属字体可用性探针 |
+| iOS 26 | CSS 特性检测（`isIOS26Plus`），用于修正 iOS 26+ 的冻结 UA |
+
+::: warning iOS 26 版本检测说明
+从 iOS 26 起，Apple 将 UA 中的 `CPU iPhone OS` 冻结在 `18_7`，导致纯 UA 解析返回错误的系统版本。`getEnvContext()` 会通过 CSS 特性检测自动确认是否为 iOS 26+，并将 `osVersion` 修正为 `'26'`（主版本号）。
+
+若需获取精确的小版本号（`26.0`–`26.5`），请使用 [`probeIOS26Version()`](#probeios26version)。
+:::
 
 **示例：**
 
@@ -143,5 +150,53 @@ getLanguage(nav: NavContext): string
 const nav = getNavContext()
 console.log(getLanguage(nav)) // 'zh-CN'
 ```
+
+---
+
+---
+
+## `probeIOS26Version()` {#probeios26version}
+
+通过 CSS / JavaScript 特性检测探测 iOS 26 的精确小版本号。返回 `'26.0'`–`'26.5'` 或 `null`（非 iOS 26+ 环境）。
+
+> **前提**：此函数仅在浏览器环境中有意义。在 Node.js 中始终返回 `null`。
+
+```typescript
+import { probeIOS26Version } from 'ua-browser'
+
+probeIOS26Version(): string | null
+```
+
+**返回值：** `string | null`
+
+**检测原理：**
+
+| 返回值 | 判断依据 |
+| :-- | :-- |
+| `'26.5'` | `Origin` API 存在（Safari 26.5 新增） |
+| `'26.4'` | `PerformanceResourceTiming.finalResponseHeadersStart` 存在 |
+| `'26.3'` | `NavigateEvent.prototype.signal` 存在 |
+| `'26.2'` | `Math.sumPrecise` 存在 |
+| `'26.0'` | `CSS.supports('animation-timeline', 'view()')` 为 `true` |
+| `null` | 非 Safari/WebKit 26+（iOS 18 或以下） |
+
+**示例：**
+
+```typescript
+import { probeIOS26Version, getEnvContext, parseUA } from 'ua-browser'
+
+// B 方案：getEnvContext 自动将 osVersion 修正为 '26'（主版本）
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+console.log(result.osVersion) // '26'（iOS 26+ 时）
+
+// A 方案：精确小版本
+const exact = probeIOS26Version()
+console.log(exact) // '26.5'、'26.4'、'26.3'、'26.2'、'26.0' 或 null
+```
+
+::: tip
+两者结合使用效果最佳：`parseUA` 负责所有字段的综合解析，`probeIOS26Version()` 仅在需要精确 iOS 26 小版本时单独调用。
+:::
 
 ---

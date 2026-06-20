@@ -235,7 +235,7 @@ import {
 内置超过 70 种浏览器、20 种操作系统、40+ 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
 
 部分覆盖：
-- **浏览器** — Chrome、Safari、Arc、Brave、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书、知乎、拼多多、京东、网易云音乐、WPS Office 等
+- **浏览器** — Chrome、Safari、Arc、Brave、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书、知乎、拼多多、京东、网易云音乐、WPS Office；Instagram、Facebook、Twitter/X、TikTok、Snapchat、LinkedIn、Pinterest、Reddit、LINE、WhatsApp 等
 - **操作系统** — Windows、macOS、Android、iOS、visionOS、tvOS、HarmonyOS、OpenHarmony、Tizen、KaiOS 等
 - **AI 爬虫** — GPTBot、ClaudeBot、PerplexityBot、CCBot；消息应用 Bot（Slack、Discord、Telegram、WhatsApp）等
 - **设备** — Mobile、Tablet、PC、TV（含三星 Smart TV、HbbTV 标准）、Console（PS5、Xbox、Switch）、XR（Vision Pro、Quest）

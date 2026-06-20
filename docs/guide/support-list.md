@@ -95,6 +95,21 @@ description: ua-browser 内置 70+ 浏览器、20+ 操作系统、40+ AI 爬虫�
 | 猫眼 | `Maoyan` | 614 |
 | WPS Office | `WPSOffice` | 615 |
 
+### 国外 App 内嵌 Webview
+
+| 应用 | `BrowserName` | 优先级 |
+| :-- | :-- | :--: |
+| Instagram | `Instagram` | 620 |
+| Facebook | `Facebook` | 621 |
+| Twitter / X | `Twitter` | 622 |
+| TikTok（国际版） | `TikTok` | 623 |
+| Snapchat | `Snapchat` | 624 |
+| LinkedIn | `LinkedIn` | 625 |
+| Pinterest | `Pinterest` | 626 |
+| Reddit | `Reddit` | 627 |
+| LINE | `Line` | 628 |
+| WhatsApp | `WhatsApp` | 629 |
+
 ---
 
 ## 操作系统

@@ -127,6 +127,13 @@ describe('parseUA — full pipeline', () => {
     expect(r.engine).toBe('Gecko')
   })
 
+  it('Firefox Focus iOS (new UA — FxiOS without Safari/) → detected via parse.ts override', () => {
+    const r = parseUA(UA.firefox.focusNew)
+    expect(r.browser).toBe('Firefox Focus')
+    expect(r.version).toBe('151')
+    expect(r.os).toBe('iOS')
+  })
+
   it('IE11 on Windows 7', () => {
     const r = parseUA(UA.ie.ie11)
     expect(r.browser).toBe('IE')

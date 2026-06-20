@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useData } from 'vitepress'
 
 const { lang } = useData()
@@ -7,8 +7,9 @@ const isEn = computed(() => lang.value === 'en-US')
 
 const i18n = computed(() => isEn.value ? {
   tabBrowser: 'Current Browser',
-  tabApi: 'API Testing',
+  tabApi: 'UA Parser',
   // Tab 1
+  heroLabel: 'You are currently using',
   loading: 'Detecting…',
   noNavigator: 'Open this page in a browser to detect the current environment.',
   parseLabel: 'uaBrowser()',
@@ -26,11 +27,15 @@ const i18n = computed(() => isEn.value ? {
     language: 'Language', platform: 'Platform',
     bot: 'Bot', headless: 'Headless', webview: 'Webview',
   },
+  ios26Notice: 'iOS 26+ detected via CSS feature probe — UA is frozen at 18.7 by Apple.',
+  ios26Exact: 'Exact version',
+  ios26Probe: 'probeIOS26Version()',
   // Tab 2
+  presets: 'Try a preset',
   placeholder: 'Paste any User Agent string here…',
   useCurrentUA: 'Use current UA',
   runApi: 'Run',
-  apiEmpty: 'Paste a UA string and click "Run" to test all APIs.',
+  apiEmpty: 'Pick a preset above, paste a UA string, or click "Use current UA" to get started.',
   detectorDescs: {
     parseUA:        'Full parse — all fields',
     detectBrowser:  'Browser name + version',
@@ -54,8 +59,9 @@ const i18n = computed(() => isEn.value ? {
   },
 } : {
   tabBrowser: '当前浏览器',
-  tabApi: 'API 测试',
+  tabApi: 'UA 解析',
   // Tab 1
+  heroLabel: '您当前使用的是',
   loading: '检测中…',
   noNavigator: '请在浏览器中打开此页面以检测当前环境。',
   parseLabel: 'uaBrowser()',
@@ -73,11 +79,15 @@ const i18n = computed(() => isEn.value ? {
     language: '语言', platform: '平台',
     bot: '爬虫', headless: 'Headless', webview: 'Webview',
   },
+  ios26Notice: 'iOS 26+ 通过 CSS 特性检测确认——Apple 已将 UA 冻结在 18.7。',
+  ios26Exact: '精确版本',
+  ios26Probe: 'probeIOS26Version()',
   // Tab 2
+  presets: '快速体验',
   placeholder: '在此粘贴任意 User Agent 字符串…',
   useCurrentUA: '使用当前 UA',
   runApi: '运行',
-  apiEmpty: '粘贴 UA 字符串后点击「运行」，即可测试所有 API。',
+  apiEmpty: '选择上方预设、粘贴 UA 字符串，或点击「使用当前 UA」即可开始。',
   detectorDescs: {
     parseUA:        '完整解析——所有字段',
     detectBrowser:  '浏览器名称 + 版本',
@@ -122,19 +132,54 @@ interface ApiResults {
   isWebview:      boolean
 }
 
+// ── Presets ──────────────────────────────────────────────
+const PRESETS = [
+  { key: 'chrome-win',
+    zh: 'Chrome · Windows', en: 'Chrome · Windows',
+    ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
+  { key: 'safari-iphone',
+    zh: 'Safari · iPhone', en: 'Safari · iPhone',
+    ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Mobile/15E148 Safari/604.1' },
+  { key: 'chrome-android',
+    zh: 'Chrome · Android', en: 'Chrome · Android',
+    ua: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36' },
+  { key: 'wechat',
+    zh: '微信', en: 'WeChat',
+    ua: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 MicroMessenger/8.0.37.2380 NetType/WIFI Language/zh_CN' },
+  { key: 'googlebot',
+    zh: 'Googlebot', en: 'Googlebot',
+    ua: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.6998.165 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+  { key: 'tiktok',
+    zh: 'TikTok', en: 'TikTok',
+    ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 musical_ly_21.7.0 JsSdk/2.0 NetType/4G Channel/App Store ByteLocale/en Region/US' },
+]
+
 // ── Tab state ────────────────────────────────────────────
-const activeTab = ref<'browser' | 'api'>('browser')
+type TabId = 'browser' | 'api'
+const activeTab = ref<TabId>('browser')
+
+function syncTabFromHash() {
+  if (typeof window === 'undefined') return
+  const h = window.location.hash.slice(1)
+  if (h === 'api' || h === 'browser') activeTab.value = h as TabId
+}
+
+function setTab(tab: TabId) {
+  activeTab.value = tab
+  if (typeof window !== 'undefined') history.replaceState(null, '', `#${tab}`)
+}
 
 // ── Tab 1: Current Browser ───────────────────────────────
 const compareResult    = ref<CompareResult | null>(null)
 const browserDetecting = ref(false)
 
-// ── Tab 2: API Testing ───────────────────────────────────
+// ── Tab 2: UA Parser ─────────────────────────────────────
 const apiUaInput = ref('')
 const apiResults = ref<ApiResults | null>(null)
 
 // ── Module handles ───────────────────────────────────────
 const loaded = ref(false)
+let _probeIOS26:     (() => string | null) | null = null
 let _detect:         (() => Promise<ParseResult>) | null = null
 let _parseUA:        ((ua: string) => ParseResult) | null = null
 let _uaBrowser:      (() => ParseResult) | null = null
@@ -148,7 +193,10 @@ let _detectHeadless: ((ua: string) => boolean) | null = null
 let _isWebview:      ((ua: string) => boolean) | null = null
 
 onMounted(async () => {
+  syncTabFromHash()
+  window.addEventListener('hashchange', syncTabFromHash)
   const mod = await import('ua-browser')
+  _probeIOS26     = (mod as Record<string, unknown>)['probeIOS26Version'] as (() => string | null) ?? null
   _detect         = mod.default.detect
   _parseUA        = mod.parseUA
   _uaBrowser      = mod.default
@@ -162,6 +210,14 @@ onMounted(async () => {
   _isWebview      = mod.isWebview
   loaded.value = true
   runDetectBrowser()
+  if (typeof navigator !== 'undefined') {
+    apiUaInput.value = navigator.userAgent
+    runApi()
+  }
+})
+
+onUnmounted(() => {
+  if (typeof window !== 'undefined') window.removeEventListener('hashchange', syncTabFromHash)
 })
 
 // ── Tab 1 functions ──────────────────────────────────────
@@ -204,7 +260,17 @@ function onApiInput() {
   apiResults.value = null
 }
 
+function usePreset(ua: string) {
+  apiUaInput.value = ua
+  setTab('api')
+  if (loaded.value) runApi()
+}
+
 // ── Shared helpers ───────────────────────────────────────
+function omitConnectionType<T extends { connectionType?: unknown }>(r: T): Omit<T, 'connectionType'> {
+  const { connectionType: _, ...rest } = r
+  return rest
+}
 function buildTags(r: ParseResult) {
   const t = i18n.value
   const list: { label: string; value: string; type: string }[] = []
@@ -237,6 +303,30 @@ const detectFields = computed(() => compareResult.value ? buildFields(compareRes
 const uaTags       = computed(() => compareResult.value ? buildTags(compareResult.value.ua)       : [])
 const detectTags   = computed(() => compareResult.value ? buildTags(compareResult.value.detect)   : [])
 
+const ios26ExactVersion = computed(() => _probeIOS26?.() ?? null)
+const showIOS26Notice = computed(() => {
+  const r = compareResult.value?.detect
+  return r?.os === 'iOS' && r?.osVersion === '26'
+})
+
+const summaryLine = computed(() => {
+  const r = compareResult.value?.detect
+  if (!r) return ''
+  const browser = [r.browser, r.version].filter(v => v && v !== 'unknown').join(' ')
+  let os = ''
+  if (r.os && r.os !== 'unknown') {
+    if (r.osVersionName && r.osVersionName !== 'unknown') {
+      os = `${r.os} ${r.osVersionName}`
+    } else if (r.osVersion && r.osVersion !== 'unknown') {
+      os = `${r.os} ${r.osVersion}`
+    } else {
+      os = r.os
+    }
+  }
+  const arch = r.arch !== 'unknown' ? r.arch : ''
+  return [browser, os, arch].filter(Boolean).join(' · ')
+})
+
 const parseUAFields = computed(() => apiResults.value ? buildFields(apiResults.value.parseUA) : [])
 const parseUATags   = computed(() => apiResults.value ? buildTags(apiResults.value.parseUA)   : [])
 
@@ -256,11 +346,11 @@ const diffKeys = computed(() => {
     <div class="tab-bar">
       <button
         :class="['tab', activeTab === 'browser' && 'tab--active']"
-        @click="activeTab = 'browser'"
+        @click="setTab('browser')"
       >{{ i18n.tabBrowser }}</button>
       <button
         :class="['tab', activeTab === 'api' && 'tab--active']"
-        @click="activeTab = 'api'"
+        @click="setTab('api')"
       >{{ i18n.tabApi }}</button>
     </div>
 
@@ -268,6 +358,19 @@ const diffKeys = computed(() => {
     <template v-if="activeTab === 'browser'">
 
       <div v-if="compareResult" class="result-area">
+        <div v-if="summaryLine" class="browser-hero">
+          <span class="browser-hero-label">{{ i18n.heroLabel }}</span>
+          <span class="browser-hero-value">{{ summaryLine }}</span>
+        </div>
+
+        <div v-if="showIOS26Notice" class="ios26-notice">
+          <span class="ios26-notice-text">{{ i18n.ios26Notice }}</span>
+          <span class="ios26-notice-probe">
+            <code>{{ i18n.ios26Probe }}</code>
+            &nbsp;→&nbsp;
+            <strong>{{ ios26ExactVersion ?? '…' }}</strong>
+          </span>
+        </div>
         <div v-if="diffKeys.size > 0" class="diff-hint">
           <span class="diff-dot" />{{ i18n.diffHint }}
         </div>
@@ -329,10 +432,10 @@ const diffKeys = computed(() => {
         <details class="result-raw">
           <summary>{{ i18n.rawJson }}</summary>
           <pre>// {{ i18n.parseLabel }}
-{{ JSON.stringify(compareResult.ua, null, 2) }}
+{{ JSON.stringify(omitConnectionType(compareResult.ua), null, 2) }}
 
 // {{ i18n.detectLabel }}
-{{ JSON.stringify(compareResult.detect, null, 2) }}</pre>
+{{ JSON.stringify(omitConnectionType(compareResult.detect), null, 2) }}</pre>
         </details>
       </div>
 
@@ -343,8 +446,21 @@ const diffKeys = computed(() => {
 
     </template>
 
-    <!-- ── Tab 2: API Testing ────────────────────────────── -->
+    <!-- ── Tab 2: UA Parser ──────────────────────────────── -->
     <template v-else>
+
+      <div class="preset-area">
+        <span class="preset-label">{{ i18n.presets }}</span>
+        <div class="preset-list">
+          <button
+            v-for="p in PRESETS"
+            :key="p.key"
+            class="preset-btn"
+            :class="{ 'preset-btn--active': apiUaInput === p.ua }"
+            @click="usePreset(p.ua)"
+          >{{ isEn ? p.en : p.zh }}</button>
+        </div>
+      </div>
 
       <div class="input-area">
         <textarea
@@ -589,6 +705,112 @@ const diffKeys = computed(() => {
 .tab--active {
   color: var(--vp-c-brand-1);
   border-bottom-color: var(--vp-c-brand-1);
+}
+
+/* ── Browser hero (Tab 1) ───────────────────────────────── */
+
+.browser-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  margin-bottom: 14px;
+}
+
+.browser-hero-label {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  font-weight: 400;
+}
+
+.browser-hero-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  letter-spacing: -0.01em;
+}
+
+/* ── iOS 26 notice ──────────────────────────────────────── */
+
+.ios26-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: var(--vp-c-brand-soft);
+  border: 1px solid var(--vp-c-brand-2);
+  font-size: 12px;
+}
+
+.ios26-notice-text {
+  color: var(--vp-c-text-2);
+  flex: 1;
+  min-width: 200px;
+}
+
+.ios26-notice-probe {
+  color: var(--vp-c-text-1);
+  white-space: nowrap;
+}
+
+.ios26-notice-probe code {
+  font-size: 11px;
+  background: none;
+  padding: 0;
+  color: var(--vp-c-brand-1);
+}
+
+/* ── Presets (Tab 2) ────────────────────────────────────── */
+
+.preset-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 11px;
+  color: var(--vp-c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-btn {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.preset-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.preset-btn--active {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
 }
 
 /* ── Input area (Tab 2) ─────────────────────────────────── */

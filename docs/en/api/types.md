@@ -55,6 +55,8 @@ type BrowserName =
   | 'Pinduoduo' | 'Tmall' | 'Eleme' | 'Xianyu' | 'Zhihu'
   | 'NetEaseMusic' | 'NetEaseNews' | 'TencentVideo' | 'Youku'
   | 'Ctrip' | 'WeRead' | 'Dianping' | 'Mafengwo' | 'Maoyan' | 'WPSOffice'
+  | 'Instagram' | 'Facebook' | 'Twitter' | 'TikTok' | 'Snapchat'
+  | 'LinkedIn' | 'Pinterest' | 'Reddit' | 'Line' | 'WhatsApp'
   | 'unknown'
 ```
 
