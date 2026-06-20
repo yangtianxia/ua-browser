@@ -39,7 +39,9 @@ export const UA = {
   },
   opera: {
     modern: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 OPR/110.0.0.0',
-    legacy: 'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.17'
+    legacy: 'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.17',
+    // iOS 26+: CPU iPhone OS frozen at 18_7; Version/ carries real iOS version (Apple provides to all browsers)
+    ios26: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1 OPT/6.5.3'
   },
   // Chinese browsers
   wechat: {
@@ -55,10 +57,12 @@ export const UA = {
     ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 MQQBrowser/16.3.2 Mobile/15E148 Safari/604.1'
   },
   uc: {
-    mobile: 'Mozilla/5.0 (Linux; U; Android 9; zh-CN; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 UCBrowser/13.4.2.1306 Mobile Safari/537.36'
+    mobile: 'Mozilla/5.0 (Linux; U; Android 9; zh-CN; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 UCBrowser/13.4.2.1306 Mobile Safari/537.36',
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_5 like Mac OS X; en-US) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/23F77 UCMobile/12.2.0.1260 Mobile'
   },
   baidu: {
-    mobile: 'Mozilla/5.0 (Linux; Android 9; SM-G965F Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36 baiduboxapp/12.19.0.10'
+    mobile: 'Mozilla/5.0 (Linux; Android 9; SM-G965F Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36 baiduboxapp/12.19.0.10',
+    ios: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 SP-engine/3.59.0 main/1.0 baiduboxapp/15.64.0.10 (Baidu; P2 26.5) NABar/1.0 themeUA=Theme/default'
   },
   dingtalk: {
     mobile: 'Mozilla/5.0 (Linux; Android 11; SM-A515F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.210 Mobile Safari/537.36 DingTalk/6.0.30'
@@ -157,8 +161,10 @@ export const UA = {
   harmonyOs: {
     legacy: 'Mozilla/5.0 (Linux; Android 10; HarmonyOS; ANA-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 HuaweiBrowser/11.0.8.301 Mobile Safari/537.36',
     android11: 'Mozilla/5.0 (Linux; Android 11; NOH-AN00; HarmonyOS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.48 Mobile Safari/537.36',
+    android12: 'Mozilla/5.0 (Linux; Android 12; HarmonyOS; DCO-AL00; HMSCore 6.14.0.322) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.196 HuaweiBrowser/15.0.9.300 Mobile Safari/537.36',
     android13: 'Mozilla/5.0 (Linux; Android 13; HarmonyOS; HUAWEI Mate60Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
     android14: 'Mozilla/5.0 (Linux; Android 14; HarmonyOS; HUAWEI Pura70) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    android15: 'Mozilla/5.0 (Linux; Android 15; HarmonyOS; JAD-AL50) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36',
     next: 'Mozilla/5.0 (Linux; HarmonyOS 5.0.0; HUAWEI GT5 Pro Build/HUAWEIAGT5Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
     arkWeb: 'Mozilla/5.0 (Linux; HarmonyOS 5.0; Huawei ArkWeb/4.1.6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
   },

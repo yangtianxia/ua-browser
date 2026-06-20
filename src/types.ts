@@ -35,6 +35,7 @@ export type BrowserName =
   | '360EE'
   | '360SE'
   | 'UC'
+  | 'UCMobile'
   | 'QQBrowser'
   | 'QQ'
   | 'Baidu'

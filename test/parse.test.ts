@@ -80,6 +80,15 @@ describe('parseUA — full pipeline', () => {
     expect(r.osVersion).toBe('14.3') // real macOS version from UA, not Safari version
   })
 
+  it('Opera on iOS 26 — CPU iPhone OS frozen at 18_7, Version/ reflects real version', () => {
+    const r = parseUA(UA.opera.ios26)
+    expect(r.browser).toBe('Opera')
+    expect(r.version).toBe('6.5.3')
+    expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('26.5')
+    expect(r.isWebview).toBe(false)
+  })
+
   it('Chrome on iOS 26 — CriOS reports real OS version', () => {
     const r = parseUA(UA.chrome.crios26)
     expect(r.browser).toBe('Chrome')
@@ -206,6 +215,22 @@ describe('parseUA — webview detection', () => {
 
   it('no ; wv → isWebview: false', () => {
     expect(parseUA(UA.chrome.android).isWebview).toBe(false)
+  })
+
+  it('Baidu iOS (frozen CPU, (Baidu; P2 26.5) token) → isWebview: false, osVersion: 26.5', () => {
+    const r = parseUA(UA.baidu.ios)
+    expect(r.browser).toBe('Baidu')
+    expect(r.isWebview).toBe(false)
+    expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('26.5')
+  })
+
+  it('UC浏览器 iOS (UCMobile, no Safari/) → isWebview: false, browser: UCMobile, osVersion: 26.5', () => {
+    const r = parseUA(UA.uc.ios)
+    expect(r.browser).toBe('UCMobile')
+    expect(r.isWebview).toBe(false)
+    expect(r.os).toBe('iOS')
+    expect(r.osVersion).toBe('26.5')
   })
 })
 
