@@ -1,5 +1,18 @@
 # ua-browser
 
+## 1.4.5
+
+### Patch Changes
+
+- 新增 10 项国外 App Webview 检测：Instagram、Facebook、Twitter/X、TikTok（国际版）、Snapchat、LinkedIn、Pinterest、Reddit、LINE、WhatsApp
+- 新增 `probeIOS26Version()`：通过 CSS/JS 特性精确探测 iOS 26.x 小版本（26.0–26.5）
+- `getEnvContext()` 新增 `isIOS26Plus` 检测，UA 冻结时将 `osVersion` 自动修正为 `'26'`
+- iOS `Version/` 覆盖扩展到所有第三方浏览器（修复 Opera 等显示 18.7 的问题）
+- 修复 Firefox Focus iOS 新版检测：新版去掉了 `Focus/` token，改为 `FxiOS/ + 无 Safari/` 判断
+- 修复 Brave 误判：检测移至 360 之后，限制 `browser === 'Chrome' || 'Safari'`
+- 新增 360 Mobile iOS 检测：通过 `window__$_qihoo360_$__` 属性信号识别
+- `UCMobile` 独立拆分为 `'UCMobile'` 条目（区别于国际版 `'UC'`）
+
 ## 1.4.4
 
 ### Patch Changes

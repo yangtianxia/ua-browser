@@ -1,5 +1,18 @@
 # ua-browser
 
+## 1.4.5
+
+### Patch Changes
+
+- Added 10 foreign app webview detections: Instagram, Facebook, Twitter/X, TikTok (International), Snapchat, LinkedIn, Pinterest, Reddit, LINE, WhatsApp
+- Added `probeIOS26Version()`: detects the exact iOS 26.x minor version via CSS/JS feature probes (26.0–26.5)
+- `getEnvContext()` now sets `isIOS26Plus` via CSS feature detection; automatically corrects frozen `osVersion` to `'26'`
+- Extended iOS `Version/` override to all third-party browsers (fixes Opera and others showing 18.7)
+- Fixed Firefox Focus iOS detection: newer versions dropped `Focus/` token; now detected via `FxiOS/` + no `Safari/`
+- Fixed Brave false detection: check moved after 360 disambiguation, restricted to `browser === 'Chrome' || 'Safari'`
+- Added 360 Mobile iOS detection via `window__$_qihoo360_$__` window properties
+- Split `UCMobile` into its own `'UCMobile'` entry (distinct from international `'UC'`)
+
 ## 1.4.4
 
 ### Patch Changes
