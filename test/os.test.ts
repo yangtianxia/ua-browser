@@ -85,10 +85,16 @@ describe('detectOs', () => {
     expect(r.osVersion).toBe('2')
   })
 
-  it('HarmonyOS with Android 11 base → HarmonyOS 3', () => {
+  it('HarmonyOS with Android 11 base → HarmonyOS 2', () => {
     const r = detectOs(UA.harmonyOs.android11)
     expect(r.os).toBe('HarmonyOS')
-    expect(r.osVersion).toBe('3')
+    expect(r.osVersion).toBe('2')
+  })
+
+  it('HarmonyOS with Android 12 base → HarmonyOS 4', () => {
+    const r = detectOs(UA.harmonyOs.android12)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('4')
   })
 
   it('HarmonyOS with Android 13 base → HarmonyOS 4', () => {
@@ -99,6 +105,12 @@ describe('detectOs', () => {
 
   it('HarmonyOS with Android 14 base → HarmonyOS 4', () => {
     const r = detectOs(UA.harmonyOs.android14)
+    expect(r.os).toBe('HarmonyOS')
+    expect(r.osVersion).toBe('4')
+  })
+
+  it('HarmonyOS with Android 15 base → HarmonyOS 4', () => {
+    const r = detectOs(UA.harmonyOs.android15)
     expect(r.os).toBe('HarmonyOS')
     expect(r.osVersion).toBe('4')
   })

@@ -10,7 +10,7 @@ export type { EnvOption, BrowserName, OsName, EngineName, DeviceName, ArchName, 
 export { parseUA } from './parse.js'
 export { getLanguage, getNavContext } from './utils/navigator.js'
 export { getWindowsVersion } from './utils/windows-version.js'
-export { getEnvContext, type EnvContext, type UAHighEntropyValues } from './utils/env-context.js'
+export { getEnvContext, probeIOS26Version, type EnvContext, type UAHighEntropyValues } from './utils/env-context.js'
 export { detectBot } from './detectors/bot.js'
 export type { BotDef } from './detectors/bot.js'
 export { detectBrowser } from './detectors/browser.js'

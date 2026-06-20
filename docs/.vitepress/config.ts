@@ -25,7 +25,7 @@ export default defineConfig({
       lang: 'zh-CN',
       themeConfig: {
         nav: [
-          { text: '指南', link: '/guide/introduction' },
+          { text: '指南', link: '/guide/introduction', activeMatch: '/(guide|api)/' },
           { text: 'Playground', link: '/playground' },
           { text: '更新日志', link: '/changelog' },
           { text: '项目', items: [
@@ -56,7 +56,7 @@ export default defineConfig({
           },
         ],
 
-        outline: { level: 2, label: '本页目录' },
+        outline: { level: [2, 3], label: '本页目录' },
       },
     },
 
@@ -65,7 +65,7 @@ export default defineConfig({
       lang: 'en-US',
       themeConfig: {
         nav: [
-          { text: 'Guide', link: '/en/guide/introduction' },
+          { text: 'Guide', link: '/en/guide/introduction', activeMatch: '/en/(guide|api)/' },
           { text: 'Playground', link: '/en/playground' },
           { text: 'Changelog', link: '/en/changelog' },
           { text: 'Projects', items: [
@@ -95,7 +95,7 @@ export default defineConfig({
             ],
           },
         ],
-        outline: { level: 2, label: 'On this page' },
+        outline: { level: [2, 3], label: 'On this page' },
       },
     },
   },

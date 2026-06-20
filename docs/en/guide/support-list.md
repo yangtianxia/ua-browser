@@ -95,6 +95,21 @@ Detection priority runs from lowest to highest. When multiple rules match the sa
 | Maoyan | `Maoyan` | 614 |
 | WPS Office | `WPSOffice` | 615 |
 
+### Foreign App Webviews
+
+| App | `BrowserName` | Priority |
+| :-- | :-- | :--: |
+| Instagram | `Instagram` | 620 |
+| Facebook | `Facebook` | 621 |
+| Twitter / X | `Twitter` | 622 |
+| TikTok (International) | `TikTok` | 623 |
+| Snapchat | `Snapchat` | 624 |
+| LinkedIn | `LinkedIn` | 625 |
+| Pinterest | `Pinterest` | 626 |
+| Reddit | `Reddit` | 627 |
+| LINE | `Line` | 628 |
+| WhatsApp | `WhatsApp` | 629 |
+
 ---
 
 ## Operating Systems

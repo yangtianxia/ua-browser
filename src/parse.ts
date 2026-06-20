@@ -205,10 +205,6 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   let browser: BrowserName = rawBrowser
   let version = rawVersion
 
-  // Brave cannot be detected via UA (it mimics Chrome). Override when the
-  // browser-side navigator.brave.isBrave() signal is available.
-  if (options.ctx?.hasBrave) browser = 'Brave'
-
   // ── Post-detection overrides ────────────────────────────────────────────────
 
   // 360 browser disambiguation via Chrome global APIs and MIME types.
@@ -254,6 +250,20 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     }
   }
 
+  // 360 Mobile Browser on iOS: no MIME plugins on mobile, but injects proprietary
+  // window properties (window__$_qihoo360_$__dayMode / nightMode) detectable via ctx.
+  // Restricted to iOS + Safari UA since that's the only confirmed environment.
+  if (options.ctx?.has360Mobile && os === 'iOS' && browser === 'Safari') {
+    browser = '360'
+    version = 'unknown'
+  }
+
+  // Brave cannot be detected via UA: it mimics Chrome on Android and Safari on iOS.
+  // Only override when browser is still the generic base (Chrome or Safari) — this
+  // ensures 360/Edge/Opera/etc. detected above are not replaced, even if a browser
+  // falsely exposes navigator.brave.isBrave().
+  if (options.ctx?.hasBrave && (browser === 'Chrome' || browser === 'Safari')) browser = 'Brave'
+
   // Baidu UA can include Opera token — Opera takes priority
   if (browser === 'Baidu' && /(Opera|OPR|OPT)/.test(ua)) {
     browser = 'Opera'
@@ -266,13 +276,37 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     browser = 'Firefox Nightly'
   }
 
+  // Firefox Focus iOS: newer versions dropped the Focus/ token and use Version/ instead of Safari/.
+  // Detected by: FxiOS/ present (iOS-only) + Safari/ absent (Focus omits it, Firefox iOS always includes it).
+  if (browser === 'Firefox' && /\bFxiOS\//.test(ua) && !/\bSafari\//.test(ua)) {
+    browser = 'Firefox Focus'
+    const m = /\bFxiOS\/([\d.]+)/.exec(ua)
+    if (m) version = m[1]
+  }
+
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
-  // The Version/ token reliably reflects the real Safari/iOS version.
-  if (os === 'iOS' && browser === 'Safari') {
-    const m = /Version\/([\d.]+)/.exec(ua)
+  // \bVersion/ (word boundary excludes ReleaseVersion/ etc.) carries the real iOS version.
+  // Apple provides this token to all third-party browsers, not just Safari.
+  if (os === 'iOS') {
+    const m = /\bVersion\/([\d.]+)/.exec(ua)
     if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
       osVersion = m[1]
     }
+  }
+
+  // Baidu iOS freezes CPU iPhone OS but embeds real version in "(Baidu; P<n> <version>)".
+  // Must run before the isIOS26Plus fallback so its precise value isn't overwritten by '26'.
+  if (os === 'iOS' && browser === 'Baidu') {
+    const m = /\(Baidu; P\d+ ([\d.]+)\)/.exec(ua)
+    if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
+      osVersion = m[1]
+    }
+  }
+
+  // iOS 26+ fallback: when UA is frozen at ≤18 and no Version/ token is present (e.g. WKWebView,
+  // Firefox iOS), CSS feature detection on the ctx confirms Safari/WebKit 26+.
+  if (os === 'iOS' && parseInt(osVersion, 10) <= 18 && options.ctx?.isIOS26Plus) {
+    osVersion = '26'
   }
 
   // macOS 26+: Apple unified version numbering — Safari major version = macOS major version.
@@ -338,6 +372,13 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
       })()
     : osVersionName
 
+  // Known independent browsers (non-app, non-unknown) are never webviews, even when
+  // their iOS UA lacks Version/ and Safari/ tokens. Android "; wv" is always reliable.
+  const rawIsWebview = isWebview(ua)
+  const finalIsWebview = /; wv/.test(ua)
+    ? true
+    : rawIsWebview && (browser === 'unknown' || browserType === 'app')
+
   return {
     browser,
     version,
@@ -352,7 +393,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     vendor,
     model,
     arch,
-    isWebview: isWebview(ua),
+    isWebview: finalIsWebview,
     isHeadless,
     isBot,
     botName,

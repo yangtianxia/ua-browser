@@ -35,6 +35,10 @@ export interface EnvContext extends NavContext {
   highEntropyData?: UAHighEntropyValues
   windowsVersion?: string | null
   hasBrave?: boolean
+  /** true when running on Safari/WebKit 26+ (iOS 26 / macOS 26), detected via CSS feature probe. */
+  isIOS26Plus?: boolean
+  /** true when window.__$_qihoo360_$__ properties are present — 360 Mobile Browser signal. */
+  has360Mobile?: boolean
 }
 
 // OS-specific system fonts used to cross-confirm UA-based OS detection.
@@ -176,6 +180,15 @@ export async function getEnvContext(): Promise<EnvContext> {
     ctx.deviceMemory = navigator.deviceMemory
   }
 
+  if (typeof CSS !== 'undefined') {
+    ctx.isIOS26Plus = CSS.supports('animation-timeline', 'view()')
+  }
+
+  if (typeof window !== 'undefined') {
+    const w = window as unknown as Record<string, unknown>
+    ctx.has360Mobile = 'window__$_qihoo360_$__dayMode' in w || 'window__$_qihoo360_$__nightMode' in w
+  }
+
   if (typeof window !== 'undefined') {
     ctx.devicePixelRatio  = window.devicePixelRatio
     ctx.screenWidth       = window.screen?.width
@@ -221,4 +234,40 @@ export async function getEnvContext(): Promise<EnvContext> {
   }
 
   return ctx
+}
+
+/**
+ * Probe the iOS/macOS Safari minor version within the 26.x series via CSS/JS feature detection.
+ *
+ * Returns the detected version string ('26.0'–'26.5') or null if not running on Safari 26+.
+ * Detection is ordered from latest to earliest; the first matching check wins.
+ * Intended as a supplement to UA parsing when the UA string is frozen at iOS 18.x.
+ *
+ * Feature map (each check is first available in that version):
+ *   26.5 — Origin API
+ *   26.4 — PerformanceResourceTiming.finalResponseHeadersStart
+ *   26.3 — NavigateEvent.prototype.signal
+ *   26.2 — Math.sumPrecise
+ *   26.0 — CSS animation-timeline: view() (Scroll-driven Animations)
+ */
+export function probeIOS26Version(): string | null {
+  try {
+    if (typeof CSS === 'undefined' || !CSS.supports('animation-timeline', 'view()')) return null
+
+    if (typeof (globalThis as Record<string, unknown>)['Origin'] !== 'undefined') return '26.5'
+
+    if (
+      typeof PerformanceResourceTiming !== 'undefined' &&
+      'finalResponseHeadersStart' in PerformanceResourceTiming.prototype
+    ) return '26.4'
+
+    const NavigateEvent = (globalThis as Record<string, unknown>)['NavigateEvent'] as { prototype?: Record<string, unknown> } | null | undefined
+    if (NavigateEvent?.prototype != null && 'signal' in NavigateEvent.prototype) return '26.3'
+
+    if (typeof (Math as unknown as Record<string, unknown>)['sumPrecise'] === 'function') return '26.2'
+
+    return '26.0'
+  } catch {
+    return null
+  }
 }

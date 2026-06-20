@@ -58,7 +58,7 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('125.0')
     })
 
-    it('detects Firefox Focus', () => {
+    it('detects Firefox Focus (old UA with Focus/ token)', () => {
       const r = detectBrowser(UA.firefox.focus)
       expect(r.browser).toBe('Firefox Focus')
       expect(r.version).toBe('121.0')
@@ -130,6 +130,12 @@ describe('detectBrowser', () => {
       const r = detectBrowser(UA.uc.mobile)
       expect(r.browser).toBe('UC')
       expect(r.version).toBe('13.4.2.1306')
+    })
+
+    it('detects UC浏览器 iOS (UCMobile token)', () => {
+      const r = detectBrowser(UA.uc.ios)
+      expect(r.browser).toBe('UCMobile')
+      expect(r.version).toBe('12.2.0.1260')
     })
 
     it('detects Baidu box app', () => {
@@ -562,5 +568,118 @@ describe('detectBrowser', () => {
       const r = detectBrowser(UA.node)
       expect(r.browser).toBe('unknown')
     })
+  })
+})
+
+describe('detectBrowser — foreign app webviews', () => {
+  it('detects Instagram on Android', () => {
+    const r = detectBrowser(UA.instagram.android)
+    expect(r.browser).toBe('Instagram')
+    expect(r.version).toBe('146.0.0.27.125')
+  })
+
+  it('detects Instagram on iOS', () => {
+    const r = detectBrowser(UA.instagram.ios)
+    expect(r.browser).toBe('Instagram')
+    expect(r.version).toBe('309.1.1.28.108')
+  })
+
+  it('detects Facebook on Android (FB_IAB token)', () => {
+    const r = detectBrowser(UA.facebook.android)
+    expect(r.browser).toBe('Facebook')
+    expect(r.version).toBe('312.0.0.37.119')
+  })
+
+  it('detects Facebook on iOS (FBAN token)', () => {
+    const r = detectBrowser(UA.facebook.ios)
+    expect(r.browser).toBe('Facebook')
+    expect(r.version).toBe('309.0.0.44.118')
+  })
+
+  it('detects Twitter on Android', () => {
+    const r = detectBrowser(UA.twitter.android)
+    expect(r.browser).toBe('Twitter')
+  })
+
+  it('detects Twitter on iOS', () => {
+    const r = detectBrowser(UA.twitter.ios)
+    expect(r.browser).toBe('Twitter')
+    expect(r.version).toBe('11.67')
+  })
+
+  it('detects TikTok on Android (musical_ly + AppVersion)', () => {
+    const r = detectBrowser(UA.tiktok.android)
+    expect(r.browser).toBe('TikTok')
+    expect(r.version).toBe('36.4.4')
+  })
+
+  it('detects TikTok on iOS (musical_ly token)', () => {
+    const r = detectBrowser(UA.tiktok.ios)
+    expect(r.browser).toBe('TikTok')
+    expect(r.version).toBe('21.7.0')
+  })
+
+  it('detects Snapchat on Android', () => {
+    const r = detectBrowser(UA.snapchat.android)
+    expect(r.browser).toBe('Snapchat')
+    expect(r.version).toBe('13.17.0.42')
+  })
+
+  it('detects Snapchat on iOS', () => {
+    const r = detectBrowser(UA.snapchat.ios)
+    expect(r.browser).toBe('Snapchat')
+    expect(r.version).toBe('13.95.1.0')
+  })
+
+  it('detects LinkedIn on Android', () => {
+    const r = detectBrowser(UA.linkedin.android)
+    expect(r.browser).toBe('LinkedIn')
+    expect(r.version).toBe('2.227.56')
+  })
+
+  it('detects LinkedIn on iOS', () => {
+    const r = detectBrowser(UA.linkedin.ios)
+    expect(r.browser).toBe('LinkedIn')
+    expect(r.version).toBe('9.30.7209.4')
+  })
+
+  it('detects Pinterest on Android', () => {
+    const r = detectBrowser(UA.pinterest.android)
+    expect(r.browser).toBe('Pinterest')
+  })
+
+  it('detects Pinterest on iOS', () => {
+    const r = detectBrowser(UA.pinterest.ios)
+    expect(r.browser).toBe('Pinterest')
+  })
+
+  it('detects Reddit on Android', () => {
+    const r = detectBrowser(UA.reddit.android)
+    expect(r.browser).toBe('Reddit')
+    expect(r.version).toBe('2024.38.0')
+  })
+
+  it('detects Line on Android', () => {
+    const r = detectBrowser(UA.line.android)
+    expect(r.browser).toBe('Line')
+    expect(r.version).toBe('11.22.1')
+  })
+
+  it('detects Line on iOS', () => {
+    const r = detectBrowser(UA.line.ios)
+    expect(r.browser).toBe('Line')
+    expect(r.version).toBe('26.0.2')
+  })
+
+  it('detects WhatsApp on Android', () => {
+    const r = detectBrowser(UA.whatsapp.android)
+    expect(r.browser).toBe('WhatsApp')
+    expect(r.version).toBe('2.24.24.85')
+  })
+
+  it('detects WhatsApp on iOS', () => {
+    const r = detectBrowser(UA.whatsapp.ios)
+    expect(r.browser).toBe('WhatsApp')
+    expect(r.version).toBe('2.26.8.73')
   })
 })

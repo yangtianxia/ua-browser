@@ -50,6 +50,7 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
     chromeLookup: { '86': '13.0', '78': '12.0', '69': '11.0', '63': '9.5',
                     '55': '9.0', '50': '8.7', '30': '7.5' } },
   { name: 'UC',            priority: 330, detect: /(UCBrowser|UBrowser|UCWEB)/, versionPattern: /UC?Browser\/([\d.]+)/ },
+  { name: 'UCMobile',     priority: 331, detect: /UCMobile\//,                versionPattern: /UCMobile\/([\d.]+)/ },
   { name: 'QQBrowser',     priority: 340, detect: /(MQQBrowser|QQBrowser)/,  versionPattern: [/MQQBrowser\/([\d.]+)/, /QQBrowser\/([\d.]+)/] },
   { name: 'QQ',            priority: 345, detect: /QQ\//,                versionPattern: /QQ\/([\d.]+)/ },
   { name: 'Baidu',         priority: 350, detect: /(Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD)/, versionPattern: [/BIDUBrowser[\s/]([\d.]+)/, /baiduboxapp\/([\d.]+)/] },
@@ -100,5 +101,17 @@ export const BROWSER_DEFS: readonly BrowserDef[] = [
   { name: 'Dianping',      priority: 612, detect: /Dianping\//,           versionPattern: /Dianping\/([\d.]+)/ },
   { name: 'Mafengwo',      priority: 613, detect: /Mafengwo\//,           versionPattern: /Mafengwo\/([\d.]+)/ },
   { name: 'Maoyan',        priority: 614, detect: /MaoyanApp\//,          versionPattern: /MaoyanApp\/([\d.]+)/ },
-  { name: 'WPSOffice',     priority: 615, detect: /(wps_android|wps_ios|WPSOffice)\//i, versionPattern: [/wps_(?:android|ios)\/([\d.]+)/i, /WPSOffice\/([\d.]+)/i] }
+  { name: 'WPSOffice',     priority: 615, detect: /(wps_android|wps_ios|WPSOffice)\//i, versionPattern: [/wps_(?:android|ios)\/([\d.]+)/i, /WPSOffice\/([\d.]+)/i] },
+
+  // ── Foreign app webviews ──────────────────────────────────────────────────
+  { name: 'Instagram',   priority: 620, detect: /\bInstagram\b/,       versionPattern: /\bInstagram\s+([\d.]+)/ },
+  { name: 'Facebook',    priority: 621, detect: /\bFB_IAB\b|\bFBAN\b/, versionPattern: /FBAV\/([\d.]+)/ },
+  { name: 'Twitter',     priority: 622, detect: /\bTwitter/,            versionPattern: /Twitter for iPhone\/([\d.]+)/ },
+  { name: 'TikTok',      priority: 623, detect: /musical_ly/,           versionPattern: [/AppVersion\/([\d.]+)/, /musical_ly_([\d.]+)/] },
+  { name: 'Snapchat',    priority: 624, detect: /\bSnapchat\//,         versionPattern: /Snapchat\/([\d.]+)/ },
+  { name: 'LinkedIn',    priority: 625, detect: /LinkedInApp/,          versionPattern: /\[LinkedInApp\]\/([\d.]+)/ },
+  { name: 'Pinterest',   priority: 626, detect: /\[Pinterest\//,        versionPattern: null },
+  { name: 'Reddit',      priority: 627, detect: /\bReddit\//,           versionPattern: /Reddit\/Version ([\d.]+)/ },
+  { name: 'Line',        priority: 628, detect: /\bLine\//,             versionPattern: /Line\/([\d.]+)/ },
+  { name: 'WhatsApp',    priority: 629, detect: /\bWhatsApp\//,         versionPattern: /WhatsApp\/([\d.]+)/ },
 ] as const
