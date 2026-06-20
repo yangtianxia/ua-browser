@@ -200,6 +200,10 @@ describe('parseUA — webview detection', () => {
     expect(parseUA(UA.chrome.crios).isWebview).toBe(false)
   })
 
+  it('Zhihu iOS (osee2unifiedReleaseVersion/ not Version/) → isWebview: true', () => {
+    expect(parseUA(UA.zhihu.ios).isWebview).toBe(true)
+  })
+
   it('no ; wv → isWebview: false', () => {
     expect(parseUA(UA.chrome.android).isWebview).toBe(false)
   })
