@@ -1,5 +1,14 @@
 # ua-browser
 
+## 1.4.4
+
+### Patch Changes
+
+- 修复 iOS WKWebview 检测：将 `Version\/` 改为 `\bVersion\/`（词边界），避免 `osee2unifiedReleaseVersion/`（知乎 iOS）中的子串导致 `isWebview` 误判为 `false`
+- 修复知乎 (`Zhihu`) iOS 版本提取：改用 `osee2unifiedReleaseVersion/` token（真实版本号），不再误取 `osee2unifiedRelease/`（构建号）
+- 修复携程 (`Ctrip`) 检测收窄：`Ctrip\/` → `Ctrip\/[\d]`，避免路径类 token 误命中
+- 修复微信读书 (`WeRead`) 检测收窄：`(WeRead|wxread)\/` → `(WeRead|wxread)\/[\d]`，避免非版本 token 误命中
+
 ## 1.4.3
 
 ### Patch Changes

@@ -258,10 +258,10 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('9.46.0')
     })
 
-    it('detects Zhihu on iOS (osee2unifiedRelease token)', () => {
+    it('detects Zhihu on iOS (ZhihuHybrid + osee2unifiedReleaseVersion token)', () => {
       const r = detectBrowser(UA.zhihu.ios)
       expect(r.browser).toBe('Zhihu')
-      expect(r.version).toBe('9.46.0')
+      expect(r.version).toBe('10.100.1')
     })
 
     it('detects NetEase Cloud Music', () => {
