@@ -206,7 +206,7 @@ export const UA = {
   },
   zhihu: {
     android: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.105 Mobile Safari/537.36 Zhihu/9.46.0',
-    ios: 'osee2unifiedRelease/9.46.0 osee2unifiedReleaseVersion/9.46.0 Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+    ios: 'ZhihuHybrid DefaultBrowser osee2unifiedRelease/30010 osee2unifiedReleaseVersion/10.100.1 Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
   },
   netEaseMusic: {
     mobile: 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 NeteaseMusic/8.10.0'

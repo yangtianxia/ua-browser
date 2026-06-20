@@ -1,5 +1,14 @@
 # ua-browser
 
+## 1.4.4
+
+### Patch Changes
+
+- Fixed iOS WKWebView detection: changed `Version\/` to `\bVersion\/` (word boundary) to prevent `osee2unifiedReleaseVersion/` (Zhihu iOS) from being treated as a `Version/` token, which caused `isWebview` to incorrectly return `false`
+- Fixed Zhihu (`Zhihu`) iOS version extraction: now uses `osee2unifiedReleaseVersion/` token (real version number) instead of `osee2unifiedRelease/` (build number)
+- Fixed Ctrip (`Ctrip`) detection: narrowed `Ctrip\/` to `Ctrip\/[\d]` to avoid matching non-version path tokens
+- Fixed WeRead (`WeRead`) detection: narrowed `(WeRead|wxread)\/` to `(WeRead|wxread)\/[\d]` to avoid matching non-version tokens
+
 ## 1.4.3
 
 ### Patch Changes
