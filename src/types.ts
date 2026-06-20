@@ -83,6 +83,16 @@ export type BrowserName =
   | 'Mafengwo'
   | 'Maoyan'
   | 'WPSOffice'
+  | 'Instagram'
+  | 'Facebook'
+  | 'Twitter'
+  | 'TikTok'
+  | 'Snapchat'
+  | 'LinkedIn'
+  | 'Pinterest'
+  | 'Reddit'
+  | 'Line'
+  | 'WhatsApp'
   | 'unknown'
 
 export type OsName =
