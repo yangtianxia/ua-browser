@@ -132,6 +132,12 @@ describe('detectBrowser', () => {
       expect(r.version).toBe('13.4.2.1306')
     })
 
+    it('detects UC浏览器 iOS (UCMobile token)', () => {
+      const r = detectBrowser(UA.uc.ios)
+      expect(r.browser).toBe('UCMobile')
+      expect(r.version).toBe('12.2.0.1260')
+    })
+
     it('detects Baidu box app', () => {
       const r = detectBrowser(UA.baidu.mobile)
       expect(r.browser).toBe('Baidu')

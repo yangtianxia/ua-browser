@@ -267,9 +267,18 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
   }
 
   // iOS 26+: Apple freezes "CPU iPhone OS" at the last iOS 18 value for web compatibility.
-  // The Version/ token reliably reflects the real Safari/iOS version.
-  if (os === 'iOS' && browser === 'Safari') {
-    const m = /Version\/([\d.]+)/.exec(ua)
+  // \bVersion/ (word boundary excludes ReleaseVersion/ etc.) carries the real iOS version.
+  // Apple provides this token to all third-party browsers, not just Safari.
+  if (os === 'iOS') {
+    const m = /\bVersion\/([\d.]+)/.exec(ua)
+    if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
+      osVersion = m[1]
+    }
+  }
+
+  // Baidu iOS freezes CPU iPhone OS but embeds real version in "(Baidu; P<n> <version>)".
+  if (os === 'iOS' && browser === 'Baidu') {
+    const m = /\(Baidu; P\d+ ([\d.]+)\)/.exec(ua)
     if (m && parseInt(m[1], 10) > parseInt(osVersion, 10)) {
       osVersion = m[1]
     }
@@ -338,6 +347,13 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
       })()
     : osVersionName
 
+  // Known independent browsers (non-app, non-unknown) are never webviews, even when
+  // their iOS UA lacks Version/ and Safari/ tokens. Android "; wv" is always reliable.
+  const rawIsWebview = isWebview(ua)
+  const finalIsWebview = /; wv/.test(ua)
+    ? true
+    : rawIsWebview && (browser === 'unknown' || browserType === 'app')
+
   return {
     browser,
     version,
@@ -352,7 +368,7 @@ export function parseUA(ua: string, options: ParseOptions = {}): EnvOption {
     vendor,
     model,
     arch,
-    isWebview: isWebview(ua),
+    isWebview: finalIsWebview,
     isHeadless,
     isBot,
     botName,
