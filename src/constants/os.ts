@@ -42,7 +42,7 @@ export const OS_DEFS: readonly OsDef[] = [
   { name: 'Android',        priority: 20, detect: /(Android|Adr)/,                  versionPattern: /(?:Android|Adr) ([\d.]+)/ },
   { name: 'HarmonyOS',      priority: 30, detect: /HarmonyOS/,
     versionPattern: [/HarmonyOS[\s/]([\d.]+)/, /Android ([\d.]+)[;)]/],
-    versionLookup: { '10': '2', '11': '3', '12': '3', '13': '4', '14': '4' } },
+    versionLookup: { '10': '2', '11': '2', '12': '4', '13': '4', '14': '4', '15': '4', '16': '4' } },
   { name: 'OpenHarmony',    priority: 30, detect: /OpenHarmony/,                    versionPattern: /OpenHarmony[\s/]([\d.]+)/ },
   { name: 'KaiOS',          priority: 30, detect: /KAIOS/,                          versionPattern: /KAIOS\/([\d.]+)/ },
   { name: 'Windows',        priority: 10, detect: /Windows/,                        versionPattern: /Windows NT ([\d.]+)/,

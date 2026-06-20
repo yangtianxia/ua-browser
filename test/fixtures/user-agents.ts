@@ -157,8 +157,10 @@ export const UA = {
   harmonyOs: {
     legacy: 'Mozilla/5.0 (Linux; Android 10; HarmonyOS; ANA-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 HuaweiBrowser/11.0.8.301 Mobile Safari/537.36',
     android11: 'Mozilla/5.0 (Linux; Android 11; NOH-AN00; HarmonyOS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.48 Mobile Safari/537.36',
+    android12: 'Mozilla/5.0 (Linux; Android 12; HarmonyOS; DCO-AL00; HMSCore 6.14.0.322) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.196 HuaweiBrowser/15.0.9.300 Mobile Safari/537.36',
     android13: 'Mozilla/5.0 (Linux; Android 13; HarmonyOS; HUAWEI Mate60Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
     android14: 'Mozilla/5.0 (Linux; Android 14; HarmonyOS; HUAWEI Pura70) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    android15: 'Mozilla/5.0 (Linux; Android 15; HarmonyOS; JAD-AL50) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36',
     next: 'Mozilla/5.0 (Linux; HarmonyOS 5.0.0; HUAWEI GT5 Pro Build/HUAWEIAGT5Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
     arkWeb: 'Mozilla/5.0 (Linux; HarmonyOS 5.0; Huawei ArkWeb/4.1.6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
   },
