@@ -1,7 +1,7 @@
 {
   "name": "ua-browser",
   "version": "1.4.5",
-  "description": "uaBrowser - Browser, OS, engine and device detection from user agent strings. Supports Node.js. Zero dependencies.",
+  "description": "Modern TypeScript-first User-Agent parser for browser and Node.js. Zero dependencies, tree-shakable. Detects browser, OS, device type, engine, CPU architecture, headless browsers, AI bots, and WebView environments.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -46,19 +46,33 @@
     "url": "git+https://github.com/yangtianxia/ua-browser.git"
   },
   "keywords": [
-    "uaBrowser",
-    "userAgent",
-    "javascript",
-    "typescript",
+    "ua-browser",
+    "user-agent",
+    "user-agent-parser",
     "browser-detection",
-    "user-agent-parser"
+    "browser-parser",
+    "device-detection",
+    "os-detection",
+    "engine-detection",
+    "bot-detection",
+    "headless-browser",
+    "webview",
+    "client-hints",
+    "typescript",
+    "javascript",
+    "esm",
+    "nodejs",
+    "wechat",
+    "electron",
+    "ios",
+    "android"
   ],
   "author": "yangtianxia",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/yangtianxia/ua-browser/issues"
   },
-  "homepage": "https://github.com/yangtianxia/ua-browser#readme",
+  "homepage": "https://yangtianxia.dev/ua-browser",
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

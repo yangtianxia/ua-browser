@@ -2,12 +2,13 @@
 
 [![npm version](https://img.shields.io/npm/v/ua-browser?color=cb3837)](https://www.npmjs.com/package/ua-browser)
 [![npm downloads](https://img.shields.io/npm/dm/ua-browser)](https://www.npmjs.com/package/ua-browser)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/ua-browser)](https://bundlephobia.com/package/ua-browser)
 [![license](https://img.shields.io/npm/l/ua-browser)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6)](https://www.typescriptlang.org/)
 
-Detect browser, OS, device type, rendering engine, CPU architecture, bots, headless browsers, and Mini Programs from User Agent strings. Zero dependencies. Works in both browser and Node.js environments.
+Modern TypeScript-first User-Agent parser for browser and Node.js. Zero dependencies, tree-shakable. Goes beyond UA string parsing — hardware signals and Client Hints keep device, bot, and headless detection accurate even when UA strings lie.
 
-**[📖 Documentation](https://yangtianxia.github.io/ua-browser/)** · **[🎮 Playground](https://yangtianxia.github.io/ua-browser/playground)** · **[中文](./README.md)**
+**[📖 Documentation](https://yangtianxia.dev/ua-browser/)** · **[🎮 Playground](https://yangtianxia.dev/ua-browser/playground)** · **[中文](./README.md)**
 
 ## Features
 
@@ -234,7 +235,7 @@ import {
 
 ## Supported
 
-Over 70 browsers, 20 operating systems, and 40+ bot rules built in. See the **[full support list](https://yangtianxia.github.io/ua-browser/guide/support-list)**.
+Over 70 browsers, 20 operating systems, and 40+ bot rules built in. See the **[full support list](https://yangtianxia.dev/ua-browser/guide/support-list)**.
 
 Highlights:
 - **Browsers** — Chrome, Safari, Arc, Brave, Firefox, Edge, Samsung Internet, UC, WeChat, DingTalk, TikTok, Bilibili, Kuaishou, Xiaohongshu, Feishu, Zhihu, Pinduoduo, JD, NetEase Music, WPS Office; Instagram, Facebook, Twitter/X, TikTok, Snapchat, LinkedIn, Pinterest, Reddit, LINE, WhatsApp and more
@@ -262,7 +263,7 @@ Check the `isBot` and `botName` fields on the return value. Built-in rules cover
 
 **What is the bundle size?**
 
-Zero runtime dependencies. The bundle is tiny after gzip; tree-shaking named exports makes it smaller still.
+Zero runtime dependencies. Full bundle is 29.6KB minified, ~**9.5KB** gzip, ~**8.6KB** brotli. Tree-shaking named exports makes it smaller still.
 
 ## License
 

@@ -7,7 +7,7 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   sitemap: {
-    hostname: 'https://yangtianxia.github.io/ua-browser/',
+    hostname: 'https://yangtianxia.dev/ua-browser/',
   },
 
   head: [
@@ -29,7 +29,7 @@ export default defineConfig({
           { text: 'Playground', link: '/playground' },
           { text: '更新日志', link: '/changelog' },
           { text: '项目', items: [
-            { text: 'image-to-base64', link: 'https://yangtianxia.github.io/image-to-base64/' },
+            { text: 'image-to-base64', link: 'https://yangtianxia.dev/image-to-base64/' },
           ]},
         ],
 
@@ -69,7 +69,7 @@ export default defineConfig({
           { text: 'Playground', link: '/en/playground' },
           { text: 'Changelog', link: '/en/changelog' },
           { text: 'Projects', items: [
-            { text: 'image-to-base64', link: 'https://yangtianxia.github.io/image-to-base64/' },
+            { text: 'image-to-base64', link: 'https://yangtianxia.dev/image-to-base64/' },
           ]},
         ],
 
