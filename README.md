@@ -2,12 +2,13 @@
 
 [![npm version](https://img.shields.io/npm/v/ua-browser?color=cb3837)](https://www.npmjs.com/package/ua-browser)
 [![npm downloads](https://img.shields.io/npm/dm/ua-browser)](https://www.npmjs.com/package/ua-browser)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/ua-browser)](https://bundlephobia.com/package/ua-browser)
 [![license](https://img.shields.io/npm/l/ua-browser)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6)](https://www.typescriptlang.org/)
 
-通过 User Agent 检测浏览器、操作系统、设备类型、渲染内核、CPU 架构、爬虫、无头浏览器及小程序运行环境。零依赖，支持浏览器与 Node.js 双环境。
+TypeScript-first 的现代 User-Agent 解析库，零依赖，支持浏览器与 Node.js 双环境。不止解析 UA 字符串——额外引入硬件信号与 Client Hints，手机桌面模式、AI 爬虫、无头浏览器照样精准识别。
 
-**[📖 文档](https://yangtianxia.github.io/ua-browser/)** · **[🎮 Playground](https://yangtianxia.github.io/ua-browser/playground)** · **[English](./README.en.md)**
+**[📖 文档](https://yangtianxia.dev/ua-browser/)** · **[🎮 Playground](https://yangtianxia.dev/ua-browser/playground)** · **[English](./README.en.md)**
 
 ## 特性
 
@@ -232,7 +233,7 @@ import {
 
 ## 支持范围
 
-内置超过 70 种浏览器、20 种操作系统、40+ 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.github.io/ua-browser/guide/support-list)**。
+内置超过 70 种浏览器、20 种操作系统、40+ 种爬虫规则，详见 **[内置支持列表](https://yangtianxia.dev/ua-browser/guide/support-list)**。
 
 部分覆盖：
 - **浏览器** — Chrome、Safari、Arc、Brave、Firefox、Edge、Samsung Internet、UC、微信、钉钉、抖音、哔哩哔哩、快手、小红书、飞书、知乎、拼多多、京东、网易云音乐、WPS Office；Instagram、Facebook、Twitter/X、TikTok、Snapchat、LinkedIn、Pinterest、Reddit、LINE、WhatsApp 等
@@ -260,7 +261,7 @@ import {
 
 **包体积有多大？**
 
-零运行时依赖，gzip 后极小；按需引入（named exports + tree-shaking）体积更小。
+零运行时依赖。完整打包 minify 后 29.6KB，gzip 约 **9.5KB**，brotli 约 **8.6KB**；按需引入（named exports + tree-shaking）体积更小。
 
 ## License
 
