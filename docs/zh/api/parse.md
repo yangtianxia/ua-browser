@@ -1,6 +1,6 @@
 ---
-title: 解析函数
-description: parseUA()、parseHeaders() 和 ACCEPT_CH 的 API 文档，用于解析 UA 字符串和 HTTP 请求头。
+title: 解析函数 — parseUA() 与 parseHeaders()
+description: 在没有 navigator 的环境解析 UA 字符串与 Sec-CH-UA 请求头——Node.js、SSR 与日志分析。含 parseUA()、parseHeaders()。
 ---
 
 # 解析函数
@@ -21,19 +21,19 @@ parseUA(ua: string, options?: ParseOptions): EnvOption
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | 要解析的 UA 字符串 |
-| `options` | [`ParseOptions`](/api/types#parseoptions) | 否 | 注入上下文，详见下表 |
+| `options` | [`ParseOptions`](/zh/api/types#parseoptions) | 否 | 注入上下文，详见下表 |
 
 **`ParseOptions` 字段：**
 
 | 字段 | 类型 | 说明 |
 | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 浏览器环境子集（语言、平台、触控点数）。使用 `getNavContext()` 从 `navigator` 读取。 |
+| `nav` | [`NavContext`](/zh/api/types#navcontext) | 浏览器环境子集（语言、平台、触控点数）。使用 `getNavContext()` 从 `navigator` 读取。 |
 | `windowsVersion` | `string \| null` | 由 `getWindowsVersion()` 预先获取的 Windows 版本，用于区分 Windows 10 / 11。 |
-| `ctx` | [`EnvContext`](/api/types#envcontext) | `getEnvContext()` 的返回值，包含完整多信号上下文。**同时传入时优先级高于 `nav` 和 `windowsVersion`**。 |
+| `ctx` | [`EnvContext`](/zh/api/types#envcontext) | `getEnvContext()` 的返回值，包含完整多信号上下文。**同时传入时优先级高于 `nav` 和 `windowsVersion`**。 |
 | `customBotDefs` | `readonly BotDef[]` | 自定义 Bot 检测规则，插在 `GenericBot` 兜底之前，不影响全局状态。 |
 | `language` | `string` | 显式语言覆盖（BCP47，如 `"zh-CN"`）。优先级高于 nav/ctx 及 UA 推断，适合服务端传入 `Accept-Language` 请求头。 |
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**返回值：** [`EnvOption`](/zh/api/types#envoption)
 
 **示例：**
 
@@ -67,7 +67,7 @@ const result = parseUA(ua, { customBotDefs: myBots })
 
 ## `parseHeaders(headers)` {#parseheaders}
 
-从 HTTP 请求头中解析 UA 及 Client Hints，返回 [`EnvOption`](/api/types#envoption)。适用于 SSR 精准检测场景。
+从 HTTP 请求头中解析 UA 及 Client Hints，返回 [`EnvOption`](/zh/api/types#envoption)。适用于 SSR 精准检测场景。
 
 ```typescript
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
@@ -79,7 +79,7 @@ parseHeaders(headers: Record<string, string | string[] | undefined>): EnvOption
 | :-- | :-- | :-- | :-- |
 | `headers` | `Record<string, string \| string[] \| undefined>` | 是 | HTTP 请求头对象（如 Express / Next.js 中的 `req.headers`） |
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**返回值：** [`EnvOption`](/zh/api/types#envoption)
 
 **可读取的 Client Hints 请求头：**
 

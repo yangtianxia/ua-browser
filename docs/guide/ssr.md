@@ -1,13 +1,13 @@
 ---
 title: Node.js / SSR
-description: 在 Node.js、Next.js、Nuxt 等 SSR 框架中使用 parseUA 和 parseHeaders 检测浏览器环境。
+description: Use parseUA and parseHeaders in Node.js, Next.js, Nuxt, and other SSR frameworks for browser environment detection.
 ---
 
 # Node.js / SSR
 
-## 纯 UA 解析：`parseUA()`
+## UA-only parsing: `parseUA()`
 
-纯函数，无浏览器 API 依赖，可直接在 Node.js、Deno、Edge Runtime 使用：
+A pure function with no browser API dependencies — runs in Node.js, Deno, and Edge Runtime:
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -16,51 +16,46 @@ const ua = req.headers['user-agent'] ?? ''
 const { browser, os, device, isBot, botName } = parseUA(ua)
 
 if (isBot) {
-  // 拦截爬虫
   res.status(403).end()
   return
 }
-
-if (device === 'Mobile') {
-  // 服务端判断设备类型
-}
 ```
 
-**局限性**：UA 字符串的冻结问题同样存在于服务端——Chrome 版本固定为 `149.0.0.0`，macOS 26+ 显示为 `10.15.7`。需要真实值时使用 `parseHeaders()`。
+**Limitation**: UA string freezing affects server-side detection too — Chrome version is fixed at `149.0.0.0`, macOS 26+ shows as `10.15.7`. Use `parseHeaders()` for real values.
 
 ---
 
-## Client Hints 精准检测：`parseHeaders()`
+## Accurate detection with Client Hints: `parseHeaders()`
 
-Chrome / Edge 90+ 在 HTTPS 环境下会随请求发送 `Sec-CH-UA-*` 头。通过先发送 `Accept-CH` 响应头，再用 `parseHeaders()` 解析后续请求，可获得真实版本和架构信息。
+Chrome / Edge 90+ sends `Sec-CH-UA-*` headers on HTTPS requests. Set the `Accept-CH` response header once, then use `parseHeaders()` on subsequent requests:
 
 ```typescript
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
 
-// 第一次响应：告知浏览器开始上报 Client Hints
+// First response: tell the browser to start sending Client Hints
 res.setHeader('Accept-CH', ACCEPT_CH)
 
-// 后续请求携带 Sec-CH-UA-* 头后，精确解析
+// Subsequent requests carry Sec-CH-UA-* headers
 const result = parseHeaders(req.headers)
 
-console.log(result.version)   // '149.0.7827.102' — 来自 Sec-CH-UA-Full-Version-List
-console.log(result.arch)      // 'x86_64' — 来自 Sec-CH-UA-Arch
-console.log(result.osVersion) // '26.5.1' — 来自 Sec-CH-UA-Platform-Version
+console.log(result.version)   // '149.0.7827.102' — from Sec-CH-UA-Full-Version-List
+console.log(result.arch)      // 'x86_64' — from Sec-CH-UA-Arch
+console.log(result.osVersion) // '26.5.1' — from Sec-CH-UA-Platform-Version
 ```
 
-**相比 `parseUA()` 的额外能力：**
+**What `parseHeaders()` adds over `parseUA()`:**
 
-| 能力 | `parseUA()` | `parseHeaders()` |
+| Capability | `parseUA()` | `parseHeaders()` |
 | :-- | :-- | :-- |
-| 浏览器完整版本 | UA 冻结值 | ✅ `Sec-CH-UA-Full-Version-List` |
-| macOS 26+ 真实版本 | UA 冻结值 | ✅ `Sec-CH-UA-Platform-Version` |
-| CPU 架构 | UA 推断 | ✅ `Sec-CH-UA-Arch` |
-| Brave 浏览器识别 | ❌ | ✅ `Sec-CH-UA` 品牌 |
-| Windows 10 / 11 区分 | ❌ | ✅ `Sec-CH-UA-Platform-Version` |
+| Real browser full version | Frozen UA value | ✅ `Sec-CH-UA-Full-Version-List` |
+| macOS 26+ real version | Frozen UA value | ✅ `Sec-CH-UA-Platform-Version` |
+| CPU architecture | UA inference | ✅ `Sec-CH-UA-Arch` |
+| Brave browser detection | ❌ | ✅ `Sec-CH-UA` brand |
+| Windows 10 / 11 distinction | ❌ | ✅ `Sec-CH-UA-Platform-Version` |
 
 ---
 
-## Next.js 示例
+## Next.js example
 
 ```typescript
 // pages/api/detect.ts
@@ -68,9 +63,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  // 通知浏览器上报 Client Hints
   res.setHeader('Accept-CH', ACCEPT_CH)
-
   const result = parseHeaders(req.headers as Record<string, string>)
   res.json(result)
 }
@@ -78,19 +71,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 ---
 
-## 精确区分 Windows 10 / 11
+## Accurate Windows 10 / 11 Detection
 
-Windows 10 和 11 的 UA 字符串完全相同，需借助 Client Hints API：
+Windows 10 and 11 share the same UA string — use Client Hints to tell them apart:
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
 
-// 仅限浏览器端
+// Browser-side only
 const nav = getNavContext()
 const windowsVersion = await getWindowsVersion(nav)
 const { os, osVersion } = parseUA(navigator.userAgent, { nav, windowsVersion })
 
-console.log(osVersion) // '11' 或 '10'
+console.log(osVersion) // '11' or '10'
 ```
 
-> 在 SSR 环境中，Windows 10/11 区分通过 `parseHeaders()` 读取 `Sec-CH-UA-Platform-Version` 自动完成，无需额外调用。
+> In SSR, Windows 10/11 distinction is handled automatically by `parseHeaders()` via `Sec-CH-UA-Platform-Version`.

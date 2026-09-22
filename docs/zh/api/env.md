@@ -1,6 +1,6 @@
 ---
-title: 环境上下文
-description: getEnvContext()、getNavContext()、getWindowsVersion() 和 getLanguage() 的 API 文档。
+title: 环境上下文 — getEnvContext() 与 getNavContext()
+description: UA 字符串看不到的环境信号——GPU、屏幕、Client Hints。涵盖 getEnvContext()、getNavContext() 等环境辅助函数。
 ---
 
 # 环境上下文
@@ -10,7 +10,7 @@ description: getEnvContext()、getNavContext()、getWindowsVersion() 和 getLang
 
 ## `getEnvContext()` {#getenvcontext}
 
-一次性采集当前浏览器的所有可用信号，返回 [`EnvContext`](/api/types#envcontext) 对象，再传给 `parseUA({ ctx })` 以启用多信号检测。
+一次性采集当前浏览器的所有可用信号，返回 [`EnvContext`](/zh/api/types#envcontext) 对象，再传给 `parseUA({ ctx })` 以启用多信号检测。
 
 ```typescript
 import { getEnvContext } from 'ua-browser'
@@ -18,7 +18,7 @@ import { getEnvContext } from 'ua-browser'
 getEnvContext(): Promise<EnvContext>
 ```
 
-**返回值：** `Promise<`[`EnvContext`](/api/types#envcontext)`>`
+**返回值：** `Promise<`[`EnvContext`](/zh/api/types#envcontext)`>`
 
 **采集的信号：**
 
@@ -33,6 +33,13 @@ getEnvContext(): Promise<EnvContext>
 | 网络 | `connection.effectiveType`、`connection.saveData` |
 | 音频 | 采样率 |
 | 字体 | 操作系统专属字体可用性探针 |
+| iOS 26 | CSS 特性检测（`isIOS26Plus`），用于修正 iOS 26+ 的冻结 UA |
+
+::: warning iOS 26 版本检测说明
+从 iOS 26 起，Apple 将 UA 中的 `CPU iPhone OS` 冻结在 `18_7`，导致纯 UA 解析返回错误的系统版本。`getEnvContext()` 会通过 CSS 特性检测自动确认是否为 iOS 26+，并将 `osVersion` 修正为 `'26'`（主版本号）。
+
+若需获取精确的小版本号（`26.0`–`26.5`），请使用 [`probeIOS26Version()`](#probeios26version)。
+:::
 
 **示例：**
 
@@ -58,7 +65,7 @@ console.log(result.language) // 'zh-CN'
 
 ## `getNavContext()` {#getnavcontext}
 
-读取当前浏览器的 `navigator`，返回 [`NavContext`](/api/types#navcontext) 对象。在 Node.js 中返回安全的空对象，调用方无需做环境判断。
+读取当前浏览器的 `navigator`，返回 [`NavContext`](/zh/api/types#navcontext) 对象。在 Node.js 中返回安全的空对象，调用方无需做环境判断。
 
 ```typescript
 import { getNavContext } from 'ua-browser'
@@ -66,7 +73,7 @@ import { getNavContext } from 'ua-browser'
 getNavContext(): NavContext
 ```
 
-**返回值：** [`NavContext`](/api/types#navcontext)
+**返回值：** [`NavContext`](/zh/api/types#navcontext)
 
 **示例：**
 
@@ -98,7 +105,7 @@ getWindowsVersion(nav: NavContext): Promise<string | null>
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文，传入 `getNavContext()` 的返回值 |
+| `nav` | [`NavContext`](/zh/api/types#navcontext) | 是 | 浏览器上下文，传入 `getNavContext()` 的返回值 |
 
 **返回值：** `Promise<string | null>` — 版本字符串（如 `'11'`、`'10'`）或 `null`（不可用时）
 
@@ -123,7 +130,7 @@ console.log(result.osVersion) // '11' 或 '10'
 
 ## `getLanguage(nav)` {#getlanguage}
 
-从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言。将语言标签规范化为 BCP 47 格式（如 `'en-us'` → `'en-US'`，`'ZH_CN'` → `'zh-CN'`）。
+从 [`NavContext`](/zh/api/types#navcontext) 中提取标准化的浏览器语言。将语言标签规范化为 BCP 47 格式（如 `'en-us'` → `'en-US'`，`'ZH_CN'` → `'zh-CN'`）。
 
 ```typescript
 import { getLanguage, getNavContext } from 'ua-browser'
@@ -133,7 +140,7 @@ getLanguage(nav: NavContext): string
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文 |
+| `nav` | [`NavContext`](/zh/api/types#navcontext) | 是 | 浏览器上下文 |
 
 **返回值：** `string` — 标准化语言标签，如 `'zh-CN'`、`'en-US'`，不可用时返回 `'unknown'`。
 
@@ -143,5 +150,53 @@ getLanguage(nav: NavContext): string
 const nav = getNavContext()
 console.log(getLanguage(nav)) // 'zh-CN'
 ```
+
+---
+
+---
+
+## `probeIOS26Version()` {#probeios26version}
+
+通过 CSS / JavaScript 特性检测探测 iOS 26 的精确小版本号。返回 `'26.0'`–`'26.5'` 或 `null`（非 iOS 26+ 环境）。
+
+> **前提**：此函数仅在浏览器环境中有意义。在 Node.js 中始终返回 `null`。
+
+```typescript
+import { probeIOS26Version } from 'ua-browser'
+
+probeIOS26Version(): string | null
+```
+
+**返回值：** `string | null`
+
+**检测原理：**
+
+| 返回值 | 判断依据 |
+| :-- | :-- |
+| `'26.5'` | `Origin` API 存在（Safari 26.5 新增） |
+| `'26.4'` | `PerformanceResourceTiming.finalResponseHeadersStart` 存在 |
+| `'26.3'` | `NavigateEvent.prototype.signal` 存在 |
+| `'26.2'` | `Math.sumPrecise` 存在 |
+| `'26.0'` | `CSS.supports('animation-timeline', 'view()')` 为 `true` |
+| `null` | 非 Safari/WebKit 26+（iOS 18 或以下） |
+
+**示例：**
+
+```typescript
+import { probeIOS26Version, getEnvContext, parseUA } from 'ua-browser'
+
+// B 方案：getEnvContext 自动将 osVersion 修正为 '26'（主版本）
+const ctx = await getEnvContext()
+const result = parseUA(navigator.userAgent, { ctx })
+console.log(result.osVersion) // '26'（iOS 26+ 时）
+
+// A 方案：精确小版本
+const exact = probeIOS26Version()
+console.log(exact) // '26.5'、'26.4'、'26.3'、'26.2'、'26.0' 或 null
+```
+
+::: tip
+两者结合使用效果最佳：`parseUA` 负责所有字段的综合解析，`probeIOS26Version()` 仅在需要精确 iOS 26 小版本时单独调用。
+:::
 
 ---

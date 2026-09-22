@@ -1,6 +1,6 @@
 ---
-title: 独立检测器
-description: detectBot()、detectBrowser()、detectOS() 等独立检测器的 API 文档，支持按需引入。
+title: 独立检测器 — detectBot() 与 detectOS()
+description: 按需引入单个检测器——detectBot()、detectBrowser()、detectOS()——浏览器端减小体积，Node.js 端单独跑一项检测。
 ---
 
 # 独立检测器
@@ -160,7 +160,7 @@ detectDevice(ua: string): DeviceName
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
 
-**返回值：** [`DeviceName`](/api/types#devicename)
+**返回值：** [`DeviceName`](/zh/api/types#devicename)
 
 **示例：**
 
@@ -187,7 +187,7 @@ detectVendorModel(ua: string): VendorModelResult
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
 
-**返回值：** [`VendorModelResult`](/api/types#vendormodelresult)
+**返回值：** [`VendorModelResult`](/zh/api/types#vendormodelresult)
 
 **示例：**
 
@@ -213,9 +213,9 @@ detectArch(ua: string, ctx?: EnvContext): ArchName
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
 | `ua` | `string` | 是 | UA 字符串 |
-| `ctx` | [`EnvContext`](/api/types#envcontext) | 否 | `getEnvContext()` 的返回值，启用 GPU 和 Client Hints 检测 |
+| `ctx` | [`EnvContext`](/zh/api/types#envcontext) | 否 | `getEnvContext()` 的返回值，启用 GPU 和 Client Hints 检测 |
 
-**返回值：** [`ArchName`](/api/types#archname) — `'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'`
+**返回值：** [`ArchName`](/zh/api/types#archname) — `'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'`
 
 **检测优先级链：**
 
@@ -313,7 +313,7 @@ satisfies(info: EnvOption, criteria: Partial<EnvOption>): boolean
 
 | 参数 | 类型 | 必填 | 说明 |
 | :-- | :-- | :-- | :-- |
-| `info` | [`EnvOption`](/api/types#envoption) | 是 | `parseUA()` 或 `uaBrowser()` 的返回值 |
+| `info` | [`EnvOption`](/zh/api/types#envoption) | 是 | `parseUA()` 或 `uaBrowser()` 的返回值 |
 | `criteria` | `Partial<EnvOption>` | 是 | 要匹配的字段子集 |
 
 **返回值：** `boolean`

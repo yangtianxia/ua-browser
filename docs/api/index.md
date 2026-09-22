@@ -1,13 +1,13 @@
 ---
-title: API 参考
-description: ua-browser 完整 API 文档，包括 parseUA、uaBrowser.detect、getEnvContext、parseHeaders、satisfies 等所有导出函数。
+title: API Reference
+description: Every ua-browser export with its TypeScript signature, so you can pick the entry point that matches your environment — browser, Node.js, or SSR.
 ---
 
-# API 参考
+# API Reference
 
 ## `uaBrowser()` {#uabrowser}
 
-检测当前浏览器环境，返回完整的环境信息对象。自动读取 `navigator.userAgent` 并注入 `navigator` 上下文（语言、平台、触控点数）。
+Detect the current browser environment and return a full environment info object. Automatically reads `navigator.userAgent` and injects the `navigator` context (language, platform, touch points).
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -15,9 +15,9 @@ import uaBrowser from 'ua-browser'
 uaBrowser(): EnvOption
 ```
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**Returns:** [`EnvOption`](/api/types#envoption)
 
-**示例：**
+**Example:**
 
 ```typescript
 const info = uaBrowser()
@@ -25,13 +25,13 @@ console.log(info.browser) // 'Chrome'
 console.log(info.os)      // 'Windows'
 ```
 
-**注意事项：**
-- 无法判断的字段返回 `'unknown'`，不会返回空字符串。
-- 在 Node.js 中 `navigator` 不可用，`language` 和 `platform` 将为 `'unknown'`。
-- 若需要解析任意 UA 字符串，请使用 [`parseUA()`](#parseua)。
-- 若需要更高精度，浏览器端请使用 [`uaBrowser.detect()`](#uabrowser-detect)。
+**Notes:**
+- Returns `'unknown'` for fields that cannot be determined, never an empty string.
+- In Node.js, `navigator` is unavailable; `language` and `platform` will be `'unknown'`.
+- To parse an arbitrary UA string, use [`parseUA()`](#parseua).
+- For higher accuracy in browsers, use [`uaBrowser.detect()`](#uabrowser-detect).
 
-默认导出对象同时挂载了以下静态成员：
+The default export also exposes the following static members:
 
 ```typescript
 uaBrowser.detect(): Promise<EnvOption>
@@ -44,47 +44,47 @@ uaBrowser.VERSION: string
 
 ## `uaBrowser.detect()` {#uabrowser-detect}
 
-`uaBrowser()` 的异步高精度版本。内部先调用 [`getEnvContext()`](#getenvcontext) 采集硬件与浏览器信号，再执行解析，能更准确地识别设备类型和 CPU 架构。
+Async, high-accuracy version of `uaBrowser()`. Internally calls [`getEnvContext()`](#getenvcontext) to collect hardware and browser signals before parsing, enabling more accurate device type and CPU architecture detection.
 
-**这是浏览器端代码的推荐入口。**
+**This is the recommended entry point for browser-side code.**
 
 ```typescript
 uaBrowser.detect(): Promise<EnvOption>
 ```
 
-**返回值：** `Promise<`[`EnvOption`](/api/types#envoption)`>`
+**Returns:** `Promise<`[`EnvOption`](/api/types#envoption)`>`
 
-**`detect()` 采集的信号：**
+**Signals collected by `detect()`:**
 
-| 信号 | 用途 |
+| Signal | Purpose |
 | :-- | :-- |
-| Client Hints (`Sec-CH-UA-*`) | 精确版本、平台、架构 |
-| WebGL 渲染器 / 厂商 | GPU 类型 → 判断移动端 vs. 桌面端、Apple Silicon vs. Intel |
-| CSS `env(safe-area-inset-top)` | iOS 刘海 / 灵动岛 → 确认为移动设备 |
-| `devicePixelRatio` | 手机（≥3）vs. Mac（2）vs. 显示器（1–2） |
-| 振动 / DeviceMotion API | 仅移动端有效 → 确认移动设备意图 |
-| 网络类型（`connection.effectiveType`）| 辅助设备分类 |
-| 字体探针 | 操作系统级字体可用性 |
+| Client Hints (`Sec-CH-UA-*`) | Exact version, platform, architecture |
+| WebGL renderer / vendor | GPU type → mobile vs. desktop, Apple Silicon vs. Intel |
+| CSS `env(safe-area-inset-top)` | iOS notch / Dynamic Island → confirms mobile device |
+| `devicePixelRatio` | Phone (≥3) vs. Mac (2) vs. monitor (1–2) |
+| Vibration / DeviceMotion APIs | Mobile-only APIs → confirms mobile intent |
+| Network type (`connection.effectiveType`) | Supplements device classification |
+| Font probes | OS-level font availability |
 
-**示例：**
+**Example:**
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
 const result = await uaBrowser.detect()
-console.log(result.device) // 'Mobile' — 即便开了桌面模式也能正确识别
-console.log(result.arch)   // 'arm64' 或 'x86_64'
+console.log(result.device) // 'Mobile' — correct even in desktop mode
+console.log(result.arch)   // 'arm64' or 'x86_64'
 ```
 
-**注意事项：**
-- 仅限浏览器环境。在 Node.js 中 `getEnvContext()` 返回空上下文，结果等同于 `uaBrowser()`。
-- 所有 DOM 访问均包裹在 `try/catch` 中，不会抛出异常。
+**Notes:**
+- Browser-only. In Node.js `getEnvContext()` returns empty context, so the result is equivalent to `uaBrowser()`.
+- All DOM accesses are wrapped in `try/catch` and will not throw.
 
 ---
 
 ## `parseUA(ua, options?)` {#parseua}
 
-纯函数版本：无全局状态、无 DOM 访问。适合 SSR、Node.js 及单元测试。
+Pure function: no global state, no DOM access. Suitable for SSR, Node.js, and unit testing.
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -92,43 +92,43 @@ import { parseUA } from 'ua-browser'
 parseUA(ua: string, options?: ParseOptions): EnvOption
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | 要解析的 UA 字符串 |
-| `options` | [`ParseOptions`](/api/types#parseoptions) | 否 | 注入上下文，详见下表 |
+| `ua` | `string` | Yes | UA string to parse. |
+| `options` | [`ParseOptions`](/api/types#parseoptions) | No | Inject context; see below. |
 
-**`ParseOptions` 字段：**
+**`ParseOptions` fields:**
 
-| 字段 | 类型 | 说明 |
+| Field | Type | Description |
 | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 浏览器环境子集（语言、平台、触控点数）。使用 `getNavContext()` 从 `navigator` 读取。 |
-| `windowsVersion` | `string \| null` | 由 `getWindowsVersion()` 预先获取的 Windows 版本，用于区分 Windows 10 / 11。 |
-| `ctx` | [`EnvContext`](/api/types#envcontext) | `getEnvContext()` 的返回值，包含完整多信号上下文。**同时传入时优先级高于 `nav` 和 `windowsVersion`**。 |
-| `customBotDefs` | `readonly BotDef[]` | 自定义 Bot 检测规则，插在 `GenericBot` 兜底之前，不影响全局状态。 |
-| `language` | `string` | 显式语言覆盖（BCP47，如 `"zh-CN"`）。优先级高于 nav/ctx 及 UA 推断，适合服务端传入 `Accept-Language` 请求头。 |
+| `nav` | [`NavContext`](/api/types#navcontext) | Browser environment subset (language, platform, touch points). Use `getNavContext()` to read from `navigator`. |
+| `windowsVersion` | `string \| null` | Pre-resolved Windows version string from `getWindowsVersion()`. Needed to distinguish Windows 10 vs. 11. |
+| `ctx` | [`EnvContext`](/api/types#envcontext) | Full multi-signal context from `getEnvContext()`. **Takes priority over `nav` and `windowsVersion`** when both are provided. |
+| `customBotDefs` | `readonly BotDef[]` | Custom bot detection rules inserted before the `GenericBot` catch-all. Does not affect global state. |
+| `language` | `string` | Explicit language override (BCP47). Highest priority — overrides all navigator/header sources. Useful for server-side rendering when passing `Accept-Language`. |
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**Returns:** [`EnvOption`](/api/types#envoption)
 
-**示例：**
+**Examples:**
 
 ```typescript
-// 最简用法：仅 UA 字符串
+// Minimal: UA string only
 const result = parseUA(navigator.userAgent)
 
-// 注入 navigator 上下文（language/platform 已填充）
+// With navigator context (language/platform populated)
 import { parseUA, getNavContext } from 'ua-browser'
 const nav = getNavContext()
 const result = parseUA(navigator.userAgent, { nav })
-console.log(result.language) // 'zh-CN'
+console.log(result.language) // 'en-US'
 console.log(result.platform) // 'Win32'
 
-// 注入完整环境上下文（启用多信号检测）
+// With full env context (multi-signal detection enabled)
 import { parseUA, getEnvContext } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
-console.log(result.arch) // 'arm64'（基于 WebGL / Client Hints）
+console.log(result.arch) // 'arm64' (from WebGL / Client Hints)
 
-// 自定义 Bot 规则
+// With custom bot rules
 import { parseUA } from 'ua-browser'
 import type { BotDef } from 'ua-browser'
 const myBots: BotDef[] = [{ name: 'GenericBot', detect: /MyInternalCrawler/ }]
@@ -139,7 +139,7 @@ const result = parseUA(ua, { customBotDefs: myBots })
 
 ## `parseHeaders(headers)` {#parseheaders}
 
-从 HTTP 请求头中解析 UA 及 Client Hints，返回 [`EnvOption`](/api/types#envoption)。适用于 SSR 精准检测场景。
+Parse UA and Client Hints from HTTP request headers. Returns [`EnvOption`](/api/types#envoption). Suitable for precise SSR detection.
 
 ```typescript
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
@@ -147,49 +147,49 @@ import { parseHeaders, ACCEPT_CH } from 'ua-browser'
 parseHeaders(headers: Record<string, string | string[] | undefined>): EnvOption
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `headers` | `Record<string, string \| string[] \| undefined>` | 是 | HTTP 请求头对象（如 Express / Next.js 中的 `req.headers`） |
+| `headers` | `Record<string, string \| string[] \| undefined>` | Yes | HTTP request headers object (e.g. `req.headers` in Express / Next.js). |
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**Returns:** [`EnvOption`](/api/types#envoption)
 
-**可读取的 Client Hints 请求头：**
+**Client Hints headers read:**
 
-| 请求头 | 数据 |
+| Header | Data |
 | :-- | :-- |
-| `user-agent` | 完整 UA 字符串 |
-| `sec-ch-ua` | 浏览器品牌列表 |
-| `sec-ch-ua-full-version-list` | 精确浏览器版本 |
-| `sec-ch-ua-platform` | 操作系统名称 |
-| `sec-ch-ua-platform-version` | OS 版本（可区分 Windows 10 / 11） |
-| `sec-ch-ua-arch` | CPU 架构（如 `x86`、`arm`） |
-| `sec-ch-ua-mobile` | 移动端标识 |
+| `user-agent` | Full UA string |
+| `sec-ch-ua` | Browser brand list |
+| `sec-ch-ua-full-version-list` | Exact browser version |
+| `sec-ch-ua-platform` | OS name |
+| `sec-ch-ua-platform-version` | OS version (distinguishes Windows 10 / 11) |
+| `sec-ch-ua-arch` | CPU architecture (e.g. `x86`, `arm`) |
+| `sec-ch-ua-mobile` | Mobile hint |
 
-**两阶段请求流程：**
+**Two-request pattern:**
 
-首次请求时浏览器只发送 `user-agent`。在响应中返回 `ACCEPT_CH`，告知支持的浏览器后续请求附带 Client Hints。
+On the first request, browsers only send the `user-agent` header. Return `ACCEPT_CH` in the response to request Client Hints; they arrive on subsequent requests.
 
 ```typescript
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
 
-// 第一次响应——告知浏览器上报 Client Hints
+// First response — tell the browser to send Client Hints
 res.setHeader('Accept-CH', ACCEPT_CH)
 
-// 后续请求携带 Client Hints 后
+// Subsequent requests — full Client Hints included
 const result = parseHeaders(req.headers)
-console.log(result.arch) // 'x86_64'（来自 Sec-CH-UA-Arch）
+console.log(result.arch) // 'x86_64' (from Sec-CH-UA-Arch)
 console.log(result.os)   // 'Windows'
 ```
 
-**注意事项：**
-- 兼容 Express、Koa、Next.js API Route、Fastify、Hono 等任何以普通对象形式暴露请求头的框架。
-- Client Hints 请求头缺失时回退到纯 UA 解析。
+**Notes:**
+- Works with Express, Koa, Next.js API routes, Fastify, Hono, etc. — any framework that exposes headers as a plain object.
+- If Client Hints headers are absent, falls back to UA-only parsing.
 
 ---
 
 ## `getEnvContext()` {#getenvcontext}
 
-一次性采集当前浏览器的所有可用信号，返回 [`EnvContext`](/api/types#envcontext) 对象，再传给 `parseUA({ ctx })` 以启用多信号检测。
+Collect all available browser signals in one async call and return an [`EnvContext`](/api/types#envcontext) object. Pass the result to `parseUA({ ctx })` for multi-signal detection.
 
 ```typescript
 import { getEnvContext } from 'ua-browser'
@@ -197,23 +197,23 @@ import { getEnvContext } from 'ua-browser'
 getEnvContext(): Promise<EnvContext>
 ```
 
-**返回值：** `Promise<`[`EnvContext`](/api/types#envcontext)`>`
+**Returns:** `Promise<`[`EnvContext`](/api/types#envcontext)`>`
 
-**采集的信号：**
+**Signals collected:**
 
-| 类别 | 信号 |
+| Category | Signals |
 | :-- | :-- |
-| Client Hints | `platform`、`platformVersion`、`architecture`、`fullVersionList` |
-| WebGL | GPU 渲染器 + 厂商、最大纹理尺寸、压缩纹理格式（ASTC/ETC2/PVRTC/S3TC） |
-| 屏幕 | `devicePixelRatio`、`screenWidth`、`screenHeight` |
-| CSS env | `safe-area-inset-top`（iOS 刘海 / 灵动岛） |
-| 硬件 API | `hardwareConcurrency`、`deviceMemory`、振动 API、DeviceMotion 事件 |
-| 输入 | `pointerType`（`coarse`/`fine`/`none`）、hover 能力 |
-| 网络 | `connection.effectiveType`、`connection.saveData` |
-| 音频 | 采样率 |
-| 字体 | 操作系统专属字体可用性探针 |
+| Client Hints | `platform`, `platformVersion`, `architecture`, `fullVersionList` |
+| WebGL | GPU renderer + vendor, max texture size, compressed texture formats (ASTC/ETC2/PVRTC/S3TC) |
+| Screen | `devicePixelRatio`, `screenWidth`, `screenHeight` |
+| CSS env | `safe-area-inset-top` (iOS notch / Dynamic Island) |
+| Hardware APIs | `hardwareConcurrency`, `deviceMemory`, vibration API, DeviceMotion event |
+| Input | `pointerType` (`coarse`/`fine`/`none`), hover capability |
+| Network | `connection.effectiveType`, `connection.saveData` |
+| Audio | Sample rate |
+| Fonts | OS-specific font availability probes |
 
-**示例：**
+**Example:**
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -221,21 +221,21 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.device)   // 'Mobile' — 开了桌面模式也能正确识别
-console.log(result.arch)     // 'arm64'（Apple Silicon）或 'x86_64'（Intel）
-console.log(result.language) // 'zh-CN'
+console.log(result.device)   // 'Mobile' — correct even in desktop mode
+console.log(result.arch)     // 'arm64' (Apple Silicon) or 'x86_64' (Intel)
+console.log(result.language) // 'en-US'
 ```
 
-**注意事项：**
-- 仅限浏览器环境。在 Node.js 中调用是安全的——所有 DOM 访问均有保护，返回 `undefined`，结果等同于 `getNavContext()`。
-- 每个 DOM API 均单独包裹在 `try/catch` 中，单个权限拒绝不会阻断其余信号采集。
-- 如果不需要复用 `ctx` 对象，直接使用 `uaBrowser.detect()` 更简洁。
+**Notes:**
+- Browser-only. Safe to call in Node.js — all DOM accesses are guarded and return `undefined`; the result is equivalent to `getNavContext()`.
+- Each DOM API is wrapped in an individual `try/catch`, so a single permission denial does not block the rest.
+- Prefer `uaBrowser.detect()` if you don't need to reuse the `ctx` object.
 
 ---
 
 ## `getWindowsVersion(nav)` {#getwindowsversion}
 
-异步获取精确的 Windows 版本，用于区分 Windows 10 与 Windows 11（两者 UA 字符串相同，均为 `Windows NT 10.0`）。
+Asynchronously resolve the accurate Windows version to distinguish Windows 10 from Windows 11 (which share the same UA string: `Windows NT 10.0`).
 
 ```typescript
 import { getWindowsVersion, getNavContext, parseUA } from 'ua-browser'
@@ -243,32 +243,32 @@ import { getWindowsVersion, getNavContext, parseUA } from 'ua-browser'
 getWindowsVersion(nav: NavContext): Promise<string | null>
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文，传入 `getNavContext()` 的返回值 |
+| `nav` | [`NavContext`](/api/types#navcontext) | Yes | Browser context; pass `getNavContext()`. |
 
-**返回值：** `Promise<string | null>` — 版本字符串（如 `'11'`、`'10'`）或 `null`（不可用时）
+**Returns:** `Promise<string | null>` — the version string (e.g. `'11'`, `'10'`) or `null` when unavailable.
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
 const windowsVersion = await getWindowsVersion(nav)
 const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 
-console.log(result.osVersion) // '11' 或 '10'
+console.log(result.osVersion) // '11' or '10'
 ```
 
-**注意事项：**
-- 依赖 `navigator.userAgentData.getHighEntropyValues()`（Chrome 90+、Edge 90+）。
-- Firefox、Safari 及 Node.js 返回 `null`，`osVersion` 回退到 UA 派生值。
-- `getEnvContext()` 内部已调用此函数；仅在需要 `NavContext` 级上下文而不想承担完整 `EnvContext` 开销时才单独使用。
+**Notes:**
+- Requires `navigator.userAgentData.getHighEntropyValues()` (Chrome 90+, Edge 90+).
+- Returns `null` in Firefox, Safari, and Node.js — `osVersion` falls back to UA-derived value.
+- `getEnvContext()` already calls this internally; use `getWindowsVersion()` directly only when you want `NavContext`-level context without the full `EnvContext` overhead.
 
 ---
 
 ## `detectBot(ua, customDefs?)` {#detectbot}
 
-独立爬虫检测器，不运行完整 `parseUA()` 流水线。
+Standalone bot detector. Returns the bot detection result without running the full `parseUA()` pipeline.
 
 ```typescript
 import { detectBot } from 'ua-browser'
@@ -277,48 +277,48 @@ import type { BotDef } from 'ua-browser'
 detectBot(ua: string, customDefs?: readonly BotDef[]): { isBot: boolean; botName: BotName; botCategory: BotCategory }
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | 要检测的 UA 字符串 |
-| `customDefs` | `readonly BotDef[]` | 否 | 附加 Bot 规则，插在内置规则之后、`GenericBot` 兜底之前 |
+| `ua` | `string` | Yes | UA string to test. |
+| `customDefs` | `readonly BotDef[]` | No | Additional bot rules. Inserted after built-in rules, before `GenericBot` catch-all. |
 
-**返回值：** `{ isBot: boolean; botName: BotName; botCategory: BotCategory }`
+**Returns:** `{ isBot: boolean; botName: BotName; botCategory: BotCategory }`
 
-**`BotDef` 结构：**
+**`BotDef` shape:**
 
 ```typescript
 interface BotDef {
-  name: BotName         // 匹配后返回的 botName 值
-  detect: RegExp        // 与 UA 字符串匹配的正则
-  category: BotCategory // Bot 分类
+  name: BotName         // the bot label returned in botName
+  detect: RegExp        // matched against the UA string
+  category: BotCategory // bot classification
 }
 ```
 
-**示例：**
+**Example:**
 
 ```typescript
 const { isBot, botName, botCategory } = detectBot(ua)
 // isBot: true, botName: 'Googlebot', botCategory: 'search-engine'
 
-// 自定义规则
+// Custom rules
 const myDefs: BotDef[] = [
   { name: 'GenericBot', detect: /MyInternalCrawler/ }
 ]
 detectBot(ua, myDefs)
 
-// 或通过 parseUA 透传，获得完整结果
+// Or pass through parseUA for a full result
 parseUA(ua, { customBotDefs: myDefs })
 ```
 
-**注意事项：**
-- 内置规则覆盖 30+ 种 Bot，包含 AI 训练爬虫（GPTBot、ClaudeBot、PerplexityBot、CCBot 等）。
-- `customDefs` 不修改任何全局状态。
+**Notes:**
+- Built-in rules cover 30+ bots including AI training crawlers (GPTBot, ClaudeBot, PerplexityBot, CCBot, etc.).
+- `customDefs` do not modify any global state.
 
 ---
 
 ## `detectArch(ua, ctx?)` {#detectarch}
 
-独立 CPU 架构检测器。不传 `ctx` 时仅依赖 UA 字符串启发式推断。
+Standalone CPU architecture detector. Without `ctx`, falls back to UA-string heuristics only.
 
 ```typescript
 import { detectArch } from 'ua-browser'
@@ -326,35 +326,35 @@ import { detectArch } from 'ua-browser'
 detectArch(ua: string, ctx?: EnvContext): ArchName
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
-| `ctx` | [`EnvContext`](/api/types#envcontext) | 否 | `getEnvContext()` 的返回值，启用 GPU 和 Client Hints 检测 |
+| `ua` | `string` | Yes | UA string. |
+| `ctx` | [`EnvContext`](/api/types#envcontext) | No | Multi-signal context from `getEnvContext()`. Enables GPU and Client Hints detection. |
 
-**返回值：** [`ArchName`](/api/types#archname) — `'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'`
+**Returns:** [`ArchName`](/api/types#archname) — `'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'`
 
-**检测优先级链：**
+**Detection priority chain:**
 
-1. Client Hints `Sec-CH-UA-Arch`（最高精度）
-2. WebGL 渲染器字符串（ANGLE → x86/x86_64；Apple GPU → arm64；Adreno/Mali → arm64）
-3. `navigator.platform`（如 `'Win32'` → x86_64；`'iPhone'` → arm64）
-4. UA 字符串模式（最低精度——受 UA 冻结影响）
+1. Client Hints `Sec-CH-UA-Arch` (highest accuracy)
+2. WebGL renderer string (ANGLE → x86/x86_64; Apple GPU → arm64; Adreno/Mali → arm64)
+3. `navigator.platform` (e.g. `'Win32'` → x86_64; `'iPhone'` → arm64)
+4. UA string patterns (lowest accuracy — affected by UA freezing)
 
-**示例：**
+**Example:**
 
 ```typescript
 import { detectArch, getEnvContext } from 'ua-browser'
 
 const ctx = await getEnvContext()
 const arch = detectArch(navigator.userAgent, ctx)
-// Apple Silicon 上返回 'arm64'，Intel Mac 上返回 'x86_64'
+// 'arm64' on Apple Silicon, 'x86_64' on Intel Mac
 ```
 
 ---
 
 ## `detectHeadless(ua)` {#detectheadless}
 
-检测 UA 字符串是否表明当前为无头浏览器。
+Detect whether the UA string indicates a headless browser.
 
 ```typescript
 import { detectHeadless } from 'ua-browser'
@@ -362,17 +362,17 @@ import { detectHeadless } from 'ua-browser'
 detectHeadless(ua: string): boolean
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | 要检测的 UA 字符串 |
+| `ua` | `string` | Yes | UA string to test. |
 
-**返回值：** `boolean`
+**Returns:** `boolean`
 
-**可检测的标识：** `HeadlessChrome`、`Headless`、`PhantomJS`、`Electron`、`Playwright`、`jsdom`、`Selenium`。
+**Detected markers:** `HeadlessChrome`, `Headless`, `PhantomJS`, `Electron`, `Playwright`, `jsdom`, `Selenium` and other common headless identifiers.
 
-> 现代 Puppeteer / Playwright 使用隐身模式可隐藏上述标识，此函数仅覆盖未经伪装的常见场景。
+> **Note:** Tools that spoof a real UA (e.g. Puppeteer with a custom UA) cannot be detected by string matching alone.
 
-**示例：**
+**Example:**
 
 ```typescript
 detectHeadless('Mozilla/5.0 ... HeadlessChrome/124.0.0.0 ...')
@@ -383,7 +383,7 @@ detectHeadless('Mozilla/5.0 ... HeadlessChrome/124.0.0.0 ...')
 
 ## `isWebview(ua)` {#iswebview}
 
-检测 UA 是否表明当前为嵌入式 WebView（Android Webview 或 iOS WKWebView）。
+Detect whether the UA indicates an embedded WebView (Android Webview or iOS WKWebView).
 
 ```typescript
 import { isWebview } from 'ua-browser'
@@ -391,29 +391,29 @@ import { isWebview } from 'ua-browser'
 isWebview(ua: string): boolean
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | 要检测的 UA 字符串 |
+| `ua` | `string` | Yes | UA string to test. |
 
-**返回值：** `boolean`
+**Returns:** `boolean`
 
-**检测逻辑：**
-- **Android Webview：** UA 包含 `; wv)` 标识符
-- **iOS WKWebView：** Safari UA 同时缺少 `Version/` 和 `Safari/` token（WKWebView 会将它们移除）
+**Detection logic:**
+- **Android Webview:** UA contains `; wv)` marker
+- **iOS WKWebView:** Safari UA that lacks both `Version/` token and `Safari/` token (WKWebView strips them)
 
-**示例：**
+**Example:**
 
 ```typescript
-isWebview('Mozilla/5.0 (Linux; Android 10; K; wv) ...')   // true  （Android）
-isWebview('Mozilla/5.0 (iPhone ...) ... Mobile/15E148')    // true  （iOS WKWebView）
-isWebview('Mozilla/5.0 ... Version/17.4 ... Safari/604.1') // false （真实 Safari）
+isWebview('Mozilla/5.0 (Linux; Android 10; K; wv) ...') // true  (Android)
+isWebview('Mozilla/5.0 (iPhone ...) ... Mobile/15E148')  // true  (iOS WKWebView)
+isWebview('Mozilla/5.0 ... Version/17.4 ... Safari/604.1') // false (real Safari)
 ```
 
 ---
 
 ## `getNavContext()` {#getnavcontext}
 
-读取当前浏览器的 `navigator`，返回 [`NavContext`](/api/types#navcontext) 对象。在 Node.js 中返回安全的空对象，调用方无需做环境判断。
+Read the current browser's `navigator` and return a [`NavContext`](/api/types#navcontext) object. In Node.js, returns a safe empty object so callers do not need environment checks.
 
 ```typescript
 import { getNavContext } from 'ua-browser'
@@ -421,27 +421,27 @@ import { getNavContext } from 'ua-browser'
 getNavContext(): NavContext
 ```
 
-**返回值：** [`NavContext`](/api/types#navcontext)
+**Returns:** [`NavContext`](/api/types#navcontext)
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
 const result = parseUA(navigator.userAgent, { nav })
 
-console.log(result.language) // 'zh-CN'
+console.log(result.language) // 'en-US'
 console.log(result.platform) // 'Win32'
 ```
 
-**注意事项：**
-- 同时需要架构 / 设备精度信号时，优先使用 `getEnvContext()`。
-- `getNavContext()` 是同步的；`getEnvContext()` 是异步的。
+**Notes:**
+- Prefer `getEnvContext()` when you also need arch / device accuracy signals.
+- `getNavContext()` is synchronous; `getEnvContext()` is async.
 
 ---
 
 ## `getLanguage(nav)` {#getlanguage}
 
-从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言。将语言标签规范化为 BCP 47 格式（如 `'en-us'` → `'en-US'`，`'ZH_CN'` → `'zh-CN'`）。
+Extract the normalized browser language from a [`NavContext`](/api/types#navcontext). Normalizes the tag to standard BCP 47 form (e.g. `'en-us'` → `'en-US'`, `'ZH_CN'` → `'zh-CN'`).
 
 ```typescript
 import { getLanguage, getNavContext } from 'ua-browser'
@@ -449,24 +449,24 @@ import { getLanguage, getNavContext } from 'ua-browser'
 getLanguage(nav: NavContext): string
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文 |
+| `nav` | [`NavContext`](/api/types#navcontext) | Yes | Browser context. |
 
-**返回值：** `string` — 标准化语言标签，如 `'zh-CN'`、`'en-US'`，不可用时返回 `'unknown'`。
+**Returns:** `string` — normalized language tag, e.g. `'en-US'`, `'zh-CN'`, or `'unknown'`.
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
-console.log(getLanguage(nav)) // 'zh-CN'
+console.log(getLanguage(nav)) // 'en-US'
 ```
 
 ---
 
 ## `ACCEPT_CH` {#accept-ch}
 
-包含 `parseHeaders()` 可消费的所有 Client Hints 请求头名称的常量字符串。将其设置为 `Accept-CH` 响应头，以请求支持的浏览器（Chrome / Edge 90+）在后续请求中携带这些信息。
+Constant string containing all Client Hints headers that `parseHeaders()` can consume. Set it as the `Accept-CH` response header to request these hints from supporting browsers (Chrome / Edge 90+).
 
 ```typescript
 import { ACCEPT_CH } from 'ua-browser'
@@ -475,18 +475,18 @@ ACCEPT_CH: string
 // 'Sec-CH-UA, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version, Sec-CH-UA-Arch, Sec-CH-UA-Mobile'
 ```
 
-**示例：**
+**Example:**
 
 ```typescript
 res.setHeader('Accept-CH', ACCEPT_CH)
-res.setHeader('Vary', 'Sec-CH-UA, Sec-CH-UA-Full-Version-List')  // 推荐同时设置
+res.setHeader('Vary', 'Sec-CH-UA, Sec-CH-UA-Full-Version-List')  // optional but recommended
 ```
 
 ---
 
 ## `detectBrowser(ua)` {#detectbrowser}
 
-独立浏览器检测器，不运行完整 `parseUA()` 流水线。
+Standalone browser detector that does not run the full `parseUA()` pipeline.
 
 ```typescript
 import { detectBrowser } from 'ua-browser'
@@ -494,13 +494,13 @@ import { detectBrowser } from 'ua-browser'
 detectBrowser(ua: string): { browser: BrowserName; version: string; browserType: BrowserType }
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
+| `ua` | `string` | Yes | UA string |
 
-**返回值：** `{ browser: BrowserName; version: string; browserType: BrowserType }`
+**Returns:** `{ browser: BrowserName; version: string; browserType: BrowserType }`
 
-**示例：**
+**Example:**
 
 ```typescript
 const { browser, version, browserType } = detectBrowser(navigator.userAgent)
@@ -511,7 +511,7 @@ const { browser, version, browserType } = detectBrowser(navigator.userAgent)
 
 ## `detectOS(ua)` {#detectos}
 
-独立操作系统检测器，不运行完整 `parseUA()` 流水线。
+Standalone OS detector that does not run the full `parseUA()` pipeline.
 
 ```typescript
 import { detectOS } from 'ua-browser'
@@ -519,13 +519,13 @@ import { detectOS } from 'ua-browser'
 detectOS(ua: string): { os: OsName; osVersion: string; osVersionName: string }
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
+| `ua` | `string` | Yes | UA string |
 
-**返回值：** `{ os: OsName; osVersion: string; osVersionName: string }`
+**Returns:** `{ os: OsName; osVersion: string; osVersionName: string }`
 
-**示例：**
+**Example:**
 
 ```typescript
 const { os, osVersion, osVersionName } = detectOS(navigator.userAgent)
@@ -536,7 +536,7 @@ const { os, osVersion, osVersionName } = detectOS(navigator.userAgent)
 
 ## `detectEngine(ua)` {#detectengine}
 
-独立渲染引擎检测器，不运行完整 `parseUA()` 流水线。
+Standalone rendering engine detector. Does not run the full `parseUA()` pipeline.
 
 ```typescript
 import { detectEngine } from 'ua-browser'
@@ -544,13 +544,13 @@ import { detectEngine } from 'ua-browser'
 detectEngine(ua: string): { engine: EngineName; engineVersion: string }
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
+| `ua` | `string` | Yes | User agent string |
 
-**返回值：** `{ engine: EngineName; engineVersion: string }`
+**Returns:** `{ engine: EngineName; engineVersion: string }`
 
-**示例：**
+**Example:**
 
 ```typescript
 const { engine, engineVersion } = detectEngine(navigator.userAgent)
@@ -561,7 +561,7 @@ const { engine, engineVersion } = detectEngine(navigator.userAgent)
 
 ## `detectVendorModel(ua)` {#detectvendormodel}
 
-独立设备厂商/型号提取器。
+Standalone device vendor/model extractor.
 
 ```typescript
 import { detectVendorModel } from 'ua-browser'
@@ -569,13 +569,13 @@ import { detectVendorModel } from 'ua-browser'
 detectVendorModel(ua: string): VendorModelResult
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
+| `ua` | `string` | Yes | User agent string |
 
-**返回值：** [`VendorModelResult`](/api/types#vendormodelresult)
+**Returns:** [`VendorModelResult`](/api/types#vendormodelresult)
 
-**示例：**
+**Example:**
 
 ```typescript
 const { vendor, model } = detectVendorModel(ua)
@@ -586,7 +586,7 @@ const { vendor, model } = detectVendorModel(ua)
 
 ## `detectDevice(ua)` {#detectdevice}
 
-独立设备类型检测器，不运行完整 `parseUA()` 流水线。仅基于 UA 字符串推断，不使用硬件信号。
+Standalone device type detector. Does not run the full `parseUA()` pipeline. UA-only — does not use hardware signals.
 
 ```typescript
 import { detectDevice } from 'ua-browser'
@@ -594,13 +594,13 @@ import { detectDevice } from 'ua-browser'
 detectDevice(ua: string): DeviceName
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `ua` | `string` | 是 | UA 字符串 |
+| `ua` | `string` | Yes | User agent string |
 
-**返回值：** [`DeviceName`](/api/types#devicename)
+**Returns:** [`DeviceName`](/api/types#devicename)
 
-**示例：**
+**Example:**
 
 ```typescript
 const device = detectDevice(navigator.userAgent)
@@ -611,7 +611,7 @@ const device = detectDevice(navigator.userAgent)
 
 ## `satisfies(info, criteria)` {#satisfies}
 
-条件匹配辅助函数。支持 TypeScript 类型检查，比手写 `&&` 链更简洁。
+Condition-matching helper. TypeScript-aware, cleaner than chaining `&&` expressions.
 
 ```typescript
 import { satisfies } from 'ua-browser'
@@ -619,31 +619,31 @@ import { satisfies } from 'ua-browser'
 satisfies(info: EnvOption, criteria: Partial<EnvOption>): boolean
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `info` | [`EnvOption`](/api/types#envoption) | 是 | `parseUA()` 或 `uaBrowser()` 的返回值 |
-| `criteria` | `Partial<EnvOption>` | 是 | 要匹配的字段子集 |
+| `info` | [`EnvOption`](/api/types#envoption) | Yes | Return value from `parseUA()` or `uaBrowser()` |
+| `criteria` | `Partial<EnvOption>` | Yes | Subset of fields to match against |
 
-**返回值：** `boolean`
+**Returns:** `boolean`
 
-**示例：**
+**Example:**
 
 ```typescript
 import uaBrowser, { satisfies } from 'ua-browser'
 
 const info = uaBrowser()
 
-// 等同于 info.os === 'iOS' && info.device === 'Mobile'
+// equivalent to: info.os === 'iOS' && info.device === 'Mobile'
 if (satisfies(info, { os: 'iOS', device: 'Mobile' })) {
   // ...
 }
 
-// 仅匹配 AI 爬虫
+// match AI crawlers only
 if (satisfies(info, { isBot: true, botCategory: 'ai-llm' })) {
   // ...
 }
 
-// 仅匹配 App 内嵌浏览器（微信、钉钉等）
+// match in-app browsers (WeChat, DingTalk, etc.)
 if (satisfies(info, { browserType: 'app' })) {
   // ...
 }
@@ -653,10 +653,10 @@ if (satisfies(info, { browserType: 'app' })) {
 
 ## `VERSION` {#version}
 
-当前库版本号字符串，与 `package.json` 中的 `version` 字段一致。
+The current library version string, matching `version` in `package.json`.
 
 ```typescript
 import { VERSION } from 'ua-browser'
 
-VERSION: string  // 例如 '2.0.0'
+VERSION: string  // e.g. '2.0.0'
 ```
