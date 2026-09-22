@@ -2,6 +2,7 @@
 node_modules
 dist
 docs/.vitepress/cache
+scripts
 
 # local env files
 .env.local
@@ -20,4 +21,4 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?docs/.vitepress/dist\ndocs/.vitepress/cache
+*.sw?

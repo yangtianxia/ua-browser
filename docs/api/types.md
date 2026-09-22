@@ -1,13 +1,13 @@
 ---
-title: 类型定义
-description: ua-browser TypeScript 类型定义，BrowserName、OsName、DeviceName、BotName 等精确字面量联合类型。
+title: Type Definitions
+description: ua-browser TypeScript types — BrowserName, OsName, DeviceName, BotName, EnvOption, and all literal union types with full definitions.
 ---
 
-# 类型定义
+# Type Definitions
 
 ## EnvOption
 
-`uaBrowser()` 和 `parseUA()` 的返回类型。
+The return type of `uaBrowser()` and `parseUA()`.
 
 ```typescript
 interface EnvOption {
@@ -16,19 +16,19 @@ interface EnvOption {
   versionMajor:   number
   browserType:    BrowserType      // 'browser' | 'brand' | 'app' | 'unknown'
   engine:         EngineName
-  engineVersion:  string           // 引擎版本，如 '537.36'、'605.1.15'
+  engineVersion:  string           // engine version, e.g. '537.36', '605.1.15'
   os:             OsName
   osVersion:      string
-  osVersionName:  string           // 如 'Sonoma'、'Windows 11'，无名称时为 'unknown'
+  osVersionName:  string           // e.g. 'Sonoma', 'Windows 11'; 'unknown' when unnamed
   device:         DeviceName
-  vendor:         string           // 设备厂商，如 'Samsung'、'Apple'，未知时为 'unknown'
-  model:          string           // 设备型号，如 'SM-G991B'、'iPhone'，未知时为 'unknown'
+  vendor:         string           // device manufacturer, e.g. 'Samsung', 'Apple'; 'unknown' when unrecognized
+  model:          string           // device model, e.g. 'SM-G991B', 'iPhone'; 'unknown' when unrecognized
   arch:           ArchName
   isWebview:      boolean
   isHeadless:     boolean
   isBot:          boolean
   botName:        BotName
-  botCategory:    BotCategory      // Bot 分类
+  botCategory:    BotCategory      // bot classification
   language:       string
   platform:       string
   connectionType: '4g' | '3g' | '2g' | 'slow-2g' | 'unknown'
@@ -60,7 +60,7 @@ type BrowserName =
   | 'unknown'
 ```
 
-> **Arc**：UA 包含 `Arc/X.X.X` 标记，纯 UA 检测。**Brave**：UA 与 Chrome 完全相同，仅在浏览器环境下通过 `navigator.brave.isBrave()` 识别（需使用 `uaBrowser.detect()` 或传入 `ctx`）。
+> **Arc**: UA contains the `Arc/X.X.X` token — pure UA detection. **Brave**: UA is identical to Chrome; only detectable in browser environments via `navigator.brave.isBrave()` (requires `uaBrowser.detect()` or passing `ctx`).
 
 ---
 
@@ -92,15 +92,15 @@ type OsName =
 type DeviceName = 'Mobile' | 'Tablet' | 'PC' | 'TV' | 'Console' | 'XR' | 'unknown'
 ```
 
-| 值 | 说明 |
+| Value | Description |
 | :-- | :-- |
-| `Mobile` | 手机 |
-| `Tablet` | 平板 |
-| `PC` | 桌面电脑 |
-| `TV` | 智能电视（Samsung Smart TV、HbbTV 等） |
-| `Console` | 游戏主机（PlayStation、Xbox、Nintendo Switch） |
-| `XR` | 扩展现实设备（Apple Vision Pro、Meta Quest） |
-| `unknown` | 无法识别 |
+| `Mobile` | Smartphone |
+| `Tablet` | Tablet |
+| `PC` | Desktop computer |
+| `TV` | Smart TV (Samsung Smart TV, HbbTV, etc.) |
+| `Console` | Game console (PlayStation, Xbox, Nintendo Switch) |
+| `XR` | Extended reality device (Apple Vision Pro, Meta Quest) |
+| `unknown` | Unrecognized |
 
 ---
 
@@ -116,24 +116,24 @@ type ArchName = 'x86' | 'x86_64' | 'arm' | 'arm64' | 'unknown'
 
 ```typescript
 type BotName =
-  // 搜索引擎
+  // Search engines
   | 'Googlebot' | 'Bingbot' | 'Baiduspider' | 'Bytespider'
   | 'YandexBot' | 'DuckDuckBot' | 'Slurp' | 'Sogou' | '360Spider' | 'PetalBot'
   | 'Applebot-Extended' | 'Applebot'
-  // 社交媒体爬虫
+  // Social media crawlers
   | 'Facebookbot' | 'Twitterbot' | 'LinkedInBot' | 'PinterestBot'
-  // 消息应用链接预览
+  // Messaging link preview bots
   | 'Slackbot' | 'Discordbot' | 'TelegramBot' | 'WhatsApp'
-  // SEO 工具
+  // SEO tools
   | 'SemrushBot' | 'AhrefsBot' | 'MJ12bot' | 'ScreamingFrog' | 'DataForSeoBot'
-  // AI / LLM 爬虫
+  // AI / LLM crawlers
   | 'GPTBot' | 'OAI-SearchBot' | 'ChatGPT-User'
   | 'ClaudeBot' | 'PerplexityBot' | 'CCBot' | 'AdsBot'
   | 'Google-Extended' | 'Meta-ExternalAgent' | 'Amazonbot'
   | 'Diffbot' | 'cohere-ai' | 'YouBot'
-  // 监控 / 存档
+  // Monitoring / archiving
   | 'UptimeRobot' | 'ia_archiver'
-  // 通用兜底
+  // Generic catch-all
   | 'GenericBot' | 'unknown'
 ```
 
@@ -143,13 +143,13 @@ type BotName =
 
 ```typescript
 type BotCategory =
-  | 'search-engine'   // Googlebot、Bingbot、Baiduspider 等
-  | 'ai-llm'          // GPTBot、ClaudeBot、PerplexityBot 等
-  | 'social'          // Facebookbot、Twitterbot、LinkedInBot 等
-  | 'link-preview'    // Slackbot、Discordbot、TelegramBot 等
-  | 'seo-tool'        // SemrushBot、AhrefsBot、MJ12bot 等
-  | 'monitoring'      // UptimeRobot、ia_archiver 等
-  | 'generic'         // GenericBot 通用捕获
+  | 'search-engine'   // Googlebot, Bingbot, Baiduspider, etc.
+  | 'ai-llm'          // GPTBot, ClaudeBot, PerplexityBot, etc.
+  | 'social'          // Facebookbot, Twitterbot, LinkedInBot, etc.
+  | 'link-preview'    // Slackbot, Discordbot, TelegramBot, etc.
+  | 'seo-tool'        // SemrushBot, AhrefsBot, MJ12bot, etc.
+  | 'monitoring'      // UptimeRobot, ia_archiver, etc.
+  | 'generic'         // GenericBot catch-all
   | 'unknown'
 ```
 
@@ -159,24 +159,24 @@ type BotCategory =
 
 ```typescript
 type BrowserType =
-  | 'browser'   // 标准/通用浏览器：Chrome、Firefox、Safari、Edge 等
-  | 'brand'     // 品牌/地区浏览器：UC、QQBrowser、360SE、华为浏览器 等
-  | 'app'       // App 内嵌浏览器：微信、钉钉、抖音、Bilibili 等
+  | 'browser'   // Standard browsers: Chrome, Firefox, Safari, Edge, etc.
+  | 'brand'     // Regional/OEM browsers: UC, QQBrowser, 360SE, Huawei Browser, etc.
+  | 'app'       // In-app browsers: WeChat, DingTalk, Douyin, Bilibili, etc.
   | 'unknown'
 ```
 
-由 `BROWSER_DEFS` 中的 `priority` 字段推导：≥500 为 `'app'`，≥300 为 `'brand'`，其余为 `'browser'`。
+Derived from the `priority` field in `BROWSER_DEFS`: ≥500 → `'app'`, ≥300 → `'brand'`, otherwise `'browser'`.
 
 ---
 
 ## VendorModelResult
 
-`detectVendorModel()` 的返回类型。
+Return type of `detectVendorModel()`.
 
 ```typescript
 interface VendorModelResult {
-  vendor: string   // 设备厂商，如 'Samsung'、'Apple'、'Google'，未知时为 'unknown'
-  model:  string   // 设备型号，如 'SM-G991B'、'iPhone'、'Pixel 7'，未知时为 'unknown'
+  vendor: string   // device manufacturer, e.g. 'Samsung', 'Apple', 'Google'; 'unknown' when unrecognized
+  model:  string   // device model, e.g. 'SM-G991B', 'iPhone', 'Pixel 7'; 'unknown' when unrecognized
 }
 ```
 
@@ -184,7 +184,7 @@ interface VendorModelResult {
 
 ## NavContext
 
-浏览器环境的可注入子集，用于隔离副作用、方便测试。`getNavContext()` 在浏览器中读取真实的 `navigator`，在 Node.js 中返回空对象。
+An injectable subset of the browser environment, used to isolate side effects and enable testing. `getNavContext()` reads the real `navigator` in browsers and returns an empty object in Node.js.
 
 ```typescript
 interface NavContext {
@@ -195,10 +195,10 @@ interface NavContext {
   maxTouchPoints:   number
   mimeTypes?:       MimeTypeArray
   connection?: {
-    saveData?:      boolean
-    effectiveType?: '4g' | '3g' | '2g' | 'slow-2g'  // Network Information API
-    rtt?:           number   // 往返时延（毫秒）
-    downlink?:      number   // 有效带宽（Mbps）
+    saveData?:       boolean
+    effectiveType?:  '4g' | '3g' | '2g' | 'slow-2g'  // Network Information API
+    rtt?:            number   // round-trip time in milliseconds
+    downlink?:       number   // effective bandwidth in Mbps
   }
   userAgentData?: {
     platform: string
@@ -211,48 +211,48 @@ interface NavContext {
 
 ## EnvContext
 
-继承自 `NavContext`，附加 `getEnvContext()` 采集的硬件与浏览器信号。传给 `parseUA({ ctx })` 以启用多信号检测。
+Extends `NavContext` with additional hardware and browser signals collected by `getEnvContext()`. Pass to `parseUA({ ctx })` for multi-signal detection.
 
 ```typescript
 interface EnvContext extends NavContext {
   // WebGL GPU
-  webglRenderer?:           string   // 如 'Adreno (TM) 730'、'Apple GPU'、'ANGLE (Intel...)'
-  webglVendor?:             string   // 如 'Qualcomm'、'Apple'、'Google Inc. (Intel)'
-  webglMaxTextureSize?:     number   // 移动端 ≤8192；桌面端 ≥16384
-  webglFragPrecision?:      number   // 片元着色器浮点精度
+  webglRenderer?:           string   // e.g. 'Adreno (TM) 730', 'Apple GPU', 'ANGLE (Intel...)'
+  webglVendor?:             string   // e.g. 'Qualcomm', 'Apple', 'Google Inc. (Intel)'
+  webglMaxTextureSize?:     number   // mobile ≤8192; desktop ≥16384
+  webglFragPrecision?:      number   // fragment shader float precision
   webglCompressedFormats?: {
-    s3tc:  boolean   // DXT/BC 格式——桌面 GPU（DirectX 系）
-    pvrtc: boolean   // PowerVR——仅 iOS
-    etc2:  boolean   // GLES 3.0+——Android（Adreno/Mali/PowerVR）
+    s3tc:  boolean   // DXT/BC formats — desktop GPU (DirectX lineage)
+    pvrtc: boolean   // PowerVR — iOS only
+    etc2:  boolean   // GLES 3.0+ — Android (Adreno/Mali/PowerVR)
     astc:  boolean   // Adreno 4xx+ / Mali Txx+ / Apple A8+
   }
 
-  // 屏幕与显示
-  devicePixelRatio?:   number   // 手机 ≥3，MacBook 2，外接显示器 1–2
+  // Screen & display
+  devicePixelRatio?:   number   // phone ≥3, MacBook 2, external monitor 1–2
   screenWidth?:        number
   screenHeight?:       number
-  safeAreaInsetTop?:   number   // >0 表示 iOS 刘海 / 灵动岛设备
+  safeAreaInsetTop?:   number   // >0 on iOS with notch / Dynamic Island
 
-  // 硬件 API
-  hardwareConcurrency?: number   // 逻辑 CPU 核心数
-  deviceMemory?:        number   // 内存 GB（取整值，如 4、8）
-  audioSampleRate?:     number   // 通常为 44100 或 48000
-  hasVibration?:        boolean  // navigator.vibrate 存在——仅移动端浏览器
-  hasDeviceMotion?:     boolean  // DeviceMotionEvent 可用——移动端传感器
+  // Hardware APIs
+  hardwareConcurrency?: number   // logical CPU cores
+  deviceMemory?:        number   // RAM in GB (rounded, e.g. 4, 8)
+  audioSampleRate?:     number   // typically 44100 or 48000
+  hasVibration?:        boolean  // navigator.vibrate present — mobile browsers only
+  hasDeviceMotion?:     boolean  // DeviceMotionEvent available — mobile sensor
 
-  // 输入
-  pointerType?:      'coarse' | 'fine' | 'none'  // 主指针精度
-  hoverCapability?:  boolean                       // 主输入设备是否支持 hover
+  // Input
+  pointerType?:      'coarse' | 'fine' | 'none'  // primary pointer precision
+  hoverCapability?:  boolean                       // primary input supports hover
 
-  // Client Hints（高熵值）
-  highEntropyData?: UAHighEntropyValues  // getHighEntropyValues() 的返回值
-  windowsVersion?:  string | null        // getWindowsVersion() 的解析结果
+  // Client Hints (high entropy)
+  highEntropyData?: UAHighEntropyValues  // result of getHighEntropyValues()
+  windowsVersion?:  string | null        // resolved by getWindowsVersion()
 
-  // 字体探针
-  fontProbes?: Record<string, boolean>  // 操作系统特有字体可用性
+  // Font probes
+  fontProbes?: Record<string, boolean>  // OS-specific font availability
 
-  // 浏览器特征
-  hasBrave?: boolean  // navigator.brave.isBrave() — 仅 Brave 浏览器返回 true
+  // Browser features
+  hasBrave?: boolean  // navigator.brave.isBrave() — true only in Brave browser
 }
 ```
 
@@ -260,14 +260,14 @@ interface EnvContext extends NavContext {
 
 ## ParseOptions
 
-`parseUA()` 的第二个参数。
+The second argument to `parseUA()`.
 
 ```typescript
 interface ParseOptions {
-  nav?:            NavContext           // 注入浏览器环境上下文（浏览器端按需传入）
-  windowsVersion?: string | null       // 预先 await getWindowsVersion() 的结果
-  ctx?:            EnvContext          // getEnvContext() 的返回值，优先级高于 nav 和 windowsVersion
-  customBotDefs?:  readonly BotDef[]   // 自定义 Bot 规则，插在 GenericBot 兜底之前
-  language?:       string              // 显式语言覆盖（BCP47），优先级最高，适合服务端传入 Accept-Language
+  nav?:            NavContext           // inject browser environment context
+  windowsVersion?: string | null       // pre-resolved result of getWindowsVersion()
+  ctx?:            EnvContext          // return value of getEnvContext(); takes priority over nav and windowsVersion
+  customBotDefs?:  readonly BotDef[]   // custom bot rules, inserted before the GenericBot catch-all
+  language?:       string              // explicit language override (BCP47), highest priority, useful for server-side Accept-Language
 }
 ```

@@ -1,16 +1,16 @@
 ---
-title: 环境上下文
-description: getEnvContext()、getNavContext()、getWindowsVersion() 和 getLanguage() 的 API 文档。
+title: Env Context — getEnvContext() and getNavContext()
+description: Signals a UA string can't see — GPU, screen, Client Hints, iOS 26's frozen version. Covers getEnvContext(), getNavContext(), getWindowsVersion(), getLanguage().
 ---
 
-# 环境上下文
+# Environment Context
 
 
 ---
 
 ## `getEnvContext()` {#getenvcontext}
 
-一次性采集当前浏览器的所有可用信号，返回 [`EnvContext`](/api/types#envcontext) 对象，再传给 `parseUA({ ctx })` 以启用多信号检测。
+Collects every available browser signal in one call and returns an [`EnvContext`](/api/types#envcontext) object — pass it to `parseUA({ ctx })` to enable multi-signal detection.
 
 ```typescript
 import { getEnvContext } from 'ua-browser'
@@ -18,30 +18,30 @@ import { getEnvContext } from 'ua-browser'
 getEnvContext(): Promise<EnvContext>
 ```
 
-**返回值：** `Promise<`[`EnvContext`](/api/types#envcontext)`>`
+**Returns:** `Promise<`[`EnvContext`](/api/types#envcontext)`>`
 
-**采集的信号：**
+**Signals it collects:**
 
-| 类别 | 信号 |
+| Category | Signals |
 | :-- | :-- |
-| Client Hints | `platform`、`platformVersion`、`architecture`、`fullVersionList` |
-| WebGL | GPU 渲染器 + 厂商、最大纹理尺寸、压缩纹理格式（ASTC/ETC2/PVRTC/S3TC） |
-| 屏幕 | `devicePixelRatio`、`screenWidth`、`screenHeight` |
-| CSS env | `safe-area-inset-top`（iOS 刘海 / 灵动岛） |
-| 硬件 API | `hardwareConcurrency`、`deviceMemory`、振动 API、DeviceMotion 事件 |
-| 输入 | `pointerType`（`coarse`/`fine`/`none`）、hover 能力 |
-| 网络 | `connection.effectiveType`、`connection.saveData` |
-| 音频 | 采样率 |
-| 字体 | 操作系统专属字体可用性探针 |
-| iOS 26 | CSS 特性检测（`isIOS26Plus`），用于修正 iOS 26+ 的冻结 UA |
+| Client Hints | `platform`, `platformVersion`, `architecture`, `fullVersionList` |
+| WebGL | GPU renderer + vendor, max texture size, compressed texture formats (ASTC/ETC2/PVRTC/S3TC) |
+| Screen | `devicePixelRatio`, `screenWidth`, `screenHeight` |
+| CSS env | `safe-area-inset-top` (iOS notch / Dynamic Island) |
+| Hardware APIs | `hardwareConcurrency`, `deviceMemory`, Vibration API, DeviceMotion events |
+| Input | `pointerType` (`coarse`/`fine`/`none`), hover capability |
+| Network | `connection.effectiveType`, `connection.saveData` |
+| Audio | Sample rate |
+| Fonts | OS-specific font availability probe |
+| iOS 26 | CSS feature detection (`isIOS26Plus`) to correct the frozen UA on iOS 26+ |
 
-::: warning iOS 26 版本检测说明
-从 iOS 26 起，Apple 将 UA 中的 `CPU iPhone OS` 冻结在 `18_7`，导致纯 UA 解析返回错误的系统版本。`getEnvContext()` 会通过 CSS 特性检测自动确认是否为 iOS 26+，并将 `osVersion` 修正为 `'26'`（主版本号）。
+::: warning iOS 26 version detection
+Since iOS 26, Apple freezes `CPU iPhone OS` in the UA at `18_7`, so pure UA parsing reports the wrong system version. `getEnvContext()` confirms iOS 26+ through CSS feature detection and corrects `osVersion` to `'26'` (the major version).
 
-若需获取精确的小版本号（`26.0`–`26.5`），请使用 [`probeIOS26Version()`](#probeios26version)。
+For the exact minor version (`26.0`–`26.5`), use [`probeIOS26Version()`](#probeios26version).
 :::
 
-**示例：**
+**Example:**
 
 ```typescript
 import { getEnvContext, parseUA } from 'ua-browser'
@@ -49,15 +49,15 @@ import { getEnvContext, parseUA } from 'ua-browser'
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
 
-console.log(result.device)   // 'Mobile' — 开了桌面模式也能正确识别
-console.log(result.arch)     // 'arm64'（Apple Silicon）或 'x86_64'（Intel）
+console.log(result.device)   // 'Mobile' — correct even in desktop mode
+console.log(result.arch)     // 'arm64' (Apple Silicon) or 'x86_64' (Intel)
 console.log(result.language) // 'zh-CN'
 ```
 
-**注意事项：**
-- 仅限浏览器环境。在 Node.js 中调用是安全的——所有 DOM 访问均有保护，返回 `undefined`，结果等同于 `getNavContext()`。
-- 每个 DOM API 均单独包裹在 `try/catch` 中，单个权限拒绝不会阻断其余信号采集。
-- 如果不需要复用 `ctx` 对象，直接使用 `uaBrowser.detect()` 更简洁。
+**Notes:**
+- Browser only. Safe to call in Node.js — every DOM access is guarded, `undefined` is returned, and the result is equivalent to `getNavContext()`.
+- Each DOM API is wrapped in its own `try/catch`, so a single denied permission does not block the remaining signals.
+- If you don't need to reuse the `ctx` object, `uaBrowser.detect()` is simpler.
 
 ---
 
@@ -65,7 +65,7 @@ console.log(result.language) // 'zh-CN'
 
 ## `getNavContext()` {#getnavcontext}
 
-读取当前浏览器的 `navigator`，返回 [`NavContext`](/api/types#navcontext) 对象。在 Node.js 中返回安全的空对象，调用方无需做环境判断。
+Reads the current browser's `navigator` and returns a [`NavContext`](/api/types#navcontext) object. In Node.js it returns a safe empty object, so callers need no environment checks.
 
 ```typescript
 import { getNavContext } from 'ua-browser'
@@ -73,9 +73,9 @@ import { getNavContext } from 'ua-browser'
 getNavContext(): NavContext
 ```
 
-**返回值：** [`NavContext`](/api/types#navcontext)
+**Returns:** [`NavContext`](/api/types#navcontext)
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
@@ -85,9 +85,9 @@ console.log(result.language) // 'zh-CN'
 console.log(result.platform) // 'Win32'
 ```
 
-**注意事项：**
-- 同时需要架构 / 设备精度信号时，优先使用 `getEnvContext()`。
-- `getNavContext()` 是同步的；`getEnvContext()` 是异步的。
+**Notes:**
+- When you also need architecture or device-precision signals, prefer `getEnvContext()`.
+- `getNavContext()` is synchronous; `getEnvContext()` is asynchronous.
 
 ---
 
@@ -95,7 +95,7 @@ console.log(result.platform) // 'Win32'
 
 ## `getWindowsVersion(nav)` {#getwindowsversion}
 
-异步获取精确的 Windows 版本，用于区分 Windows 10 与 Windows 11（两者 UA 字符串相同，均为 `Windows NT 10.0`）。
+Fetches the exact Windows version asynchronously, to tell Windows 10 from Windows 11 — their UA strings are identical (`Windows NT 10.0`).
 
 ```typescript
 import { getWindowsVersion, getNavContext, parseUA } from 'ua-browser'
@@ -103,26 +103,26 @@ import { getWindowsVersion, getNavContext, parseUA } from 'ua-browser'
 getWindowsVersion(nav: NavContext): Promise<string | null>
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文，传入 `getNavContext()` 的返回值 |
+| `nav` | [`NavContext`](/api/types#navcontext) | Yes | Browser context; pass the return value of `getNavContext()` |
 
-**返回值：** `Promise<string | null>` — 版本字符串（如 `'11'`、`'10'`）或 `null`（不可用时）
+**Returns:** `Promise<string | null>` — a version string (such as `'11'`, `'10'`), or `null` when unavailable
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
 const windowsVersion = await getWindowsVersion(nav)
 const result = parseUA(navigator.userAgent, { nav, windowsVersion })
 
-console.log(result.osVersion) // '11' 或 '10'
+console.log(result.osVersion) // '11' or '10'
 ```
 
-**注意事项：**
-- 依赖 `navigator.userAgentData.getHighEntropyValues()`（Chrome 90+、Edge 90+）。
-- Firefox、Safari 及 Node.js 返回 `null`，`osVersion` 回退到 UA 派生值。
-- `getEnvContext()` 内部已调用此函数；仅在需要 `NavContext` 级上下文而不想承担完整 `EnvContext` 开销时才单独使用。
+**Notes:**
+- Requires `navigator.userAgentData.getHighEntropyValues()` (Chrome 90+, Edge 90+).
+- Returns `null` on Firefox, Safari, and Node.js, in which case `osVersion` falls back to the UA-derived value.
+- `getEnvContext()` calls this internally; use it standalone only when you need `NavContext`-level context without paying for a full `EnvContext`.
 
 ---
 
@@ -130,7 +130,7 @@ console.log(result.osVersion) // '11' 或 '10'
 
 ## `getLanguage(nav)` {#getlanguage}
 
-从 [`NavContext`](/api/types#navcontext) 中提取标准化的浏览器语言。将语言标签规范化为 BCP 47 格式（如 `'en-us'` → `'en-US'`，`'ZH_CN'` → `'zh-CN'`）。
+Extracts a normalized browser language from a [`NavContext`](/api/types#navcontext). Normalizes the tag to BCP 47 form (e.g. `'en-us'` → `'en-US'`, `'ZH_CN'` → `'zh-CN'`).
 
 ```typescript
 import { getLanguage, getNavContext } from 'ua-browser'
@@ -138,13 +138,13 @@ import { getLanguage, getNavContext } from 'ua-browser'
 getLanguage(nav: NavContext): string
 ```
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 | :-- | :-- | :-- | :-- |
-| `nav` | [`NavContext`](/api/types#navcontext) | 是 | 浏览器上下文 |
+| `nav` | [`NavContext`](/api/types#navcontext) | Yes | Browser context |
 
-**返回值：** `string` — 标准化语言标签，如 `'zh-CN'`、`'en-US'`，不可用时返回 `'unknown'`。
+**Returns:** `string` — normalized language tag such as `'zh-CN'` or `'en-US'`; `'unknown'` when unavailable.
 
-**示例：**
+**Example:**
 
 ```typescript
 const nav = getNavContext()
@@ -157,9 +157,9 @@ console.log(getLanguage(nav)) // 'zh-CN'
 
 ## `probeIOS26Version()` {#probeios26version}
 
-通过 CSS / JavaScript 特性检测探测 iOS 26 的精确小版本号。返回 `'26.0'`–`'26.5'` 或 `null`（非 iOS 26+ 环境）。
+Probes the exact iOS 26 minor version through CSS / JavaScript feature detection. Returns `'26.0'`–`'26.5'`, or `null` outside an iOS 26+ environment.
 
-> **前提**：此函数仅在浏览器环境中有意义。在 Node.js 中始终返回 `null`。
+> **Requirement**: this function is only meaningful in a browser. It always returns `null` in Node.js.
 
 ```typescript
 import { probeIOS26Version } from 'ua-browser'
@@ -167,36 +167,36 @@ import { probeIOS26Version } from 'ua-browser'
 probeIOS26Version(): string | null
 ```
 
-**返回值：** `string | null`
+**Returns:** `string | null`
 
-**检测原理：**
+**How it decides:**
 
-| 返回值 | 判断依据 |
+| Return value | Evidence |
 | :-- | :-- |
-| `'26.5'` | `Origin` API 存在（Safari 26.5 新增） |
-| `'26.4'` | `PerformanceResourceTiming.finalResponseHeadersStart` 存在 |
-| `'26.3'` | `NavigateEvent.prototype.signal` 存在 |
-| `'26.2'` | `Math.sumPrecise` 存在 |
-| `'26.0'` | `CSS.supports('animation-timeline', 'view()')` 为 `true` |
-| `null` | 非 Safari/WebKit 26+（iOS 18 或以下） |
+| `'26.5'` | The `Origin` API exists (new in Safari 26.5) |
+| `'26.4'` | `PerformanceResourceTiming.finalResponseHeadersStart` exists |
+| `'26.3'` | `NavigateEvent.prototype.signal` exists |
+| `'26.2'` | `Math.sumPrecise` exists |
+| `'26.0'` | `CSS.supports('animation-timeline', 'view()')` is `true` |
+| `null` | Not Safari/WebKit 26+ (iOS 18 or earlier) |
 
-**示例：**
+**Example:**
 
 ```typescript
 import { probeIOS26Version, getEnvContext, parseUA } from 'ua-browser'
 
-// B 方案：getEnvContext 自动将 osVersion 修正为 '26'（主版本）
+// Option B: getEnvContext corrects osVersion to '26' (the major version) automatically
 const ctx = await getEnvContext()
 const result = parseUA(navigator.userAgent, { ctx })
-console.log(result.osVersion) // '26'（iOS 26+ 时）
+console.log(result.osVersion) // '26' on iOS 26+
 
-// A 方案：精确小版本
+// Option A: the exact minor version
 const exact = probeIOS26Version()
-console.log(exact) // '26.5'、'26.4'、'26.3'、'26.2'、'26.0' 或 null
+console.log(exact) // '26.5', '26.4', '26.3', '26.2', '26.0', or null
 ```
 
 ::: tip
-两者结合使用效果最佳：`parseUA` 负责所有字段的综合解析，`probeIOS26Version()` 仅在需要精确 iOS 26 小版本时单独调用。
+The two work best together: `parseUA` handles every field, and `probeIOS26Version()` is called separately when you need an exact iOS 26 minor version.
 :::
 
 ---

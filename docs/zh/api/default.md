@@ -1,6 +1,6 @@
 ---
-title: 默认导出
-description: uaBrowser() 同步检测和 uaBrowser.detect() 异步高精度检测的 API 文档。
+title: 默认导出 — uaBrowser() 与 detect()
+description: 该调用哪个入口：需要同步结果用 uaBrowser()，想要 Client Hints 与硬件信号带来的高精度用 uaBrowser.detect()。
 ---
 
 # 默认导出
@@ -18,7 +18,7 @@ import uaBrowser from 'ua-browser'
 uaBrowser(): EnvOption
 ```
 
-**返回值：** [`EnvOption`](/api/types#envoption)
+**返回值：** [`EnvOption`](/zh/api/types#envoption)
 
 **示例：**
 
@@ -31,7 +31,7 @@ console.log(info.os)      // 'Windows'
 **注意事项：**
 - 无法判断的字段返回 `'unknown'`，不会返回空字符串。
 - 在 Node.js 中 `navigator` 不可用，`language` 和 `platform` 将为 `'unknown'`。
-- 若需要解析任意 UA 字符串，请使用 [`parseUA()`](#parseua)。
+- 若需要解析任意 UA 字符串，请使用 [`parseUA()`](/zh/api/parse#parseua)。
 - 若需要更高精度，浏览器端请使用 [`uaBrowser.detect()`](#uabrowser-detect)。
 
 默认导出对象同时挂载了以下静态成员：
@@ -49,7 +49,7 @@ uaBrowser.VERSION: string
 
 ## `uaBrowser.detect()` {#uabrowser-detect}
 
-`uaBrowser()` 的异步高精度版本。内部先调用 [`getEnvContext()`](#getenvcontext) 采集硬件与浏览器信号，再执行解析，能更准确地识别设备类型和 CPU 架构。
+`uaBrowser()` 的异步高精度版本。内部先调用 [`getEnvContext()`](/zh/api/env#getenvcontext) 采集硬件与浏览器信号，再执行解析，能更准确地识别设备类型和 CPU 架构。
 
 **这是浏览器端代码的推荐入口。**
 
@@ -57,7 +57,7 @@ uaBrowser.VERSION: string
 uaBrowser.detect(): Promise<EnvOption>
 ```
 
-**返回值：** `Promise<`[`EnvOption`](/api/types#envoption)`>`
+**返回值：** `Promise<`[`EnvOption`](/zh/api/types#envoption)`>`
 
 **`detect()` 采集的信号：**
 

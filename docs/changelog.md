@@ -1,5 +1,6 @@
 ---
-title: 更新日志
+title: Changelog — ua-browser release history
+description: Upgrading? Every ua-browser release and its breaking changes, plus new browser, AI-bot, and webview detections — newest first.
 ---
 
-<!--@include: ../CHANGELOG.md-->
+<!--@include: ../CHANGELOG.en.md-->

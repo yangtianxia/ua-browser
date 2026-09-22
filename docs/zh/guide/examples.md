@@ -1,20 +1,20 @@
 ---
-title: Examples
-description: Real-world ua-browser examples — device detection, AI bot recognition, SSR detection, headless browser blocking, Windows 10/11 detection.
+title: 使用示例 — 设备、爬虫与 SSR 检测
+description: ua-browser 常见使用场景：设备类型检测、AI 爬虫识别、SSR 服务端检测、无头浏览器拦截、Windows 10/11 区分。
 ---
 
-# Examples
+# 使用示例
 
-## Device Redirect
+## 设备跳转
 
-### Accurate redirect (recommended)
+### 精准跳转（推荐）
 
-The synchronous `uaBrowser()` call cannot detect phones in desktop mode. Use `detect()` to identify the real device via hardware signals (CSS safe-area, device pixel ratio, etc.):
+`uaBrowser()` 同步调用无法识别开了桌面模式的手机。使用 `detect()` 可通过硬件信号（CSS safe-area、设备像素比等）识别真实设备：
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-// detect() correctly identifies mobile even when the user has enabled desktop mode
+// detect() 即使手机开了"请求桌面网站"也能正确识别为 Mobile
 const result = await uaBrowser.detect()
 
 if (result.device === 'Mobile' || result.device === 'Tablet') {
@@ -22,12 +22,12 @@ if (result.device === 'Mobile' || result.device === 'Tablet') {
 }
 ```
 
-### Quick redirect (when accuracy is not critical)
+### 快速跳转（不需要精确设备检测时）
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-// Sync, no waiting — but a phone in desktop mode is detected as 'PC'
+// 同步，无需等待；但开了桌面模式的手机会被识别为 PC
 const { device } = uaBrowser()
 
 if (device === 'Mobile' || device === 'Tablet') {
@@ -37,52 +37,52 @@ if (device === 'Mobile' || device === 'Tablet') {
 
 ---
 
-## Getting the Real Browser Version
+## 获取真实浏览器版本
 
-Chrome 109+ freezes the UA minor version to `0.0.0` (e.g. `149.0.0.0`). Use `detect()` when you need the real version:
+Chrome 109+ 将 UA 中的小版本冻结为 `0.0.0`（如 `149.0.0.0`）。需要真实版本时必须用 `detect()`：
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-// ❌ Sync: version = '149.0.0.0' (frozen UA value)
+// ❌ 同步：version = '149.0.0.0'（UA 冻结值）
 const sync = uaBrowser()
 console.log(sync.version) // '149.0.0.0'
 
-// ✅ Async: version = '149.0.7827.102' (real value from Client Hints)
+// ✅ 异步：version = '149.0.7827.102'（Client Hints 真实值）
 const result = await uaBrowser.detect()
 console.log(result.version)      // '149.0.7827.102'
 console.log(result.versionMajor) // 149
 
-// Load polyfills based on actual version
+// 按版本加载兼容代码
 if (result.browser === 'Safari' && result.versionMajor < 16) {
   await import('./polyfills/safari-legacy.js')
 }
 ```
 
-> **Note**: `detect()` requires HTTPS or localhost. On plain HTTP it falls back to frozen UA values.
+> **注意**：`detect()` 需要 HTTPS 或 localhost 环境，HTTP 下退回 UA 冻结值。
 
 ---
 
-## AI Crawler Recognition
+## 识别 AI 爬虫
 
-40+ built-in bot rules let you filter crawlers precisely in server middleware:
+库内置 40+ 爬虫规则，可在服务端中间件中精准过滤：
 
 ```typescript
 import { parseUA } from 'ua-browser'
 
-// Express / Koa middleware
+// Express / Koa 中间件
 function handleBots(req, res, next) {
   const ua = req.headers['user-agent'] ?? ''
   const { isBot, botName, botCategory } = parseUA(ua)
 
   if (!isBot) return next()
 
-  // AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.)
+  // AI 爬虫（GPTBot、ClaudeBot、PerplexityBot 等）
   if (botCategory === 'ai-llm') {
     return res.status(200).json({ allowed: false, reason: 'ai-crawler' })
   }
 
-  // Allow search engine crawlers through
+  // 搜索引擎爬虫放行
   if (botCategory === 'search-engine') {
     return next()
   }
@@ -94,9 +94,9 @@ function handleBots(req, res, next) {
 
 ---
 
-## Block Headless Browsers
+## 拦截无头浏览器
 
-Playwright and Puppeteer's default UAs are identical to real Chrome — use `isHeadless` to detect them:
+Playwright / Puppeteer 的默认 UA 与正常 Chrome 一致，需靠 `isHeadless` 标记识别：
 
 ```typescript
 import uaBrowser from 'ua-browser'
@@ -104,14 +104,14 @@ import uaBrowser from 'ua-browser'
 const { isHeadless, isBot } = uaBrowser()
 
 if (isHeadless) {
-  // Automated script / scraper
+  // 自动化脚本 / 爬虫
   document.body.innerHTML = 'Access denied.'
 }
 ```
 
 ---
 
-## SSR: Server-side Differential Rendering
+## SSR：服务端差异化渲染
 
 ```typescript
 import { parseUA } from 'ua-browser'
@@ -133,37 +133,37 @@ export async function getServerSideProps({ req }) {
 
 ---
 
-## SSR: Accurate Detection with Client Hints
+## SSR：Client Hints 精准检测
 
-Combine `Sec-CH-UA-*` headers in Express / Next.js to get real version, arch, and OS version:
+在 Express / Next.js 中结合 `Sec-CH-UA-*` 头，获取真实版本、架构和 OS 版本：
 
 ```typescript
 import { parseHeaders, ACCEPT_CH } from 'ua-browser'
 
-// First response: tell the browser to start sending Client Hints
+// 第一次响应：通知浏览器上报 Client Hints
 app.use((_req, res, next) => {
   res.setHeader('Accept-CH', ACCEPT_CH)
   next()
 })
 
-// Subsequent requests: get real version and architecture
+// 后续请求：获取真实版本和架构
 app.get('/api/info', (req, res) => {
   const result = parseHeaders(req.headers)
   res.json({
     browser:   result.browser,
-    version:   result.version,   // '149.0.7827.102' (not the frozen UA value)
+    version:   result.version,   // '149.0.7827.102'（非 UA 冻结值）
     os:        result.os,
-    osVersion: result.osVersion, // '26.5.1' (real macOS version)
-    arch:      result.arch,      // 'x86_64' (from Sec-CH-UA-Arch)
+    osVersion: result.osVersion, // '26.5.1'（macOS 真实版本）
+    arch:      result.arch,      // 'x86_64'（来自 Sec-CH-UA-Arch）
   })
 })
 ```
 
 ---
 
-## Accurate Windows 10 / 11 Detection
+## 精确区分 Windows 10 / 11
 
-Windows 10 and 11 share the same UA string — use `navigator.userAgentData` to tell them apart:
+Windows 10 和 11 的 UA 字符串完全相同，需借助 `navigator.userAgentData` 区分：
 
 ```typescript
 import { parseUA, getWindowsVersion, getNavContext } from 'ua-browser'
@@ -173,12 +173,12 @@ const windowsVersion = await getWindowsVersion(nav)
 const { os, osVersion } = parseUA(navigator.userAgent, { nav, windowsVersion })
 
 console.log(os)        // 'Windows'
-console.log(osVersion) // '11' or '10'
+console.log(osVersion) // '11' 或 '10'
 ```
 
 ---
 
-## Vue Composable
+## Vue 组合式函数
 
 ```typescript
 // composables/useBrowser.ts
@@ -191,7 +191,7 @@ export function useBrowser() {
   const loading = ref(true)
 
   onMounted(async () => {
-    // detect() for accurate version, device, and arch
+    // detect() 获取精准版本、设备、架构
     info.value = await uaBrowser.detect()
     loading.value = false
   })
@@ -229,7 +229,7 @@ export function useBrowser(): EnvOption | null {
   const [info, setInfo] = useState<EnvOption | null>(null)
 
   useEffect(() => {
-    // detect() collects hardware signals asynchronously
+    // detect() 异步采集硬件信号，获取精准结果
     uaBrowser.detect().then(setInfo)
   }, [])
 
@@ -255,14 +255,14 @@ export function BrowserInfo() {
 
 ---
 
-## Analytics Reporting
+## 统计上报
 
-Report real version and arch, not frozen UA values:
+上报真实版本和架构，而非 UA 冻结值：
 
 ```typescript
 import uaBrowser from 'ua-browser'
 
-// detect() for accurate data
+// detect() 获取真实数据
 const { browser, version, versionMajor, os, osVersion, device, arch } =
   await uaBrowser.detect()
 
@@ -275,19 +275,19 @@ fetch('/api/analytics', {
 
 ---
 
-## Tree-shakeable Individual Detectors
+## 按需使用独立检测器
 
-Import only the detection you need to keep your bundle lean:
+只需要单项检测能力时，按需导入减小打包体积：
 
 ```typescript
 import { detectBot, detectArch } from 'ua-browser'
 
 const ua = navigator.userAgent
 
-// Bot detection only
+// 只检测爬虫
 const { isBot, botName, botCategory } = detectBot(ua)
 
-// Arch detection only (UA-based, no Client Hints)
+// 只检测架构（UA 层，不含 Client Hints）
 const arch = detectArch(ua)
 // 'x86_64' | 'arm64' | 'arm' | 'x86' | 'unknown'
 ```

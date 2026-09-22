@@ -1,13 +1,15 @@
 ---
 layout: home
+title: User-Agent Parser for Browser & Node.js
+description: Zero-dependency TypeScript User-Agent parser — detects browser, OS, engine, device type, headless browsers, and AI bots in one call.
 
 hero:
   name: uaBrowser
-  text: 超越 UA 字符串的浏览器检测
-  tagline: UA 字符串会撒谎。ua-browser 结合硬件信号与 Client Hints，在 UA 失真时依然准确。零依赖，支持浏览器与 Node.js。
+  text: Browser Detection Beyond UA Strings
+  tagline: UA strings lie. ua-browser combines hardware signals and Client Hints to stay accurate when the UA string can't be trusted. Zero dependencies. Browser and Node.js.
   actions:
     - theme: brand
-      text: 快速开始
+      text: Get Started
       link: /guide/getting-started
     - theme: alt
       text: Playground
@@ -18,26 +20,26 @@ hero:
 
 features:
   - icon: 🛰️
-    title: 硬件信号检测
-    details: WebGL 渲染器、CSS safe-area-inset、设备像素比、振动 API——开了桌面模式的手机、Apple Silicon vs Intel，都能正确识别。
+    title: Hardware Signal Detection
+    details: WebGL renderer, CSS safe-area-inset, device pixel ratio, Vibration API — correctly identifies phones in desktop mode and distinguishes Apple Silicon from Intel Mac.
 
   - icon: 🔑
-    title: Client Hints 支持
-    details: 浏览器端通过 getHighEntropyValues 获取真实版本与架构；服务端通过 parseHeaders 读取 Sec-CH-UA-* 头，精准检测无需猜测。
+    title: Client Hints Support
+    details: In the browser, getHighEntropyValues returns real version and arch data. Server-side, parseHeaders reads Sec-CH-UA-* headers for precise detection without guesswork.
 
   - icon: 🤖
-    title: AI 爬虫识别
-    details: 内置 40+ 爬虫规则，涵盖 GPTBot、ClaudeBot、PerplexityBot、CCBot，以及 Slack、Discord、Telegram 等消息预览 Bot。
+    title: AI Bot Recognition
+    details: 40+ built-in bot rules covering GPTBot, ClaudeBot, PerplexityBot, CCBot, and messaging link-preview bots (Slack, Discord, Telegram, WhatsApp).
 
   - icon: 👻
-    title: 无头浏览器检测
-    details: 识别 HeadlessChrome、Playwright、Puppeteer、Electron、jsdom 等自动化环境，有效拦截非人类流量。
+    title: Headless Browser Detection
+    details: Identifies HeadlessChrome, Playwright, Puppeteer, Electron, jsdom, and Selenium environments to block non-human traffic.
 
   - icon: 🌲
     title: Tree-shakeable
-    details: 所有功能命名导出，按需引入单个检测器，Vite / Rollup / webpack 5+ 自动 tree-shake，不引入无用代码。
+    details: All features are named exports. Import only what you need — Vite, Rollup, and webpack 5+ eliminate unused code automatically.
 
   - icon: ⚡
-    title: 零依赖 · 极小体积
-    details: 无任何运行时依赖，gzip 后极小，浏览器与 Node.js 双环境可用，TypeScript 原生支持。
+    title: Zero Dependencies · Tiny Bundle
+    details: No runtime dependencies. Tiny after gzip. Works in browser and Node.js. Full TypeScript support with precise literal union types.
 ---
